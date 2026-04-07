@@ -635,9 +635,9 @@ function saveDraft() {
 function togglePublish() {
   if (!validate()) return;
   if (!document.getElementById('fAbstract').value.trim()) {
-    toast('El resumen es obligatorio para publicar');
-    document.getElementById('fAbstract').focus();
-    return;
+    // Warn but don't block — resumen es recomendado, no obligatorio
+    const ok = confirm('Este artículo no tiene resumen.\nEl resumen ayuda a los lectores a entender de qué trata el artículo.\n\n¿Publicar de todas formas?');
+    if (!ok) { document.getElementById('fAbstract').focus(); return; }
   }
 
   const existing = getAll().find(a => a.id === curId);

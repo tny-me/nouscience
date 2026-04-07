@@ -775,7 +775,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 });
 
 // ─── DYNAMIC ARTICLES ────────────────────────────────────────────────────────
-(function(){
+function loadDynamicArticles(){
   function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function fmtDate(iso){
     if(!iso)return'';
@@ -792,14 +792,23 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   let arts=[];
   try{arts=JSON.parse(localStorage.getItem('nit_articles')||'[]');}catch{}
   const published=arts.filter(a=>a.published);
-  if(!published.length)return;
-
-  // Update count
-  const countEl=document.getElementById('artCount');
-  if(countEl)countEl.textContent=published.length+' artículo'+(published.length===1?'':'s');
 
   const grid=document.getElementById('artGrid');
+  const countEl=document.getElementById('artCount');
   if(!grid)return;
+
+  if(!published.length){
+    // Restore static fallback if articles were unpublished
+    if(grid.dataset.dynamic==='1'){
+      location.reload();
+    }
+    return;
+  }
+
+  // Mark grid as dynamic so we know it's been replaced
+  grid.dataset.dynamic='1';
+
+  if(countEl)countEl.textContent=published.length+' artículo'+(published.length===1?'':'s');
 
   const featured=published.find(a=>a.featured)||published[0];
   const others=published.filter(a=>a.id!==featured.id).slice(0,2);
@@ -810,7 +819,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     <a href="article.html?id=${esc(featured.id)}" class="art-main">
       <div class="art-flag${cl?' '+cl:''}">✦ ${esc(featured.discipline||'Destacado')}</div>
       <h3 class="art-h">${esc(featured.title)}</h3>
-      <p class="art-exc">${esc(featured.abstract)}</p>
+      <p class="art-exc">${esc(featured.abstract||'')}</p>
       <div class="art-meta">
         <span class="art-mi">${esc(featured.discipline||'')}</span>
         ${featured.readTime?`<span class="art-md"></span><span class="art-mi">${esc(featured.readTime)} lectura</span>`:''}
@@ -824,7 +833,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     <a href="article.html?id=${esc(a.id)}" class="art-side">
       <div class="art-flag${c?' '+c:''}">✦ ${esc(a.discipline||'Artículo')}</div>
       <h3 class="art-h">${esc(a.title)}</h3>
-      <p class="art-exc">${esc(a.abstract)}</p>
+      <p class="art-exc">${esc(a.abstract||'')}</p>
       <div class="art-meta">
         <span class="art-mi">${a.readTime?esc(a.readTime)+' lectura':fmtDate(a.publishedAt)}</span>
         ${a.discipline?`<span class="art-md"></span><span class="art-mi">${esc(a.discipline)}</span>`:''}
@@ -832,7 +841,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     </a>`;
   });
 
-  // Fill empty side slots if less than 2 other articles
+  // Fill empty side slots if fewer than 2 side articles
   while(others.length<2){
     html+=`<div class="art-side" style="background:var(--bg);display:flex;align-items:center;justify-content:center;">
       <span style="font-size:11px;color:var(--ink4);letter-spacing:.08em;text-transform:uppercase;">Próximamente</span>
@@ -854,7 +863,15 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   html+=`</div>`;
 
   grid.innerHTML=html;
-})();
+}
+
+// Run on page load
+loadDynamicArticles();
+
+// Re-run automatically when articles change in another tab (admin.html)
+window.addEventListener('storage',function(e){
+  if(e.key==='nit_articles') loadDynamicArticles();
+});
 </script>
 </body>
 </html>
