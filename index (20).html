@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nouscience Institute of Theology</title>
+<meta name="description" content="El conocimiento de Dios, al alcance de todos."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#F5F4F0; --surface:#fff; --ink:#080806; --ink2:#2C2C28;
+  --ink3:#706F68; --ink4:#AEADA6; --blue:#1240AB; --bluemid:#1A52CC;
+  --bluepale:#EBF0FF; --amber:#D4820A; --amberpale:#FFF3DC;
+  --red:#C41E3A; --rule:#E2E0D8; --ruled:#C8C6BC;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:'Inter','Arial',sans-serif;
+  font-weight:300;line-height:1.65;overflow-x:hidden;
+}
+
+/* FONTS FALLBACK - if Google Fonts don't load, these still look great */
+@supports not (font-family: 'Syne') {
+  .syne { font-family: 'Arial Black', 'Impact', sans-serif; }
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.rev{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);}
+.rev.in{opacity:1;transform:none;}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--surface);border-bottom:1px solid var(--rule);
+  height:56px;display:flex;align-items:stretch;
+  animation:fadeIn .5s both;
+}
+.nav-brand{
+  display:flex;align-items:center;gap:0;padding:0 24px;
+  border-right:1px solid var(--rule);text-decoration:none;
+}
+.nav-block{width:5px;height:26px;background:var(--blue);margin-right:11px;flex-shrink:0;}
+.nav-main{
+  font-family:'Inter','Arial',sans-serif;font-weight:700;font-size:13px;
+  letter-spacing:.05em;color:var(--ink);text-transform:uppercase;
+  line-height:1;display:block;
+}
+.nav-sub{
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.14em;color:var(--blue);text-transform:uppercase;
+  line-height:1;display:block;margin-top:2px;
+}
+.nav-links{flex:1;display:flex;align-items:center;padding:0 24px;gap:2px;}
+.nav-link{
+  font-family:'Inter','Arial',sans-serif;font-size:11px;font-weight:500;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);
+  text-decoration:none;padding:0 14px;height:56px;display:flex;
+  align-items:center;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;
+}
+.nav-link:hover{color:var(--blue);border-color:var(--blue);}
+.nav-right{display:flex;align-items:center;padding:0 20px;gap:10px;border-left:1px solid var(--rule);}
+.nav-cta{
+  font-family:'Inter','Arial',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;background:var(--blue);
+  color:#fff;text-decoration:none;padding:8px 18px;transition:background .2s;white-space:nowrap;
+}
+.nav-cta:hover{background:var(--bluemid);}
+
+/* HERO */
+.hero{
+  margin-top:56px;background:var(--ink);position:relative;overflow:hidden;
+  min-height:88vh;display:grid;grid-template-columns:1fr 380px;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:80px 80px;pointer-events:none;
+}
+.hero-main{
+  padding:80px;display:flex;flex-direction:column;
+  justify-content:space-between;border-right:1px solid rgba(255,255,255,.07);
+  position:relative;z-index:1;
+}
+.hero-label{
+  font-family:'Inter','Arial',sans-serif;font-size:11px;
+  letter-spacing:.15em;color:var(--bluemid);text-transform:uppercase;
+  margin-bottom:32px;display:flex;align-items:center;gap:10px;
+  animation:fadeUp .7s .2s both;
+}
+.hero-dot{width:6px;height:6px;background:var(--bluemid);border-radius:50%;}
+.hero-h1{
+  font-family:'Inter','Arial',sans-serif;font-weight:800;
+  font-size:clamp(48px,6.5vw,84px);line-height:1.0;letter-spacing:-.02em;
+  color:#fff;margin-bottom:40px;animation:fadeUp .7s .35s both;
+}
+.hero-h1 .accent{color:var(--amber);}
+.hero-h1 .dim{color:rgba(255,255,255,.3);display:block;font-weight:700;}
+.hero-desc{
+  font-family:'Inter','Arial',sans-serif;font-size:17px;font-weight:300;
+  line-height:1.75;color:rgba(255,255,255,.5);max-width:520px;margin-bottom:44px;
+  animation:fadeUp .7s .5s both;
+}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;animation:fadeUp .7s .65s both;}
+.btn-p{
+  font-family:'Inter','Arial',sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;background:var(--blue);color:#fff;
+  text-decoration:none;padding:13px 28px;transition:background .2s,transform .2s;
+  display:inline-block;
+}
+.btn-p:hover{background:var(--bluemid);transform:translateY(-1px);}
+.btn-s{
+  font-family:'Inter','Arial',sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;background:transparent;
+  color:rgba(255,255,255,.55);text-decoration:none;padding:13px 28px;
+  border:1px solid rgba(255,255,255,.14);transition:all .2s;display:inline-block;
+}
+.btn-s:hover{border-color:rgba(255,255,255,.35);color:#fff;}
+.hero-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid rgba(255,255,255,.07);margin-top:72px;
+  animation:fadeUp .7s .8s both;
+}
+.hstat{padding:24px 0;border-right:1px solid rgba(255,255,255,.07);}
+.hstat:last-child{border-right:none;}
+.hstat+.hstat{padding-left:28px;}
+.hstat-n{
+  font-family:'Inter','Arial',sans-serif;font-weight:800;font-size:40px;
+  color:#fff;letter-spacing:-.02em;line-height:1;display:block;
+}
+.hstat-l{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);
+  margin-top:5px;display:block;
+}
+
+/* HERO SIDEBAR */
+.hero-side{
+  background:rgba(255,255,255,.03);padding:52px 36px;
+  display:flex;flex-direction:column;position:relative;z-index:1;
+  animation:fadeIn .8s .5s both;
+}
+.side-label{
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--bluemid);
+  margin-bottom:20px;display:flex;align-items:center;gap:8px;
+}
+.side-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07);}
+.side-verse{flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 0;}
+.side-verse-t{
+  font-family:'Inter','Arial',sans-serif;font-size:19px;font-weight:300;
+  font-style:italic;line-height:1.6;color:rgba(255,255,255,.82);margin-bottom:18px;
+}
+.side-verse-r{
+  font-family:'Inter','Arial',sans-serif;font-size:11px;
+  letter-spacing:.12em;color:var(--amber);
+}
+.side-div{height:1px;background:rgba(255,255,255,.07);margin:24px 0;}
+.side-topics{display:flex;flex-direction:column;gap:1px;}
+.side-topic{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  cursor:pointer;transition:background .2s;text-decoration:none;
+}
+.side-topic:hover{background:rgba(255,255,255,.04);}
+.topic-bar{width:3px;height:16px;background:var(--blue);flex-shrink:0;}
+.topic-bar.a{background:var(--amber);} .topic-bar.r{background:var(--red);}
+.topic-nm{
+  font-family:'Inter','Arial',sans-serif;font-size:12px;font-weight:500;
+  color:rgba(255,255,255,.55);flex:1;
+}
+.topic-ct{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  color:rgba(255,255,255,.18);
+}
+
+/* FILTER BAR */
+.filterbar{
+  background:var(--surface);border-bottom:1px solid var(--rule);
+  padding:0 80px;height:44px;display:flex;align-items:center;justify-content:space-between;
+}
+.fb-left{display:flex;align-items:center;gap:20px;}
+.fb-lbl{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--ink4);
+}
+.fb-tags{display:flex;gap:6px;}
+.fb-tag{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.08em;color:var(--blue);background:var(--bluepale);
+  padding:3px 10px;cursor:pointer;transition:background .2s;border:none;
+}
+.fb-tag:hover{background:#D6E2FF;}
+.fb-tag.on{background:var(--blue);color:#fff;}
+.fb-r{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  color:var(--ink4);letter-spacing:.08em;
+}
+
+/* ARTICLES */
+.articles{padding:80px;background:var(--bg);}
+.sec-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:36px;padding-bottom:14px;border-bottom:2px solid var(--ink);
+}
+.sec-left{display:flex;align-items:baseline;gap:14px;}
+.sec-ey{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--blue);
+}
+.sec-h{
+  font-family:'Inter','Arial',sans-serif;font-weight:700;font-size:22px;
+  letter-spacing:-.01em;color:var(--ink);
+}
+.sec-all{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--blue);text-decoration:none;
+  display:flex;align-items:center;gap:5px;transition:gap .2s;
+}
+.sec-all:hover{gap:9px;}
+.sec-all::after{content:'→';}
+
+/* Article Grid */
+.art-grid{
+  display:grid;grid-template-columns:1fr 1fr 300px;
+  gap:1px;background:var(--rule);
+}
+.art-main{
+  background:var(--surface);padding:40px;text-decoration:none;
+  display:block;position:relative;overflow:hidden;transition:background .2s;
+  grid-row:span 2;
+}
+.art-main:hover{background:#FAFAF8;}
+.art-side{
+  background:var(--surface);padding:32px;text-decoration:none;
+  display:block;transition:background .2s;border-bottom:1px solid var(--rule);
+}
+.art-side:last-of-type{border-bottom:none;}
+.art-side:hover{background:#FAFAF8;}
+.art-list{background:var(--surface);padding:32px;grid-row:span 2;}
+.art-flag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.15em;text-transform:uppercase;color:#fff;
+  background:var(--blue);padding:4px 10px;margin-bottom:18px;
+}
+.art-flag.am{background:var(--amber);}
+.art-flag.rd{background:var(--red);}
+.art-h{
+  font-family:'Inter','Arial',sans-serif;font-weight:700;font-size:17px;
+  line-height:1.25;letter-spacing:-.02em;color:var(--ink);margin-bottom:12px;
+}
+.art-main .art-h{font-size:30px;}
+.art-exc{
+  font-family:'Inter','Arial',sans-serif;font-size:14px;font-weight:300;
+  line-height:1.7;color:var(--ink3);margin-bottom:22px;
+}
+.art-meta{display:flex;align-items:center;gap:12px;}
+.art-mi{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.07em;color:var(--ink4);display:flex;align-items:center;gap:4px;
+}
+.art-md{width:3px;height:3px;background:var(--ruled);border-radius:50%;}
+.art-list-lbl{
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--ink4);
+  padding-bottom:14px;border-bottom:1px solid var(--rule);margin-bottom:18px;
+}
+.art-li{
+  display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);
+  text-decoration:none;transition:opacity .2s;
+}
+.art-li:hover{opacity:.65;}
+.art-li:last-child{border-bottom:none;}
+.art-li-n{
+  font-family:'Inter','Arial',sans-serif;font-weight:800;font-size:26px;
+  color:var(--rule);letter-spacing:-.02em;line-height:1;flex-shrink:0;width:32px;
+}
+.art-li-t{
+  font-family:'Inter','Arial',sans-serif;font-weight:600;font-size:13px;
+  line-height:1.35;color:var(--ink);margin-bottom:5px;
+}
+.art-li-tag{
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.1em;color:var(--blue);
+}
+
+/* DISCIPLINES */
+.disciplines{background:var(--surface);padding:80px;border-top:1px solid var(--rule);}
+.disc-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--rule);margin-top:36px;
+}
+.disc-card{
+  background:var(--surface);padding:32px 28px;cursor:pointer;
+  transition:background .2s;position:relative;overflow:hidden;
+}
+.disc-card:hover{background:var(--bg);}
+.disc-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--blue);transform:scaleX(0);transform-origin:left;
+  transition:transform .3s cubic-bezier(.16,1,.3,1);
+}
+.disc-card:hover::before{transform:scaleX(1);}
+.disc-card.am::before{background:var(--amber);}
+.disc-card.rd::before{background:var(--red);}
+.disc-n{
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.2em;color:var(--ink4);margin-bottom:18px;display:block;
+}
+.disc-nm{
+  font-family:'Inter','Arial',sans-serif;font-weight:700;font-size:17px;
+  letter-spacing:-.01em;color:var(--ink);margin-bottom:7px;
+}
+.disc-sub{
+  font-family:'Inter','Arial',sans-serif;font-size:11px;font-style:italic;
+  color:var(--ink4);margin-bottom:12px;
+}
+.disc-d{font-size:13px;line-height:1.6;color:var(--ink3);margin-bottom:18px;}
+.disc-q{
+  font-family:'Inter','Arial',sans-serif;font-size:11px;font-weight:600;color:var(--blue);
+}
+.disc-card.am .disc-q{color:var(--amber);}
+.disc-card.rd .disc-q{color:var(--red);}
+
+/* MANIFESTO */
+.manifesto{
+  background:var(--ink);padding:96px 80px;
+  display:grid;grid-template-columns:5fr 4fr;gap:80px;align-items:center;
+}
+.m-ey{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--bluemid);
+  margin-bottom:22px;display:flex;align-items:center;gap:10px;
+}
+.m-ey::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
+.m-h{
+  font-family:'Inter','Arial',sans-serif;font-weight:800;
+  font-size:clamp(34px,4vw,52px);letter-spacing:-.02em;line-height:1.1;
+  color:#fff;margin-bottom:26px;
+}
+.m-h .hl{color:var(--amber);}
+.m-b{
+  font-family:'Inter','Arial',sans-serif;font-size:16px;font-weight:300;
+  line-height:1.8;color:rgba(255,255,255,.45);margin-bottom:36px;
+}
+.m-verse{
+  font-family:'Inter','Arial',sans-serif;font-size:17px;font-style:italic;
+  font-weight:300;color:rgba(255,255,255,.78);
+  border-left:3px solid var(--amber);padding:14px 22px;background:rgba(255,255,255,.03);
+}
+.m-verse small{
+  display:block;font-family:'Inter','Arial',sans-serif;font-size:10px;
+  font-style:normal;letter-spacing:.15em;color:var(--amber);margin-top:8px;
+}
+.pillars{display:flex;flex-direction:column;}
+.pill{
+  padding:26px 0;border-bottom:1px solid rgba(255,255,255,.06);
+  display:grid;grid-template-columns:52px 1fr;gap:18px;
+}
+.pill:first-child{padding-top:0;}
+.pill:last-child{border-bottom:none;}
+.pill-n{
+  font-family:'Inter','Arial',sans-serif;font-weight:800;font-size:34px;
+  color:rgba(255,255,255,.07);letter-spacing:-.02em;line-height:1;
+}
+.pill-t{
+  font-family:'Inter','Arial',sans-serif;font-weight:600;font-size:14px;
+  letter-spacing:-.01em;color:rgba(255,255,255,.88);margin-bottom:5px;
+}
+.pill-d{font-size:13px;line-height:1.6;color:rgba(255,255,255,.32);}
+
+/* SUBSCRIBE */
+.subscribe{
+  background:var(--blue);padding:80px;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
+}
+.sub-ey{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:14px;
+}
+.sub-h{
+  font-family:'Inter','Arial',sans-serif;font-weight:800;
+  font-size:clamp(30px,3.5vw,46px);letter-spacing:-.02em;line-height:1.1;color:#fff;
+}
+.sub-d{
+  font-family:'Inter','Arial',sans-serif;font-size:15px;font-weight:300;
+  line-height:1.7;color:rgba(255,255,255,.55);margin-bottom:26px;
+}
+.sub-form{display:flex;}
+.sub-inp{
+  flex:1;font-family:'Inter','Arial',sans-serif;font-size:13px;
+  padding:13px 16px;border:1px solid rgba(255,255,255,.15);border-right:none;
+  background:rgba(255,255,255,.1);color:#fff;outline:none;transition:background .2s;
+}
+.sub-inp:focus{background:rgba(255,255,255,.15);}
+.sub-inp::placeholder{color:rgba(255,255,255,.28);}
+.sub-btn{
+  font-family:'Inter','Arial',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;background:#fff;color:var(--blue);
+  border:none;padding:13px 24px;cursor:pointer;transition:background .2s;white-space:nowrap;
+}
+.sub-btn:hover{background:var(--bluepale);}
+.sub-note{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.07em;color:rgba(255,255,255,.28);margin-top:10px;
+}
+
+/* FOOTER */
+footer{background:#06060A;}
+.ft{
+  display:grid;grid-template-columns:260px 1fr 1fr 1fr;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.ft-brand{padding:56px 44px 56px 80px;border-right:1px solid rgba(255,255,255,.05);}
+.ft-logo{display:flex;align-items:center;gap:9px;margin-bottom:18px;}
+.ft-lb{width:4px;height:22px;background:var(--blue);}
+.ft-lm{
+  font-family:'Inter','Arial',sans-serif;font-weight:700;font-size:13px;
+  letter-spacing:.05em;text-transform:uppercase;color:#fff;line-height:1;display:block;
+}
+.ft-ls{
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.15em;color:var(--bluemid);text-transform:uppercase;
+  line-height:1;display:block;margin-top:2px;
+}
+.ft-desc{font-size:12px;line-height:1.7;color:rgba(255,255,255,.22);margin-bottom:20px;}
+.ft-issn{
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.14em;color:rgba(255,255,255,.12);
+}
+.ft-col{padding:56px 36px;border-right:1px solid rgba(255,255,255,.05);}
+.ft-col:last-child{border-right:none;}
+.ft-ct{
+  font-family:'Inter','Arial',sans-serif;font-size:9px;
+  letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.28);
+  margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.05);
+}
+.ft-links{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.ft-links a{
+  font-family:'Inter','Arial',sans-serif;font-size:13px;font-weight:500;
+  color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s;
+  display:flex;align-items:center;gap:7px;
+}
+.ft-links a:hover{color:#fff;}
+.ft-links a::before{
+  content:'';width:10px;height:1px;background:rgba(255,255,255,.12);
+  flex-shrink:0;transition:width .2s,background .2s;
+}
+.ft-links a:hover::before{width:16px;background:var(--bluemid);}
+.ft-bot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 80px;
+}
+.ft-copy{
+  font-family:'Inter','Arial',sans-serif;font-size:10px;
+  letter-spacing:.09em;color:rgba(255,255,255,.12);
+}
+.ft-motto{
+  font-family:'Inter','Arial',sans-serif;font-size:12px;font-style:italic;
+  color:rgba(255,255,255,.12);
+}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .hero{grid-template-columns:1fr;}
+  .hero-side{display:none;}
+  .hero-main{padding:60px 40px;}
+  .articles,.disciplines,.manifesto{padding:60px 40px;}
+  .filterbar{padding:0 40px;}
+  .art-grid{grid-template-columns:1fr 1fr;}
+  .art-main{grid-column:span 2;grid-row:auto;}
+  .art-list{display:none;}
+  .disc-grid{grid-template-columns:1fr 1fr;}
+  .manifesto{grid-template-columns:1fr;gap:48px;}
+  .subscribe{grid-template-columns:1fr;gap:32px;padding:60px 40px;}
+  .ft{grid-template-columns:1fr 1fr;}
+  .ft-brand{padding:48px 40px;}
+  .ft-bot{padding:18px 40px;}
+}
+@media(max-width:700px){
+  .nav-links,.nav-right .nav-link{display:none;}
+  .hero-main{padding:44px 20px;}
+  .hero-stats{grid-template-columns:1fr 1fr;}
+  .articles,.disciplines{padding:44px 20px;}
+  .art-grid{grid-template-columns:1fr;}
+  .art-main{grid-column:auto;}
+  .disc-grid{grid-template-columns:1fr;}
+  .manifesto,.subscribe{padding:44px 20px;}
+  .sub-form{flex-direction:column;}
+  .sub-inp{border-right:1px solid rgba(255,255,255,.15);border-bottom:none;}
+  .ft{grid-template-columns:1fr;}
+  .ft-brand{padding:40px 20px;}
+  .ft-col{padding:32px 20px;}
+  .ft-bot{flex-direction:column;gap:8px;padding:16px 20px;text-align:center;}
+  .filterbar{padding:0 20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">
+    <div class="nav-block"></div>
+    <div>
+      <span class="nav-main">Nouscience</span>
+      <span class="nav-sub">Institute of Theology</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#articles" class="nav-link">Artículos</a>
+    <a href="#disciplines" class="nav-link">Disciplinas</a>
+    <a href="#manifesto" class="nav-link">Misión</a>
+    <a href="#subscribe" class="nav-link">Biblioteca</a>
+  </div>
+  <div class="nav-right">
+    <a href="#subscribe" class="nav-cta">Suscribirse →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-main">
+    <div>
+      <div class="hero-label"><span class="hero-dot"></span>Nouscience Institute of Theology · Est. 2025</div>
+      <h1 class="hero-h1">
+        El conocimiento<br/>
+        de <span class="accent">Dios,</span><br/>
+        <span class="dim">al alcance de todos.</span>
+      </h1>
+      <p class="hero-desc">
+        Estudios teológicos rigurosos fundados directamente en las Sagradas Escrituras.
+        La referencia para iglesias, líderes y todo aquel que busca a Dios
+        con inteligencia y corazón genuino.
+      </p>
+      <div class="hero-btns">
+        <a href="#articles" class="btn-p">Explorar Artículos →</a>
+        <a href="#disciplines" class="btn-s">Ver Disciplinas</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat">
+        <span class="hstat-n">12</span>
+        <span class="hstat-l">Disciplinas</span>
+      </div>
+      <div class="hstat">
+        <span class="hstat-n">66</span>
+        <span class="hstat-l">Libros Bíblicos</span>
+      </div>
+      <div class="hstat">
+        <span class="hstat-n">∞</span>
+        <span class="hstat-l">Profundidad</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-side">
+    <div class="side-label">Versículo del Día</div>
+    <div class="side-verse">
+      <p class="side-verse-t">"Me buscaréis y me encontraréis cuando me busquéis de todo corazón."</p>
+      <span class="side-verse-r">— Jeremías 29:13</span>
+    </div>
+    <div class="side-div"></div>
+    <div class="side-label">Disciplinas</div>
+    <div class="side-topics">
+      <a href="#" class="side-topic"><div class="topic-bar"></div><span class="topic-nm">Teología Bíblica</span><span class="topic-ct">12</span></a>
+      <a href="#" class="side-topic"><div class="topic-bar"></div><span class="topic-nm">Cristología</span><span class="topic-ct">8</span></a>
+      <a href="#" class="side-topic"><div class="topic-bar a"></div><span class="topic-nm">Teología Moral</span><span class="topic-ct">6</span></a>
+      <a href="#" class="side-topic"><div class="topic-bar r"></div><span class="topic-nm">Apologética</span><span class="topic-ct">5</span></a>
+      <a href="#" class="side-topic"><div class="topic-bar"></div><span class="topic-nm">Soteriología</span><span class="topic-ct">4</span></a>
+      <a href="#" class="side-topic"><div class="topic-bar a"></div><span class="topic-nm">Angelología</span><span class="topic-ct">3</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filterbar">
+  <div class="fb-left">
+    <span class="fb-lbl">Filtrar</span>
+    <div class="fb-tags">
+      <button class="fb-tag on" onclick="ftag(this)">Todos</button>
+      <button class="fb-tag" onclick="ftag(this)">Bíblica</button>
+      <button class="fb-tag" onclick="ftag(this)">Sistemática</button>
+      <button class="fb-tag" onclick="ftag(this)">Moral</button>
+      <button class="fb-tag" onclick="ftag(this)">Apologética</button>
+    </div>
+  </div>
+  <span class="fb-r">47 artículos</span>
+</div>
+
+<!-- ARTICLES -->
+<section class="articles" id="articles">
+  <div class="sec-head rev">
+    <div class="sec-left"><span class="sec-ey">01 /</span><h2 class="sec-h">Artículos Recientes</h2></div>
+    <a href="#" class="sec-all">Ver todos</a>
+  </div>
+  <div class="art-grid rev">
+    <a href="#" class="art-main">
+      <div class="art-flag">✦ Destacado</div>
+      <h3 class="art-h">¿Qué es Dios? Su Naturaleza, Atributos y el Misterio de la Trinidad</h3>
+      <p class="art-exc">Desde que el ser humano abrió los ojos al mundo, una pregunta ha resonado en lo más profundo de su corazón. Una exploración profunda de la naturaleza divina desde las Sagradas Escrituras, los idiomas originales y los grandes pensadores de la fe cristiana.</p>
+      <div class="art-meta">
+        <span class="art-mi">Teología Sistemática</span>
+        <span class="art-md"></span>
+        <span class="art-mi">15 min lectura</span>
+        <span class="art-md"></span>
+        <span class="art-mi">Fundamento</span>
+      </div>
+    </a>
+    <a href="#" class="art-side">
+      <div class="art-flag am">Angelología</div>
+      <h3 class="art-h">El Mundo Invisible: Ángeles, Jerarquías y la Guerra Espiritual</h3>
+      <p class="art-exc">Existe un mundo invisible, poblado de seres poderosos que operan en la historia humana ahora mismo.</p>
+      <div class="art-meta"><span class="art-mi">20 min</span><span class="art-md"></span><span class="art-mi">Teología Bíblica</span></div>
+    </a>
+    <a href="#" class="art-side">
+      <div class="art-flag rd">Cristología</div>
+      <h3 class="art-h">Pedro: El Pescador que Dios Convirtió en Roca de Su Iglesia</h3>
+      <p class="art-exc">Un hombre que negó a Cristo tres veces terminó muriendo por Él. La transformación más extraordinaria de la historia.</p>
+      <div class="art-meta"><span class="art-mi">12 min</span><span class="art-md"></span><span class="art-mi">Teología Histórica</span></div>
+    </a>
+    <div class="art-list">
+      <div class="art-list-lbl">Más Leídos</div>
+      <a href="#" class="art-li"><span class="art-li-n">01</span><div><div class="art-li-t">La Angelología y el Mundo de los Espíritus</div><span class="art-li-tag">Teología Bíblica</span></div></a>
+      <a href="#" class="art-li"><span class="art-li-n">02</span><div><div class="art-li-t">¿Qué Dice la Biblia Sobre el Matrimonio?</div><span class="art-li-tag">Teología Moral</span></div></a>
+      <a href="#" class="art-li"><span class="art-li-n">03</span><div><div class="art-li-t">Los Atributos Omni de Dios</div><span class="art-li-tag">Teología Propia</span></div></a>
+      <a href="#" class="art-li"><span class="art-li-n">04</span><div><div class="art-li-t">La Trinidad: Un Solo Dios en Tres Personas</div><span class="art-li-tag">Cristología</span></div></a>
+      <a href="#" class="art-li"><span class="art-li-n">05</span><div><div class="art-li-t">¿Por Qué Estudiar Teología?</div><span class="art-li-tag">Introducción</span></div></a>
+    </div>
+  </div>
+</section>
+
+<!-- DISCIPLINES -->
+<section class="disciplines" id="disciplines">
+  <div class="sec-head rev">
+    <div class="sec-left"><span class="sec-ey">02 /</span><h2 class="sec-h">Disciplinas Teológicas</h2></div>
+    <a href="#" class="sec-all">Ver todas</a>
+  </div>
+  <div class="disc-grid rev">
+    <div class="disc-card"><span class="disc-n">01 — FUNDAMENTO</span><h3 class="disc-nm">Teología Bíblica</h3><div class="disc-sub">Biblical Theology</div><p class="disc-d">El estudio directo del texto sagrado en su idioma y contexto original. La base de todo conocimiento teológico serio.</p><div class="disc-q">¿Qué dijo Dios exactamente?</div></div>
+    <div class="disc-card"><span class="disc-n">02 — SISTEMA</span><h3 class="disc-nm">Teología Sistemática</h3><div class="disc-sub">Systematic Theology</div><p class="disc-d">Organización coherente de toda la verdad bíblica en un sistema doctrinal completo y riguroso.</p><div class="disc-q">¿Cómo se organiza la verdad?</div></div>
+    <div class="disc-card am"><span class="disc-n">03 — PERSONA</span><h3 class="disc-nm">Cristología</h3><div class="disc-sub">Christology</div><p class="disc-d">La doctrina de Jesucristo — su naturaleza divina y humana perfectamente unidas en una sola persona eterna.</p><div class="disc-q">¿Quién es Jesucristo?</div></div>
+    <div class="disc-card"><span class="disc-n">04 — SALVACIÓN</span><h3 class="disc-nm">Soteriología</h3><div class="disc-sub">Soteriology</div><p class="disc-d">La doctrina de la salvación — gracia, fe, justificación y redención del ser humano ante Dios.</p><div class="disc-q">¿Cómo se salva el hombre?</div></div>
+    <div class="disc-card am"><span class="disc-n">05 — ÉTICA</span><h3 class="disc-nm">Teología Moral</h3><div class="disc-sub">Moral Theology</div><p class="disc-d">La ética bíblica aplicada a la vida real. No como lista de reglas sino como sabiduría transformadora.</p><div class="disc-q">¿Cómo quiere Dios que vivamos?</div></div>
+    <div class="disc-card rd"><span class="disc-n">06 — DEFENSA</span><h3 class="disc-nm">Apologética</h3><div class="disc-sub">Apologetics</div><p class="disc-d">La defensa racional de la fe cristiana ante el escepticismo, la filosofía y otras cosmovisiones modernas.</p><div class="disc-q">¿Por qué creer?</div></div>
+    <div class="disc-card"><span class="disc-n">07 — INVISIBLE</span><h3 class="disc-nm">Angelología</h3><div class="disc-sub">Angelology</div><p class="disc-d">El estudio del mundo invisible — ángeles, demonios, jerarquías espirituales y la guerra activa en la historia.</p><div class="disc-q">¿Qué hay en el mundo invisible?</div></div>
+    <div class="disc-card am"><span class="disc-n">08 — FINAL</span><h3 class="disc-nm">Escatología</h3><div class="disc-sub">Eschatology</div><p class="disc-d">Las doctrinas del fin — muerte, juicio, resurrección, segunda venida y la eternidad en presencia de Dios.</p><div class="disc-q">¿Qué pasa al final?</div></div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto" id="manifesto">
+  <div class="rev">
+    <div class="m-ey">Nuestra Misión</div>
+    <h2 class="m-h">Escribir la visión.<br/>Para que <span class="hl">corra</span><br/>el que leyere.</h2>
+    <p class="m-b">El Nouscience Institute of Theology nació de una convicción simple: la teología rigurosa no debe estar reservada para académicos ni instituciones. La Palabra de Dios es para todo aquel que la busca con corazón genuino e inteligencia honesta. 500 millones de hispanohablantes merecen acceso a estudios teológicos serios, claros y gratuitos.</p>
+    <div class="m-verse">"Escribe la visión y declárala en tablas, para que corra el que leyere en ella."<small>Habacuc 2:2</small></div>
+  </div>
+  <div class="rev">
+    <div class="pillars">
+      <div class="pill"><div class="pill-n">I</div><div><div class="pill-t">Fundamento Bíblico</div><div class="pill-d">Todo estudio parte directamente del texto sagrado en su idioma y contexto original. La Escritura es la autoridad suprema.</div></div></div>
+      <div class="pill"><div class="pill-n">II</div><div><div class="pill-t">Rigor Intelectual</div><div class="pill-d">La fe no teme las preguntas difíciles. Las abordamos con honestidad intelectual y profundidad académica real.</div></div></div>
+      <div class="pill"><div class="pill-n">III</div><div><div class="pill-t">Acceso Universal</div><div class="pill-d">El conocimiento de Dios no tiene precio. Todo el contenido es libre y gratuito para iglesias, líderes y buscadores.</div></div></div>
+      <div class="pill"><div class="pill-n">IV</div><div><div class="pill-t">Sin Agenda Denominacional</div><div class="pill-d">Más que defender una tradición, buscamos lo que las Escrituras dicen. La verdad es la única agenda.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SUBSCRIBE -->
+<section class="subscribe" id="subscribe">
+  <div class="rev">
+    <div class="sub-ey">Biblioteca NIT — Acceso Gratuito</div>
+    <h2 class="sub-h">Teología seria.<br/>Sin costo.<br/>Sin agenda.</h2>
+  </div>
+  <div class="rev">
+    <p class="sub-d">Recibe cada nuevo estudio teológico directamente en tu correo. Artículos profundos, guías de estudio bíblico y recursos para iglesias. Para pastores, líderes y todo aquel que busca a Dios con seriedad.</p>
+    <form class="sub-form" onsubmit="doSub(event)">
+      <input class="sub-inp" type="email" placeholder="tu@correo.com" required/>
+      <button class="sub-btn" type="submit">Suscribirme →</button>
+    </form>
+    <div class="sub-note">Sin spam. Solo conocimiento. Cancela cuando quieras.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft">
+    <div class="ft-brand">
+      <div class="ft-logo"><div class="ft-lb"></div><div><span class="ft-lm">Nouscience</span><span class="ft-ls">Institute of Theology</span></div></div>
+      <p class="ft-desc">El conocimiento de Dios al alcance de todos. Estudios teológicos rigurosos para el mundo hispanohablante, basados en las Sagradas Escrituras.</p>
+      <div class="ft-issn">nouscience.com · Est. MMXXV</div>
+    </div>
+    <div class="ft-col">
+      <div class="ft-ct">Disciplinas</div>
+      <ul class="ft-links">
+        <li><a href="#">Teología Bíblica</a></li>
+        <li><a href="#">Cristología</a></li>
+        <li><a href="#">Soteriología</a></li>
+        <li><a href="#">Teología Moral</a></li>
+        <li><a href="#">Apologética</a></li>
+        <li><a href="#">Angelología</a></li>
+        <li><a href="#">Escatología</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <div class="ft-ct">Recursos</div>
+      <ul class="ft-links">
+        <li><a href="#">Biblioteca</a></li>
+        <li><a href="#">Guías de Estudio</a></li>
+        <li><a href="#">Para Iglesias</a></li>
+        <li><a href="#">Glosario Teológico</a></li>
+        <li><a href="#">Plan de Lectura</a></li>
+        <li><a href="#">Preguntas Frecuentes</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <div class="ft-ct">Instituto</div>
+      <ul class="ft-links">
+        <li><a href="#">Misión y Valores</a></li>
+        <li><a href="#">Metodología</a></li>
+        <li><a href="#">Colaborar</a></li>
+        <li><a href="#">Donaciones</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy">© 2025 Nouscience Institute of Theology · Todos los derechos reservados</span>
+    <span class="ft-motto">"La verdad os hará libres." — Juan 8:32</span>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const io = new IntersectionObserver(es => {
+  es.forEach((e,i) => {
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('in'), i*100);
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.rev').forEach(el=>io.observe(el));
+
+// Filter
+function ftag(el){
+  document.querySelectorAll('.fb-tag').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// Subscribe
+function doSub(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('.sub-btn');
+  const inp=e.target.querySelector('.sub-inp');
+  btn.textContent='✓ Suscrito';
+  btn.style.cssText='background:#E8F5E9;color:#2E7D32;';
+  inp.value='';
+  setTimeout(()=>{btn.textContent='Suscribirme →';btn.style.cssText='';},3000);
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+});
+</script>
+</body>
+</html>
