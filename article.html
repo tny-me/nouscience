@@ -329,7 +329,10 @@ footer{background:var(--ink);padding:0;}
 </footer>
 
 <script>
-(function() {
+(async function() {
+  const SB_URL = 'https://xduylfmrmxqnbtpyyjvb.supabase.co';
+  const SB_KEY = 'sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
+
   const params = new URLSearchParams(window.location.search);
   const id     = params.get('id');
   const page   = document.getElementById('page');
@@ -346,11 +349,24 @@ footer{background:var(--ink);padding:0;}
 
   if (!id) { notFound(); return; }
 
-  let articles = [];
-  try { articles = JSON.parse(localStorage.getItem('nit_articles') || '[]'); } catch {}
+  let a = null;
+  try {
+    const res = await fetch(
+      SB_URL + '/rest/v1/articles?id=eq.' + encodeURIComponent(id),
+      { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY } }
+    );
+    const rows = await res.json();
+    a = rows[0] || null;
+  } catch(e) {}
 
-  const a = articles.find(x => x.id === id);
   if (!a) { notFound(); return; }
+
+  // Supabase usa snake_case — mapeamos
+  a.authorTitle = a.author_title || '';
+  a.readTime    = a.read_time    || '';
+  a.publishedAt = a.published_at || a.updated_at || a.created_at;
+  a.abstract    = a.abstract     || '';
+  a.tags        = a.tags         || [];
 
   // Update page meta
   document.getElementById('pageTitle').textContent  = a.title + ' — Nouscience';
@@ -465,11 +481,6 @@ footer{background:var(--ink);padding:0;}
   }
 
 })();
-
-// Re-declare esc at scope for the template literals above
-function esc(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
 </script>
 </body>
 </html>
