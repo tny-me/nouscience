@@ -794,10 +794,13 @@ async function loadDynamicArticles(){
 
   let published=[];
   try{
-    const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=published_at.desc',
+    const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=created_at.desc',
       {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
-    if(res.ok) published=await res.json();
-  }catch(e){return;}// si falla, quedan los artículos estáticos
+    const data=await res.json();
+    if(!res.ok){console.error('Supabase error:',data);return;}
+    published=Array.isArray(data)?data:[];
+    console.log('Artículos publicados encontrados:',published.length,published);
+  }catch(e){console.error('Error fetching articles:',e);return;}
 
   const grid=document.getElementById('artGrid');
   const countEl=document.getElementById('artCount');
