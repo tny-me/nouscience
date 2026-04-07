@@ -154,13 +154,34 @@ nav{
   border-left:3px solid var(--blue);padding-left:22px;
 }
 
-/* ── ARTICLE BODY ── */
-.article-body-wrap{
-  max-width:800px;margin:0 auto;padding:56px 48px 80px;
+/* ── ARTICLE BODY + TOC LAYOUT ── */
+.article-layout{
+  max-width:1120px;margin:0 auto;padding:56px 48px 80px;
+}
+.article-layout.has-toc{
+  display:grid;grid-template-columns:1fr 240px;gap:64px;align-items:start;
 }
 .article-content{
-  font-size:16px;font-weight:300;line-height:1.8;color:var(--ink2);
+  font-size:16px;font-weight:300;line-height:1.8;color:var(--ink2);min-width:0;
 }
+
+/* ── TABLE OF CONTENTS ── */
+.toc-sidebar{
+  position:sticky;top:76px;max-height:calc(100vh - 100px);overflow-y:auto;
+}
+.toc-label{
+  font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink4);padding-bottom:12px;border-bottom:2px solid var(--ink);
+  margin-bottom:14px;
+}
+.toc-list{list-style:none;display:flex;flex-direction:column;}
+.toc-item a{
+  font-size:12px;font-weight:400;color:var(--ink3);text-decoration:none;
+  display:block;padding:7px 0 7px 12px;border-left:2px solid var(--rule);
+  transition:color .2s,border-color .2s;line-height:1.45;
+}
+.toc-item a:hover{color:var(--blue);border-left-color:var(--blue);}
+.toc-item.active a{color:var(--blue);border-left-color:var(--blue);font-weight:600;}
 .article-content h2{
   font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.2;
   color:var(--ink);margin:44px 0 16px;padding-top:8px;
@@ -197,7 +218,7 @@ nav{
 
 /* ── ARTICLE FOOTER ── */
 .article-footer{
-  max-width:800px;margin:0 auto;padding:0 48px 80px;
+  max-width:1120px;margin:0 auto;padding:0 48px 80px;
 }
 .af-divider{height:2px;background:var(--ink);margin-bottom:32px;}
 .af-tags-label{
@@ -248,8 +269,12 @@ footer{background:var(--ink);padding:0;}
 .ft-motto{font-size:11px;color:rgba(255,255,255,.15);font-style:italic;}
 
 /* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .article-layout.has-toc{grid-template-columns:1fr;}
+  .toc-sidebar{position:static;max-height:none;border:1px solid var(--rule);padding:20px;margin-bottom:32px;order:-1;}
+}
 @media(max-width:700px){
-  .art-header-inner,.abstract-inner,.article-body-wrap,.article-footer{padding-left:24px;padding-right:24px;}
+  .art-header-inner,.abstract-inner,.article-layout,.article-footer{padding-left:24px;padding-right:24px;}
   .art-title{font-size:28px;}
   .ft{grid-template-columns:1fr;gap:32px;padding:40px 24px 32px;}
   .ft-bot{padding:16px 24px;}
@@ -262,11 +287,7 @@ footer{background:var(--ink);padding:0;}
 <!-- ── NAV ── -->
 <nav>
   <a class="nav-brand" href="index.html">
-    <div class="nav-block"></div>
-    <div>
-      <span class="nav-main">Nouscience</span>
-      <span class="nav-sub">Institute of Theology</span>
-    </div>
+    <img src="NIT logo.png" alt="Nouscience Institute of Theology" style="height:44px;width:auto;display:block;max-width:220px;object-fit:contain;">
   </a>
   <div class="nav-links">
     <a class="nav-link" href="index.html#articles">Artículos</a>
@@ -287,8 +308,7 @@ footer{background:var(--ink);padding:0;}
   <div class="ft">
     <div class="ft-brand">
       <div class="ft-logo">
-        <div class="ft-lb"></div>
-        <div><span class="ft-lm">Nouscience</span><span class="ft-ls">Institute of Theology</span></div>
+        <img src="NIT logo Black.png" alt="Nouscience Institute of Theology" style="height:48px;width:auto;display:block;max-width:200px;object-fit:contain;">
       </div>
       <p class="ft-desc">El conocimiento de Dios al alcance de todos. Estudios teológicos rigurosos para el mundo hispanohablante, basados en las Sagradas Escrituras.</p>
       <div class="ft-issn">nouscience.com · Est. MMXXV</div>
@@ -451,7 +471,7 @@ footer{background:var(--ink);padding:0;}
     </div>` : ''}
 
     <!-- BODY -->
-    <div class="article-body-wrap">
+    <div class="article-layout" id="artLayout">
       <div class="article-content" id="artContent"></div>
     </div>
 
@@ -474,6 +494,50 @@ footer{background:var(--ink);padding:0;}
   const contentEl = document.getElementById('artContent');
   if (contentEl && a.content) {
     contentEl.innerHTML = a.content;
+    buildTOC(contentEl);
+  }
+
+  function buildTOC(contentEl) {
+    const headings = contentEl.querySelectorAll('h2');
+    if (headings.length < 2) return;
+
+    const layout = document.getElementById('artLayout');
+    if (!layout) return;
+
+    // Add IDs to each h2
+    const ids = [];
+    headings.forEach((h, i) => {
+      const slug = h.textContent.trim()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      h.id = slug || 'seccion-' + (i + 1);
+      ids.push(h.id);
+    });
+
+    // Build TOC sidebar HTML
+    const items = Array.from(headings).map(h =>
+      `<li class="toc-item"><a href="#${h.id}">${h.textContent.trim()}</a></li>`
+    ).join('');
+
+    const toc = document.createElement('div');
+    toc.className = 'toc-sidebar';
+    toc.innerHTML = `<div class="toc-label">En este artículo</div><ul class="toc-list">${items}</ul>`;
+    layout.appendChild(toc);
+    layout.classList.add('has-toc');
+
+    // Scroll-spy: highlight active section
+    const tocItems = toc.querySelectorAll('.toc-item');
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocItems.forEach(li => li.classList.remove('active'));
+          const match = toc.querySelector(`.toc-item a[href="#${entry.target.id}"]`)?.closest('.toc-item');
+          if (match) match.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+
+    headings.forEach(h => io.observe(h));
   }
 
   function esc(str) {
