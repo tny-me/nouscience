@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title id="pageTitle">Artículo — Nouscience Institute of Theology</title>
+<meta name="description" id="metaDesc" content="Nouscience Institute of Theology"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#F5F4F0; --surface:#fff; --ink:#080806; --ink2:#2C2C28;
+  --ink3:#706F68; --ink4:#AEADA6; --blue:#1240AB; --bluemid:#1A52CC;
+  --bluepale:#EBF0FF; --amber:#D4820A; --amberpale:#FFF3DC;
+  --red:#C41E3A; --rule:#E2E0D8; --ruled:#C8C6BC;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:'Inter','Arial',sans-serif;font-weight:300;line-height:1.65;overflow-x:hidden;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--surface);border-bottom:1px solid var(--rule);
+  height:56px;display:flex;align-items:stretch;
+}
+.nav-brand{
+  display:flex;align-items:center;padding:0 24px;
+  border-right:1px solid var(--rule);text-decoration:none;
+}
+.nav-block{width:5px;height:26px;background:var(--blue);margin-right:11px;flex-shrink:0;}
+.nav-main{font-weight:700;font-size:13px;letter-spacing:.05em;color:var(--ink);text-transform:uppercase;line-height:1;display:block;}
+.nav-sub{font-size:9px;letter-spacing:.14em;color:var(--blue);text-transform:uppercase;line-height:1;display:block;margin-top:2px;}
+.nav-links{flex:1;display:flex;align-items:center;padding:0 24px;gap:2px;}
+.nav-link{
+  font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);
+  text-decoration:none;padding:0 14px;height:56px;display:flex;align-items:center;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s;
+}
+.nav-link:hover{color:var(--blue);border-color:var(--blue);}
+.nav-right{display:flex;align-items:center;padding:0 20px;gap:10px;border-left:1px solid var(--rule);}
+.nav-cta{
+  font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--blue);
+  color:#fff;text-decoration:none;padding:8px 18px;transition:background .2s;white-space:nowrap;
+}
+.nav-cta:hover{background:var(--bluemid);}
+
+/* ── PAGE WRAPPER ── */
+.page{margin-top:56px;}
+
+/* ── NOT FOUND ── */
+.not-found{
+  min-height:70vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:60px;
+}
+.nf-icon{font-size:48px;opacity:.2;margin-bottom:20px;}
+.nf-h{font-size:24px;font-weight:700;letter-spacing:-.01em;margin-bottom:10px;}
+.nf-d{font-size:15px;color:var(--ink3);margin-bottom:28px;}
+.nf-btn{
+  display:inline-block;padding:11px 24px;background:var(--blue);color:#fff;
+  text-decoration:none;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  transition:background .2s;
+}
+.nf-btn:hover{background:var(--bluemid);}
+
+/* ── ARTICLE HEADER ── */
+.art-header{
+  background:var(--ink);padding:72px 0 64px;position:relative;overflow:hidden;
+}
+.art-header::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:80px 80px;pointer-events:none;
+}
+.art-header-inner{
+  max-width:800px;margin:0 auto;padding:0 48px;position:relative;z-index:1;
+}
+
+/* Breadcrumb */
+.breadcrumb{
+  display:flex;align-items:center;gap:10px;margin-bottom:32px;
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+}
+.bc-back{color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s;}
+.bc-back:hover{color:rgba(255,255,255,.8);}
+.bc-sep{color:rgba(255,255,255,.15);}
+.bc-disc{color:var(--amber);}
+
+/* Discipline badge */
+.art-badge{
+  display:inline-flex;align-items:center;
+  font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+  background:var(--blue);color:#fff;padding:5px 12px;margin-bottom:22px;
+}
+
+/* Tags */
+.art-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;}
+.art-tag{
+  font-size:10px;letter-spacing:.06em;color:rgba(255,255,255,.45);
+  border:1px solid rgba(255,255,255,.12);padding:3px 10px;
+}
+
+/* Title */
+.art-title{
+  font-size:clamp(28px,4vw,46px);font-weight:800;
+  letter-spacing:-.03em;line-height:1.08;color:#fff;
+  margin-bottom:18px;
+}
+.art-subtitle{
+  font-size:18px;font-weight:300;line-height:1.55;
+  color:rgba(255,255,255,.55);margin-bottom:36px;
+}
+
+/* Author row */
+.art-meta-row{
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  padding-top:24px;border-top:1px solid rgba(255,255,255,.08);
+}
+.art-author{display:flex;align-items:center;gap:12px;}
+.art-author-avatar{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--blue);display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;flex-shrink:0;
+  letter-spacing:-.01em;
+}
+.art-author-name{font-size:13px;font-weight:600;color:rgba(255,255,255,.88);}
+.art-author-title{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
+.art-sep{width:1px;height:24px;background:rgba(255,255,255,.1);}
+.art-meta-item{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.04em;}
+.art-meta-item span{color:rgba(255,255,255,.55);}
+.art-featured-badge{
+  margin-left:auto;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--amber);border:1px solid rgba(212,130,10,.3);padding:4px 10px;
+}
+
+/* ── ABSTRACT ── */
+.abstract-section{
+  background:var(--surface);border-bottom:1px solid var(--rule);
+  padding:44px 0;
+}
+.abstract-inner{max-width:800px;margin:0 auto;padding:0 48px;}
+.abstract-label{
+  font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:10px;
+}
+.abstract-label::after{content:'';flex:1;height:1px;background:var(--rule);}
+.abstract-text{
+  font-size:16px;font-weight:400;line-height:1.75;color:var(--ink2);
+  border-left:3px solid var(--blue);padding-left:22px;
+}
+
+/* ── ARTICLE BODY ── */
+.article-body-wrap{
+  max-width:800px;margin:0 auto;padding:56px 48px 80px;
+}
+.article-content{
+  font-size:16px;font-weight:300;line-height:1.8;color:var(--ink2);
+}
+.article-content h2{
+  font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.2;
+  color:var(--ink);margin:44px 0 16px;padding-top:8px;
+  border-top:2px solid var(--ink);
+}
+.article-content h2:first-child{margin-top:0;border-top:none;padding-top:0;}
+.article-content h3{
+  font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.3;
+  color:var(--ink);margin:32px 0 12px;
+}
+.article-content h4{
+  font-size:15px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;
+  color:var(--ink3);margin:28px 0 10px;
+}
+.article-content p{margin-bottom:18px;}
+.article-content p:last-child{margin-bottom:0;}
+.article-content strong{font-weight:600;color:var(--ink);}
+.article-content em{font-style:italic;}
+.article-content a{color:var(--blue);text-decoration:underline;text-underline-offset:3px;}
+.article-content a:hover{color:var(--bluemid);}
+.article-content blockquote{
+  border-left:3px solid var(--amber);padding:16px 24px;
+  margin:28px 0;background:var(--amberpale);
+  font-size:16px;font-style:italic;color:var(--ink2);line-height:1.7;
+}
+.article-content blockquote p{margin-bottom:0;}
+.article-content ul,.article-content ol{
+  padding-left:24px;margin-bottom:18px;
+}
+.article-content li{margin-bottom:8px;line-height:1.65;}
+.article-content ul li::marker{color:var(--blue);}
+.article-content ol li::marker{color:var(--blue);font-weight:600;}
+.article-content hr{border:none;border-top:1px solid var(--rule);margin:36px 0;}
+
+/* ── ARTICLE FOOTER ── */
+.article-footer{
+  max-width:800px;margin:0 auto;padding:0 48px 80px;
+}
+.af-divider{height:2px;background:var(--ink);margin-bottom:32px;}
+.af-tags-label{
+  font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:12px;
+}
+.af-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px;}
+.af-tag{
+  font-size:11px;color:var(--blue);background:var(--bluepale);
+  padding:5px 14px;text-decoration:none;transition:background .2s;
+}
+.af-tag:hover{background:#D6E2FF;}
+.af-nav{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+.af-back{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink3);text-decoration:none;transition:color .2s;
+}
+.af-back:hover{color:var(--blue);}
+.af-disc-link{
+  font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--blue);text-decoration:none;
+}
+.af-disc-link:hover{text-decoration:underline;}
+
+/* ── FOOTER ── */
+footer{background:var(--ink);padding:0;}
+.ft{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:60px;padding:64px 80px 48px;border-bottom:1px solid rgba(255,255,255,.07);
+}
+.ft-logo{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.ft-lb{width:5px;height:26px;background:var(--blue);}
+.ft-lm{font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#fff;display:block;line-height:1;}
+.ft-ls{font-size:9px;letter-spacing:.14em;color:var(--blue);text-transform:uppercase;display:block;margin-top:3px;}
+.ft-desc{font-size:13px;line-height:1.65;color:rgba(255,255,255,.3);margin-bottom:16px;}
+.ft-issn{font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.15);text-transform:uppercase;}
+.ft-ct{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px;}
+.ft-links{list-style:none;}
+.ft-links li{margin-bottom:8px;}
+.ft-links a{font-size:13px;color:rgba(255,255,255,.45);text-decoration:none;transition:color .2s;}
+.ft-links a:hover{color:#fff;}
+.ft-bot{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+  padding:20px 80px;
+}
+.ft-copy{font-size:11px;color:rgba(255,255,255,.2);letter-spacing:.04em;}
+.ft-motto{font-size:11px;color:rgba(255,255,255,.15);font-style:italic;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .art-header-inner,.abstract-inner,.article-body-wrap,.article-footer{padding-left:24px;padding-right:24px;}
+  .art-title{font-size:28px;}
+  .ft{grid-template-columns:1fr;gap:32px;padding:40px 24px 32px;}
+  .ft-bot{padding:16px 24px;}
+  .nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="nav-brand" href="index.html">
+    <div class="nav-block"></div>
+    <div>
+      <span class="nav-main">Nouscience</span>
+      <span class="nav-sub">Institute of Theology</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html#articles">Artículos</a>
+    <a class="nav-link" href="index.html#disciplines">Disciplinas</a>
+    <a class="nav-link" href="index.html#manifesto">Misión</a>
+  </div>
+  <div class="nav-right">
+    <a class="nav-cta" href="index.html#subscribe">Suscribirse</a>
+  </div>
+</nav>
+
+<div class="page" id="page">
+  <!-- Content injected by JS -->
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="ft">
+    <div class="ft-brand">
+      <div class="ft-logo">
+        <div class="ft-lb"></div>
+        <div><span class="ft-lm">Nouscience</span><span class="ft-ls">Institute of Theology</span></div>
+      </div>
+      <p class="ft-desc">El conocimiento de Dios al alcance de todos. Estudios teológicos rigurosos para el mundo hispanohablante, basados en las Sagradas Escrituras.</p>
+      <div class="ft-issn">nouscience.com · Est. MMXXV</div>
+    </div>
+    <div class="ft-col">
+      <div class="ft-ct">Disciplinas</div>
+      <ul class="ft-links">
+        <li><a href="index.html#disciplines">Teología Bíblica</a></li>
+        <li><a href="index.html#disciplines">Cristología</a></li>
+        <li><a href="index.html#disciplines">Soteriología</a></li>
+        <li><a href="index.html#disciplines">Teología Moral</a></li>
+        <li><a href="index.html#disciplines">Apologética</a></li>
+        <li><a href="index.html#disciplines">Escatología</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <div class="ft-ct">Recursos</div>
+      <ul class="ft-links">
+        <li><a href="#">Biblioteca</a></li>
+        <li><a href="#">Guías de Estudio</a></li>
+        <li><a href="#">Para Iglesias</a></li>
+        <li><a href="#">Glosario Teológico</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <div class="ft-ct">Instituto</div>
+      <ul class="ft-links">
+        <li><a href="index.html#manifesto">Misión y Valores</a></li>
+        <li><a href="#">Colaborar</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy">© 2025 Nouscience Institute of Theology · Todos los derechos reservados</span>
+    <span class="ft-motto">"La verdad os hará libres." — Juan 8:32</span>
+  </div>
+</footer>
+
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const id     = params.get('id');
+  const page   = document.getElementById('page');
+
+  function notFound() {
+    page.innerHTML = `
+      <div class="not-found">
+        <div class="nf-icon">✦</div>
+        <div class="nf-h">Artículo no encontrado</div>
+        <div class="nf-d">Este artículo no existe o ha sido eliminado.</div>
+        <a class="nf-btn" href="index.html">← Volver a la portada</a>
+      </div>`;
+  }
+
+  if (!id) { notFound(); return; }
+
+  let articles = [];
+  try { articles = JSON.parse(localStorage.getItem('nit_articles') || '[]'); } catch {}
+
+  const a = articles.find(x => x.id === id);
+  if (!a) { notFound(); return; }
+
+  // Update page meta
+  document.getElementById('pageTitle').textContent  = a.title + ' — Nouscience';
+  document.getElementById('metaDesc').content       = a.abstract || a.title;
+
+  // Format date
+  function fmtDate(iso) {
+    if (!iso) return '';
+    try {
+      return new Date(iso).toLocaleDateString('es-MX', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+    } catch { return ''; }
+  }
+
+  // Author initial for avatar
+  function initials(name) {
+    if (!name) return '✦';
+    return name.trim().split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+  }
+
+  // Discipline color
+  function discColor(disc) {
+    const amber = ['Teología Moral','Soteriología','Pneumatología','Escatología'];
+    const red   = ['Cristología','Apologética','Hermenéutica'];
+    if (amber.includes(disc)) return 'background:var(--amber)';
+    if (red.includes(disc))   return 'background:var(--red)';
+    return 'background:var(--blue)';
+  }
+
+  const tags    = (a.tags || []).filter(Boolean);
+  const pubDate = fmtDate(a.publishedAt || a.updatedAt || a.createdAt);
+  const readTime = a.readTime ? a.readTime : '';
+
+  page.innerHTML = `
+    <!-- HEADER -->
+    <div class="art-header">
+      <div class="art-header-inner">
+        <div class="breadcrumb">
+          <a class="bc-back" href="index.html">← Artículos</a>
+          ${a.discipline ? `<span class="bc-sep">/</span><span class="bc-disc">${esc(a.discipline)}</span>` : ''}
+        </div>
+
+        <div class="art-badge" style="${discColor(a.discipline)}">${esc(a.discipline || 'Teología')}</div>
+
+        ${tags.length ? `<div class="art-tags">${tags.map(t=>`<span class="art-tag">${esc(t)}</span>`).join('')}</div>` : ''}
+
+        <h1 class="art-title">${esc(a.title)}</h1>
+
+        ${a.subtitle ? `<p class="art-subtitle">${esc(a.subtitle)}</p>` : ''}
+
+        <div class="art-meta-row">
+          ${a.author ? `
+          <div class="art-author">
+            <div class="art-author-avatar">${esc(initials(a.author))}</div>
+            <div>
+              <div class="art-author-name">${esc(a.author)}</div>
+              ${a.authorTitle ? `<div class="art-author-title">${esc(a.authorTitle)}</div>` : ''}
+            </div>
+          </div>` : ''}
+
+          ${(a.author && pubDate) ? '<div class="art-sep"></div>' : ''}
+
+          ${pubDate ? `<div class="art-meta-item"><span>${pubDate}</span></div>` : ''}
+
+          ${(pubDate && readTime) ? '<div class="art-sep"></div>' : ''}
+
+          ${readTime ? `<div class="art-meta-item"><span>${esc(readTime)} lectura</span></div>` : ''}
+
+          ${a.featured ? '<div class="art-featured-badge">✦ Destacado</div>' : ''}
+        </div>
+      </div>
+    </div>
+
+    <!-- ABSTRACT -->
+    ${a.abstract ? `
+    <div class="abstract-section">
+      <div class="abstract-inner">
+        <div class="abstract-label">Resumen</div>
+        <p class="abstract-text">${esc(a.abstract)}</p>
+      </div>
+    </div>` : ''}
+
+    <!-- BODY -->
+    <div class="article-body-wrap">
+      <div class="article-content" id="artContent"></div>
+    </div>
+
+    <!-- ARTICLE FOOTER -->
+    <div class="article-footer">
+      <div class="af-divider"></div>
+      ${tags.length ? `
+      <div class="af-tags-label">Etiquetas</div>
+      <div class="af-tags">
+        ${tags.map(t=>`<span class="af-tag">${esc(t)}</span>`).join('')}
+      </div>` : ''}
+      <div class="af-nav">
+        <a class="af-back" href="index.html">← Volver a artículos</a>
+        ${a.discipline ? `<a class="af-disc-link" href="index.html#disciplines">${esc(a.discipline)}</a>` : ''}
+      </div>
+    </div>
+  `;
+
+  // Inject raw HTML content safely into the content div
+  const contentEl = document.getElementById('artContent');
+  if (contentEl && a.content) {
+    contentEl.innerHTML = a.content;
+  }
+
+  function esc(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+})();
+
+// Re-declare esc at scope for the template literals above
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

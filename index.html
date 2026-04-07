@@ -520,6 +520,7 @@ footer{background:#06060A;}
     <a href="#subscribe" class="nav-link">Biblioteca</a>
   </div>
   <div class="nav-right">
+    <a href="admin.html" class="nav-link" style="color:var(--ink4);font-size:10px;">Editor</a>
     <a href="#subscribe" class="nav-cta">Suscribirse →</a>
   </div>
 </nav>
@@ -591,7 +592,7 @@ footer{background:#06060A;}
       <button class="fb-tag" onclick="ftag(this)">Apologética</button>
     </div>
   </div>
-  <span class="fb-r">47 artículos</span>
+  <span class="fb-r" id="artCount">47 artículos</span>
 </div>
 
 <!-- ARTICLES -->
@@ -600,7 +601,7 @@ footer{background:#06060A;}
     <div class="sec-left"><span class="sec-ey">01 /</span><h2 class="sec-h">Artículos Recientes</h2></div>
     <a href="#" class="sec-all">Ver todos</a>
   </div>
-  <div class="art-grid rev">
+  <div class="art-grid rev" id="artGrid">
     <a href="#" class="art-main">
       <div class="art-flag">✦ Destacado</div>
       <h3 class="art-h">¿Qué es Dios? Su Naturaleza, Atributos y el Misterio de la Trinidad</h3>
@@ -772,6 +773,88 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
   });
 });
+
+// ─── DYNAMIC ARTICLES ────────────────────────────────────────────────────────
+(function(){
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function fmtDate(iso){
+    if(!iso)return'';
+    try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});}catch{return'';}
+  }
+  function discColor(d){
+    const am=['Teología Moral','Soteriología','Pneumatología','Escatología','Teología Histórica'];
+    const rd=['Cristología','Apologética','Hermenéutica'];
+    if(am.includes(d))return'am';
+    if(rd.includes(d))return'rd';
+    return'';
+  }
+
+  let arts=[];
+  try{arts=JSON.parse(localStorage.getItem('nit_articles')||'[]');}catch{}
+  const published=arts.filter(a=>a.published);
+  if(!published.length)return;
+
+  // Update count
+  const countEl=document.getElementById('artCount');
+  if(countEl)countEl.textContent=published.length+' artículo'+(published.length===1?'':'s');
+
+  const grid=document.getElementById('artGrid');
+  if(!grid)return;
+
+  const featured=published.find(a=>a.featured)||published[0];
+  const others=published.filter(a=>a.id!==featured.id).slice(0,2);
+  const listItems=published.slice(0,5);
+
+  const cl=discColor(featured.discipline);
+  let html=`
+    <a href="article.html?id=${esc(featured.id)}" class="art-main">
+      <div class="art-flag${cl?' '+cl:''}">✦ ${esc(featured.discipline||'Destacado')}</div>
+      <h3 class="art-h">${esc(featured.title)}</h3>
+      <p class="art-exc">${esc(featured.abstract)}</p>
+      <div class="art-meta">
+        <span class="art-mi">${esc(featured.discipline||'')}</span>
+        ${featured.readTime?`<span class="art-md"></span><span class="art-mi">${esc(featured.readTime)} lectura</span>`:''}
+        ${featured.author?`<span class="art-md"></span><span class="art-mi">${esc(featured.author)}</span>`:''}
+      </div>
+    </a>`;
+
+  others.forEach(a=>{
+    const c=discColor(a.discipline);
+    html+=`
+    <a href="article.html?id=${esc(a.id)}" class="art-side">
+      <div class="art-flag${c?' '+c:''}">✦ ${esc(a.discipline||'Artículo')}</div>
+      <h3 class="art-h">${esc(a.title)}</h3>
+      <p class="art-exc">${esc(a.abstract)}</p>
+      <div class="art-meta">
+        <span class="art-mi">${a.readTime?esc(a.readTime)+' lectura':fmtDate(a.publishedAt)}</span>
+        ${a.discipline?`<span class="art-md"></span><span class="art-mi">${esc(a.discipline)}</span>`:''}
+      </div>
+    </a>`;
+  });
+
+  // Fill empty side slots if less than 2 other articles
+  while(others.length<2){
+    html+=`<div class="art-side" style="background:var(--bg);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:11px;color:var(--ink4);letter-spacing:.08em;text-transform:uppercase;">Próximamente</span>
+    </div>`;
+    others.push({});
+  }
+
+  html+=`<div class="art-list">
+    <div class="art-list-lbl">Más Recientes</div>`;
+  listItems.forEach((a,i)=>{
+    html+=`<a href="article.html?id=${esc(a.id)}" class="art-li">
+      <span class="art-li-n">0${i+1}</span>
+      <div>
+        <div class="art-li-t">${esc(a.title)}</div>
+        <span class="art-li-tag">${esc(a.discipline||'')}</span>
+      </div>
+    </a>`;
+  });
+  html+=`</div>`;
+
+  grid.innerHTML=html;
+})();
 </script>
 </body>
 </html>
