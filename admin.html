@@ -228,7 +228,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
           </div>
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Lectura</label>
-            <input class="form-input" type="text" id="fTime" placeholder="Ej. 15 min"/>
+            <input class="form-input" type="text" id="fTime" placeholder="Auto" readonly style="background:var(--bg);color:var(--ink3);cursor:default;" title="Se calcula automáticamente según el contenido"/>
           </div>
         </div>
 
@@ -335,6 +335,11 @@ async function initApp(){
     placeholder:'Escribe el contenido completo del artículo aquí...',
     modules:{toolbar:[[{header:[2,3,4,false]}],['bold','italic','underline'],
       ['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']]}});
+  quill.on('text-change',()=>{
+    const words=quill.getText().trim().split(/\s+/).filter(w=>w.length>0).length;
+    const mins=Math.max(1,Math.round(words/200));
+    document.getElementById('fTime').value=words<10?'':mins+' min lectura';
+  });
   await reloadList();
 }
 if(sessionStorage.getItem('nit_ok')==='1') initApp();
