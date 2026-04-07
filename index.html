@@ -774,8 +774,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   });
 });
 
-// ─── DYNAMIC ARTICLES ────────────────────────────────────────────────────────
-(function(){
+// ─── DYNAMIC ARTICLES desde Supabase ─────────────────────────────────────────
+const SB_URL='https://xduylfmrmxqnbtpyyjvb.supabase.co';
+const SB_KEY='sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
+
+async function loadDynamicArticles(){
   function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function fmtDate(iso){
     if(!iso)return'';
@@ -789,50 +792,55 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     return'';
   }
 
-  let arts=[];
-  try{arts=JSON.parse(localStorage.getItem('nit_articles')||'[]');}catch{}
-  const published=arts.filter(a=>a.published);
-  if(!published.length)return;
-
-  // Update count
-  const countEl=document.getElementById('artCount');
-  if(countEl)countEl.textContent=published.length+' artículo'+(published.length===1?'':'s');
+  let published=[];
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=published_at.desc',
+      {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    if(res.ok) published=await res.json();
+  }catch(e){return;}// si falla, quedan los artículos estáticos
 
   const grid=document.getElementById('artGrid');
-  if(!grid)return;
+  const countEl=document.getElementById('artCount');
+  if(!grid||!published.length) return;
 
-  const featured=published.find(a=>a.featured)||published[0];
+  if(countEl) countEl.textContent=published.length+' artículo'+(published.length===1?'':'s');
+
+  // Supabase usa snake_case — creamos helpers locales
+  const f=a=>a.featured, disc=a=>a.discipline, abst=a=>a.abstract,
+        rt=a=>a.read_time, au=a=>a.author, pid=a=>a.published_at;
+
+  const featured=published.find(f)||published[0];
   const others=published.filter(a=>a.id!==featured.id).slice(0,2);
   const listItems=published.slice(0,5);
 
-  const cl=discColor(featured.discipline);
+  const cl=discColor(disc(featured));
   let html=`
     <a href="article.html?id=${esc(featured.id)}" class="art-main">
-      <div class="art-flag${cl?' '+cl:''}">✦ ${esc(featured.discipline||'Destacado')}</div>
+      <div class="art-flag${cl?' '+cl:''}">✦ ${esc(disc(featured)||'Destacado')}</div>
       <h3 class="art-h">${esc(featured.title)}</h3>
-      <p class="art-exc">${esc(featured.abstract)}</p>
+      <p class="art-exc">${esc(abst(featured)||'')}</p>
       <div class="art-meta">
-        <span class="art-mi">${esc(featured.discipline||'')}</span>
-        ${featured.readTime?`<span class="art-md"></span><span class="art-mi">${esc(featured.readTime)} lectura</span>`:''}
-        ${featured.author?`<span class="art-md"></span><span class="art-mi">${esc(featured.author)}</span>`:''}
+        <span class="art-mi">${esc(disc(featured)||'')}</span>
+        ${rt(featured)?`<span class="art-md"></span><span class="art-mi">${esc(rt(featured))} lectura</span>`:''}
+        ${au(featured)?`<span class="art-md"></span><span class="art-mi">${esc(au(featured))}</span>`:''}
       </div>
     </a>`;
 
   others.forEach(a=>{
-    const c=discColor(a.discipline);
+    const c=discColor(disc(a));
     html+=`
     <a href="article.html?id=${esc(a.id)}" class="art-side">
-      <div class="art-flag${c?' '+c:''}">✦ ${esc(a.discipline||'Artículo')}</div>
+      <div class="art-flag${c?' '+c:''}">✦ ${esc(disc(a)||'Artículo')}</div>
       <h3 class="art-h">${esc(a.title)}</h3>
-      <p class="art-exc">${esc(a.abstract)}</p>
+      <p class="art-exc">${esc(abst(a)||'')}</p>
       <div class="art-meta">
-        <span class="art-mi">${a.readTime?esc(a.readTime)+' lectura':fmtDate(a.publishedAt)}</span>
-        ${a.discipline?`<span class="art-md"></span><span class="art-mi">${esc(a.discipline)}</span>`:''}
+        <span class="art-mi">${rt(a)?esc(rt(a))+' lectura':fmtDate(pid(a))}</span>
+        ${disc(a)?`<span class="art-md"></span><span class="art-mi">${esc(disc(a))}</span>`:''}
       </div>
     </a>`;
   });
 
-  // Fill empty side slots if less than 2 other articles
+  // Fill empty side slots if fewer than 2 side articles
   while(others.length<2){
     html+=`<div class="art-side" style="background:var(--bg);display:flex;align-items:center;justify-content:center;">
       <span style="font-size:11px;color:var(--ink4);letter-spacing:.08em;text-transform:uppercase;">Próximamente</span>
@@ -847,14 +855,17 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       <span class="art-li-n">0${i+1}</span>
       <div>
         <div class="art-li-t">${esc(a.title)}</div>
-        <span class="art-li-tag">${esc(a.discipline||'')}</span>
+        <span class="art-li-tag">${esc(disc(a)||'')}</span>
       </div>
     </a>`;
   });
   html+=`</div>`;
 
   grid.innerHTML=html;
-})();
+}
+
+// Cargar artículos al abrir la página
+loadDynamicArticles();
 </script>
 </body>
 </html>
