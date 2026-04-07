@@ -26,10 +26,10 @@ body{
 nav{
   position:fixed;top:0;left:0;right:0;z-index:200;
   background:var(--surface);border-bottom:1px solid var(--rule);
-  height:72px;display:flex;align-items:stretch;
+  height:72px;display:flex;align-items:stretch;overflow:hidden;
 }
 .nav-brand{
-  display:flex;align-items:center;padding:0 24px;
+  display:flex;align-items:center;padding:0 20px;overflow:hidden;
   border-right:1px solid var(--rule);text-decoration:none;
 }
 .nav-block{width:5px;height:26px;background:var(--blue);margin-right:11px;flex-shrink:0;}
@@ -287,7 +287,7 @@ footer{background:var(--ink);padding:0;}
 <!-- ── NAV ── -->
 <nav>
   <a class="nav-brand" href="index.html">
-    <img src="NIT logo.png" alt="Nouscience Institute of Theology" style="height:58px;width:auto;display:block;max-width:240px;object-fit:contain;object-position:left center;">
+    <img src="NIT logo.png" alt="Nouscience Institute of Theology" style="height:210px;width:auto;display:block;flex-shrink:0;">
   </a>
   <div class="nav-links">
     <a class="nav-link" href="index.html#articles">Artículos</a>
@@ -307,8 +307,8 @@ footer{background:var(--ink);padding:0;}
 <footer>
   <div class="ft">
     <div class="ft-brand">
-      <div class="ft-logo">
-        <img src="NIT logo Black.png" alt="Nouscience Institute of Theology" style="height:56px;width:auto;display:block;max-width:220px;object-fit:contain;object-position:left center;">
+      <div class="ft-logo" style="overflow:hidden;height:72px;display:flex;align-items:center;">
+        <img src="NIT logo Black.png" alt="Nouscience Institute of Theology" style="height:210px;width:auto;display:block;flex-shrink:0;filter:brightness(2.5);mix-blend-mode:screen;">
       </div>
       <p class="ft-desc">El conocimiento de Dios al alcance de todos. Estudios teológicos rigurosos para el mundo hispanohablante, basados en las Sagradas Escrituras.</p>
       <div class="ft-issn">nouscience.com · Est. MMXXV</div>
