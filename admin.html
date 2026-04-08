@@ -231,6 +231,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
             <input class="form-input" type="text" id="fTime" placeholder="Auto" readonly style="background:var(--bg);color:var(--ink3);cursor:default;" title="Se calcula automáticamente según el contenido"/>
           </div>
         </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Código de artículo</label>
+          <input class="form-input" type="text" id="fCode" readonly
+            style="background:var(--bg);color:var(--ink3);cursor:default;font-family:monospace;letter-spacing:.06em;font-size:12px;"
+            placeholder="Se genera automáticamente al guardar"/>
+        </div>
 
         <div class="form-divider"></div>
         <div class="form-sec-label">Resumen / Abstract</div>
@@ -310,11 +316,33 @@ async function sbDelete(id){
   if(!r.ok) throw new Error('Error '+r.status+': '+(await r.text()));
 }
 
+// DISCIPLINE → CODE
+const DISC_CODES={
+  'Teología Bíblica':'TB','Teología Sistemática':'TS','Cristología':'CR',
+  'Soteriología':'ST','Teología Moral':'TM','Apologética':'AP',
+  'Angelología':'AN','Escatología':'ES','Teología Histórica':'TH',
+  'Hermenéutica':'HR','Eclesiología':'EC','Pneumatología':'PN'
+};
+function discCode(disc){return DISC_CODES[disc]||'TL';}
+
+async function generateArticleCode(disc){
+  const dc=discCode(disc);
+  const year=new Date().getFullYear();
+  const prefix=`NIT-${dc}-${year}-`;
+  const nums=cache
+    .filter(a=>a.articleCode&&a.articleCode.startsWith(prefix))
+    .map(a=>parseInt(a.articleCode.slice(prefix.length),10))
+    .filter(n=>!isNaN(n));
+  const next=nums.length?Math.max(...nums)+1:1;
+  return prefix+String(next).padStart(3,'0');
+}
+
 // MAPPING
 function toDb(a){
   return{id:a.id,title:a.title||null,subtitle:a.subtitle||null,abstract:a.abstract||null,
     author:a.author||null,author_title:a.authorTitle||null,discipline:a.discipline||null,
     tags:a.tags||[],read_time:a.readTime||null,content:a.content||null,
+    article_code:a.articleCode||null,
     featured:!!a.featured,published:!!a.published,published_at:a.publishedAt||null,
     created_at:a.createdAt||new Date().toISOString(),updated_at:new Date().toISOString()};
 }
@@ -322,6 +350,7 @@ function fromDb(r){
   return{id:r.id,title:r.title||'',subtitle:r.subtitle||'',abstract:r.abstract||'',
     author:r.author||'',authorTitle:r.author_title||'',discipline:r.discipline||'',
     tags:r.tags||[],readTime:r.read_time||'',content:r.content||'',
+    articleCode:r.article_code||'',
     featured:!!r.featured,published:!!r.published,publishedAt:r.published_at,
     createdAt:r.created_at,updatedAt:r.updated_at};
 }
@@ -380,7 +409,7 @@ function newArticle(){
   document.getElementById('fTitle').focus();
 }
 function clearForm(){
-  ['fTitle','fSubtitle','fAuthor','fAuthorTitle','fTags','fTime','fAbstract'].forEach(id=>document.getElementById(id).value='');
+  ['fTitle','fSubtitle','fAuthor','fAuthorTitle','fTags','fTime','fCode','fAbstract'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fDisc').value='';
   document.getElementById('fFeatured').checked=false;
   if(quill) quill.setContents([]);
@@ -402,6 +431,7 @@ function loadArt(id){
   document.getElementById('fDisc').value=a.discipline;
   document.getElementById('fTags').value=(a.tags||[]).join(', ');
   document.getElementById('fTime').value=a.readTime;
+  document.getElementById('fCode').value=a.articleCode||'';
   document.getElementById('fAbstract').value=a.abstract;
   document.getElementById('fFeatured').checked=a.featured;
   if(quill) quill.root.innerHTML=a.content||'';
@@ -419,7 +449,7 @@ function setStatus(pub,date){
 }
 
 // BUILD
-function buildData(published){
+function buildData(published,articleCode){
   const ex=cache.find(a=>a.id===curId);
   return{id:curId||genId(),
     title:document.getElementById('fTitle').value.trim(),
@@ -431,6 +461,7 @@ function buildData(published){
     readTime:document.getElementById('fTime').value.trim(),
     abstract:document.getElementById('fAbstract').value.trim(),
     content:quill?quill.root.innerHTML:'',
+    articleCode:ex?.articleCode||articleCode||null,
     featured:document.getElementById('fFeatured').checked,
     published:published,
     publishedAt:published?(ex?.publishedAt||new Date().toISOString()):null,
@@ -442,7 +473,9 @@ function buildData(published){
 async function saveDraft(){
   if(!validate())return;
   const ex=cache.find(a=>a.id===curId);
-  const art=buildData(ex?.published||false);
+  let code=ex?.articleCode||null;
+  if(!curId) code=await generateArticleCode(document.getElementById('fDisc').value);
+  const art=buildData(ex?.published||false,code);
   const isNew=!curId;
   if(!curId) curId=art.id;
   setBusy(true);
@@ -451,6 +484,7 @@ async function saveDraft(){
     updateCache(art);
     setStatus(art.published,art.updatedAt);
     document.getElementById('btnPrev').href='article.html?id='+curId;
+    document.getElementById('fCode').value=art.articleCode||'';
     renderList();
     toast('Borrador guardado',true);
   }catch(e){toast('Error: '+e.message);}
@@ -466,7 +500,9 @@ async function togglePublish(){
     }
   }
   const ex=cache.find(a=>a.id===curId);
-  const art=buildData(!(ex?.published||false));
+  let code=ex?.articleCode||null;
+  if(!curId) code=await generateArticleCode(document.getElementById('fDisc').value);
+  const art=buildData(!(ex?.published||false),code);
   const isNew=!curId;
   if(!curId) curId=art.id;
   setBusy(true);
