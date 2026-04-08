@@ -774,7 +774,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
   );
   const params=new URLSearchParams(location.search);
   const articleId=params.get('id')||'';
-  let _user=null, _savedRowId=null, _hlPopup=null, _selection=null;
+  let _user=null, _savedRowId=null, _hlPopup=null, _savedRange=null;
 
   // ── INIT ──
   // Show save button as soon as article template is ready, regardless of login
@@ -860,8 +860,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     attempt();
   }
 
-  function getTextOffsets(container,sel){
-    const range=sel.getRangeAt(0);
+  function getTextOffsetsFromRange(container,range){
     const pre=document.createRange();
     pre.selectNodeContents(container);
     pre.setEnd(range.startContainer,range.startOffset);
@@ -917,7 +916,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
       artToast('Inicia sesión para resaltar texto');
       return;
     }
-    _selection=sel;
+    _savedRange=sel.getRangeAt(0).cloneRange();
     showPopup(e.clientX,e.clientY);
   });
 
@@ -944,10 +943,12 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
 
   window.saveHL=async function(color){
     hidePopup();
-    if(!_selection||_selection.isCollapsed) return;
+    const range=_savedRange;
+    _savedRange=null;
+    if(!range||range.collapsed) return;
     const contentEl=document.getElementById('artContent');
     if(!contentEl) return;
-    const {start,end,text}=getTextOffsets(contentEl,_selection);
+    const {start,end,text}=getTextOffsetsFromRange(contentEl,range);
     if(!text.trim()) return;
     const {data,error}=await sb.from('highlights').insert({
       user_id:_user.id,
@@ -958,9 +959,8 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
       position_end:end
     }).select('id').single();
     if(error){ artToast('Error al resaltar: '+error.message); }
-    else if(data){ applyHighlightDOM(contentEl,start,end,color,data.id); }
+    else if(data){ applyHighlightDOM(contentEl,start,end,color,data.id); artToast('✓ Resaltado guardado'); }
     window.getSelection()?.removeAllRanges();
-    _selection=null;
   };
 
   document.addEventListener('mousedown',e=>{
