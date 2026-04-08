@@ -325,7 +325,7 @@ const DISC_CODES={
 };
 function discCode(disc){return DISC_CODES[disc]||'TL';}
 
-async function generateArticleCode(disc){
+function generateArticleCode(disc){
   const dc=discCode(disc);
   const year=new Date().getFullYear();
   const prefix=`NIT-${dc}-${year}-`;
@@ -412,7 +412,7 @@ function clearForm(){
   ['fTitle','fSubtitle','fAuthor','fAuthorTitle','fTags','fTime','fCode','fAbstract'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fDisc').value='';
   document.getElementById('fFeatured').checked=false;
-  if(quill) quill.setContents([]);
+  if(quill) quill.setContents([],'silent');
   setStatus(false,null);
   document.getElementById('btnPub').textContent='Publicar artículo';
   document.getElementById('btnPub').classList.remove('is-pub');
@@ -434,7 +434,10 @@ function loadArt(id){
   document.getElementById('fCode').value=a.articleCode||'';
   document.getElementById('fAbstract').value=a.abstract;
   document.getElementById('fFeatured').checked=a.featured;
-  if(quill) quill.root.innerHTML=a.content||'';
+  if(quill){
+    const delta=quill.clipboard.convert(a.content||'');
+    quill.setContents(delta,'silent');
+  }
   setStatus(a.published,a.updatedAt);
   document.getElementById('btnPub').textContent=a.published?'✓ Publicado':'Publicar artículo';
   document.getElementById('btnPub').classList.toggle('is-pub',a.published);
@@ -474,7 +477,7 @@ async function saveDraft(){
   if(!validate())return;
   const ex=cache.find(a=>a.id===curId);
   let code=ex?.articleCode||null;
-  if(!code) code=await generateArticleCode(document.getElementById('fDisc').value);
+  if(!code) code=generateArticleCode(document.getElementById('fDisc').value);
   const art=buildData(ex?.published||false,code);
   const isNew=!curId;
   if(!curId) curId=art.id;
@@ -488,7 +491,7 @@ async function saveDraft(){
     renderList();
     toast('Borrador guardado',true);
   }catch(e){toast('Error: '+e.message);}
-  setBusy(false);
+  finally{setBusy(false);}
 }
 
 // PUBLISH
@@ -501,7 +504,7 @@ async function togglePublish(){
   }
   const ex=cache.find(a=>a.id===curId);
   let code=ex?.articleCode||null;
-  if(!code) code=await generateArticleCode(document.getElementById('fDisc').value);
+  if(!code) code=generateArticleCode(document.getElementById('fDisc').value);
   const art=buildData(!(ex?.published||false),code);
   const isNew=!curId;
   if(!curId) curId=art.id;
@@ -517,7 +520,7 @@ async function togglePublish(){
     toast(art.published?'¡Artículo publicado!':'Artículo despublicado',art.published);
     renderList();
   }catch(e){toast('Error: '+e.message);}
-  setBusy(false);
+  finally{setBusy(false);}
 }
 
 // DELETE
