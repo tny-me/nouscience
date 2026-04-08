@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mi Perfil — Nouscience Institute of Theology</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="apple-touch-icon" href="favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#F5F4F0;--surface:#fff;--ink:#080806;--ink2:#2C2C28;
+  --ink3:#706F68;--ink4:#AEADA6;--blue:#1240AB;--bluemid:#1A52CC;
+  --bluepale:#EBF0FF;--amber:#D4820A;--amberpale:#FFF3DC;
+  --red:#C41E3A;--rule:#E2E0D8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:#fff;color:var(--ink);font-family:'Inter','Arial',sans-serif;font-weight:300;line-height:1.65;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--surface);border-bottom:1px solid var(--rule);height:72px;display:flex;align-items:stretch;}
+.nav-brand{display:flex;align-items:center;padding:0 20px;overflow:hidden;border-right:1px solid var(--rule);text-decoration:none;}
+.nav-links{flex:1;display:flex;align-items:center;padding:0 24px;gap:2px;}
+.nav-link{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);text-decoration:none;padding:0 14px;height:72px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
+.nav-link:hover{color:var(--blue);border-color:var(--blue);}
+.nav-right{display:flex;align-items:center;padding:0 20px;gap:10px;border-left:1px solid var(--rule);}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;letter-spacing:-.01em;flex-shrink:0;}
+.nav-user-name{font-size:12px;font-weight:500;color:var(--ink2);}
+.btn-signout{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);background:none;border:none;cursor:pointer;padding:6px 10px;transition:color .2s;font-family:inherit;}
+.btn-signout:hover{color:var(--red);}
+
+/* ── HERO ── */
+.profile-hero{margin-top:72px;background:var(--surface);border-bottom:2px solid var(--rule);padding:40px 0;}
+.profile-hero-inner{max-width:960px;margin:0 auto;padding:0 48px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+.ph-avatar{
+  width:72px;height:72px;border-radius:50%;background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.02em;
+}
+.ph-info{flex:1;}
+.ph-name{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--ink);line-height:1.15;margin-bottom:4px;}
+.ph-role{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:2px;}
+.ph-inst{font-size:13px;color:var(--ink3);}
+.ph-actions{margin-left:auto;display:flex;gap:10px;}
+.btn-so{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);background:none;border:1px solid var(--rule);padding:8px 16px;cursor:pointer;transition:color .2s,border-color .2s;font-family:inherit;}
+.btn-so:hover{color:var(--red);border-color:var(--red);}
+
+/* ── TABS ── */
+.profile-tabs{background:#fff;border-bottom:1px solid var(--rule);}
+.profile-tabs-inner{max-width:960px;margin:0 auto;padding:0 48px;display:flex;}
+.ptab{
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink4);background:none;border:none;border-bottom:2px solid transparent;
+  padding:16px 20px;cursor:pointer;transition:color .2s,border-color .2s;
+  font-family:inherit;margin-bottom:-1px;
+}
+.ptab.on{color:var(--blue);border-bottom-color:var(--blue);}
+
+/* ── CONTENT WRAPPER ── */
+.profile-body{max-width:960px;margin:0 auto;padding:40px 48px 80px;}
+
+/* ── SAVED ARTICLES ── */
+.saved-empty{text-align:center;padding:60px 20px;color:var(--ink4);}
+.saved-empty-icon{font-size:36px;opacity:.3;margin-bottom:12px;}
+.saved-empty-t{font-size:15px;font-weight:500;color:var(--ink3);margin-bottom:6px;}
+.saved-empty-d{font-size:13px;}
+.saved-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+.saved-card{
+  border:1px solid var(--rule);padding:20px;text-decoration:none;color:inherit;
+  display:block;transition:border-color .2s;position:relative;
+}
+.saved-card:hover{border-color:var(--blue);}
+.sc-disc{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
+.sc-title{font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1.3;color:var(--ink);margin-bottom:6px;}
+.sc-abstract{font-size:12px;color:var(--ink3);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px;}
+.sc-meta{font-size:11px;color:var(--ink4);display:flex;align-items:center;justify-content:space-between;}
+.sc-remove{
+  background:none;border:none;cursor:pointer;color:var(--ink4);
+  font-size:11px;padding:4px;transition:color .2s;font-family:inherit;
+  letter-spacing:.04em;text-transform:uppercase;font-weight:600;
+}
+.sc-remove:hover{color:var(--red);}
+
+/* ── HIGHLIGHTS ── */
+.hl-empty{text-align:center;padding:60px 20px;color:var(--ink4);}
+.hl-group{margin-bottom:32px;}
+.hl-group-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--rule);}
+.hl-group-title a{color:var(--blue);text-decoration:none;}
+.hl-group-title a:hover{text-decoration:underline;}
+.hl-item{
+  border-left:3px solid var(--rule);padding:10px 14px;margin-bottom:8px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.hl-item.hl-yellow{border-left-color:#F5C500;}
+.hl-item.hl-blue{border-left-color:#4A90D9;}
+.hl-item.hl-green{border-left-color:#3A9E5C;}
+.hl-text{font-size:14px;font-weight:300;color:var(--ink2);line-height:1.6;flex:1;font-style:italic;}
+.hl-del{
+  background:none;border:none;cursor:pointer;color:var(--ink4);
+  font-size:16px;flex-shrink:0;padding:0 2px;transition:color .2s;line-height:1;
+}
+.hl-del:hover{color:var(--red);}
+.hl-note{font-size:11px;color:var(--ink3);margin-top:4px;}
+
+/* ── EDIT PROFILE ── */
+.edit-form{max-width:560px;}
+.f-lbl{display:block;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.f-inp{display:block;width:100%;padding:10px 12px;border:1px solid var(--rule);font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);outline:none;margin-bottom:18px;transition:border-color .2s;}
+.f-inp:focus{border-color:var(--blue);}
+.f-sel{display:block;width:100%;padding:10px 12px;border:1px solid var(--rule);font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);outline:none;margin-bottom:18px;appearance:none;cursor:pointer;transition:border-color .2s;}
+.f-sel:focus{border-color:var(--blue);}
+.f-ta{display:block;width:100%;padding:10px 12px;border:1px solid var(--rule);font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);outline:none;margin-bottom:18px;resize:vertical;transition:border-color .2s;}
+.f-ta:focus{border-color:var(--blue);}
+.save-btn{
+  display:inline-block;padding:11px 28px;background:var(--blue);color:#fff;
+  border:none;font-family:inherit;font-size:12px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s;
+}
+.save-btn:hover{background:var(--bluemid);}
+.save-btn:disabled{opacity:.55;cursor:default;}
+.edit-ok{font-size:12px;color:#1B7F3B;margin-top:12px;}
+.edit-err{font-size:12px;color:var(--red);margin-top:12px;}
+
+/* ── FOOTER ── */
+footer{background:var(--ink);padding:0;}
+.ft{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding:64px 80px 48px;border-bottom:1px solid rgba(255,255,255,.07);}
+.ft-desc{font-size:13px;line-height:1.65;color:rgba(255,255,255,.3);margin-bottom:16px;}
+.ft-issn{font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.15);text-transform:uppercase;}
+.ft-ct{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px;}
+.ft-links{list-style:none;}
+.ft-links li{margin-bottom:8px;}
+.ft-links a{font-size:13px;color:rgba(255,255,255,.45);text-decoration:none;transition:color .2s;}
+.ft-links a:hover{color:#fff;}
+.ft-bot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:20px 80px;}
+.ft-copy{font-size:11px;color:rgba(255,255,255,.2);letter-spacing:.04em;}
+.ft-motto{font-size:11px;color:rgba(255,255,255,.15);font-style:italic;}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:var(--ink4);font-size:14px;}
+
+@media(max-width:700px){
+  .profile-hero-inner,.profile-tabs-inner,.profile-body{padding-left:20px;padding-right:20px;}
+  .ft{grid-template-columns:1fr;gap:32px;padding:40px 24px 32px;}
+  .ft-bot{padding:16px 24px;}
+  .nav-links{display:none;}
+  .ph-actions{width:100%;}
+  .saved-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="nav-brand" href="index.html">
+    <img src="NIT logo.png" alt="Nouscience Institute of Theology" style="height:115px;width:auto;display:block;flex-shrink:0;">
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html#articles">Artículos</a>
+    <a class="nav-link" href="index.html#disciplines">Disciplinas</a>
+    <a class="nav-link" href="index.html#manifesto">Misión</a>
+  </div>
+  <div class="nav-right" id="navRight">
+    <!-- populated by JS -->
+  </div>
+</nav>
+
+<!-- ── PROFILE HERO ── -->
+<div class="profile-hero">
+  <div class="profile-hero-inner" id="profileHero">
+    <div class="loading">Cargando perfil...</div>
+  </div>
+</div>
+
+<!-- ── TABS ── -->
+<div class="profile-tabs">
+  <div class="profile-tabs-inner">
+    <button class="ptab on" id="ptSaved"     onclick="showSection('saved')">Artículos guardados</button>
+    <button class="ptab"    id="ptHighlights" onclick="showSection('highlights')">Mis resaltados</button>
+    <button class="ptab"    id="ptEdit"       onclick="showSection('edit')">Editar perfil</button>
+  </div>
+</div>
+
+<!-- ── CONTENT ── -->
+<div class="profile-body">
+  <div id="secSaved">     <div class="loading">Cargando...</div></div>
+  <div id="secHighlights" style="display:none"><div class="loading">Cargando...</div></div>
+  <div id="secEdit"       style="display:none"><div class="loading">Cargando...</div></div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="ft">
+    <div class="ft-brand">
+      <div style="width:170px;height:72px;overflow:hidden;position:relative;margin-bottom:16px;">
+        <img src="NIT logo Black.png" alt="Nouscience" style="position:absolute;height:170px;width:auto;top:50%;transform:translateY(-50%);filter:brightness(2.5);mix-blend-mode:screen;">
+      </div>
+      <p class="ft-desc">El conocimiento de Dios al alcance de todos.</p>
+      <div class="ft-issn">nouscience.com · Est. MMXXV</div>
+    </div>
+    <div class="ft-col">
+      <div class="ft-ct">Disciplinas</div>
+      <ul class="ft-links">
+        <li><a href="index.html#disciplines">Teología Bíblica</a></li>
+        <li><a href="index.html#disciplines">Cristología</a></li>
+        <li><a href="index.html#disciplines">Apologética</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <div class="ft-ct">Instituto</div>
+      <ul class="ft-links">
+        <li><a href="index.html#manifesto">Misión y Valores</a></li>
+        <li><a href="auth.html">Mi cuenta</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy">© 2025 Nouscience Institute of Theology</span>
+    <span class="ft-motto">"La verdad os hará libres." — Juan 8:32</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const _sb = supabase.createClient(
+  'https://xduylfmrmxqnbtpyyjvb.supabase.co',
+  'sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65'
+);
+
+let _user = null;
+let _profile = null;
+let _savedIds = new Set();
+let _highlights = [];
+let _savedArticles = [];
+
+// ── INIT ──
+(async function init() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.href = 'auth.html'; return; }
+  _user = session.user;
+
+  // Nav
+  const initials = (_user.email || 'U').slice(0, 2).toUpperCase();
+  document.getElementById('navRight').innerHTML = `
+    <div class="nav-avatar">${esc(initials)}</div>
+    <button class="btn-signout" onclick="doSignOut()">Salir</button>
+  `;
+
+  await Promise.all([loadProfile(), loadSavedArticles(), loadHighlights()]);
+})();
+
+async function loadProfile() {
+  const { data } = await _sb.from('profiles').select('*').eq('id', _user.id).single();
+  _profile = data;
+  renderHero();
+  renderEditForm();
+}
+
+function renderHero() {
+  const name = _profile?.full_name || _user.email;
+  const initials = name.trim().split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  document.getElementById('profileHero').innerHTML = `
+    <div class="ph-avatar">${esc(initials)}</div>
+    <div class="ph-info">
+      <div class="ph-name">${esc(name)}</div>
+      ${_profile?.role ? `<div class="ph-role">${esc(_profile.role)}</div>` : ''}
+      ${_profile?.institution ? `<div class="ph-inst">${esc(_profile.institution)}</div>` : ''}
+    </div>
+    <div class="ph-actions">
+      <button class="btn-so" onclick="doSignOut()">Cerrar sesión</button>
+    </div>
+  `;
+}
+
+async function loadSavedArticles() {
+  const { data: saved } = await _sb.from('saved_articles')
+    .select('*').eq('user_id', _user.id).order('created_at', { ascending: false });
+  if (!saved || !saved.length) {
+    document.getElementById('secSaved').innerHTML = `
+      <div class="saved-empty">
+        <div class="saved-empty-icon">🔖</div>
+        <div class="saved-empty-t">No tienes artículos guardados</div>
+        <div class="saved-empty-d">Usa el botón "Guardar" en cualquier artículo para agregarlo aquí.</div>
+      </div>`;
+    return;
+  }
+
+  _savedIds = new Set(saved.map(s => s.article_id));
+
+  // Fetch actual article data
+  const SB_URL = 'https://xduylfmrmxqnbtpyyjvb.supabase.co';
+  const SB_KEY = 'sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
+  const ids = saved.map(s => s.article_id);
+  const filter = ids.map(id => `id.eq.${encodeURIComponent(id)}`).join(',');
+  let articles = [];
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/articles?or=(${filter})&select=id,title,abstract,discipline,article_code,published_at`,
+      { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
+    articles = await res.json();
+  } catch(e) {}
+
+  // Keep order from saved list
+  const articleMap = {};
+  articles.forEach(a => articleMap[a.id] = a);
+  _savedArticles = saved.map(s => ({ savedId: s.id, ...articleMap[s.article_id] })).filter(a => a.id);
+
+  const html = _savedArticles.map(a => `
+    <a class="saved-card" href="article.html?id=${esc(a.id)}">
+      <div class="sc-disc">${esc(a.discipline || 'Teología')}</div>
+      <div class="sc-title">${esc(a.title || 'Sin título')}</div>
+      ${a.abstract ? `<div class="sc-abstract">${esc(a.abstract)}</div>` : ''}
+      <div class="sc-meta">
+        <span>${a.article_code ? esc(a.article_code) : ''}</span>
+        <button class="sc-remove" onclick="removeSaved(event,'${esc(a.id)}','${esc(a.savedId)}')">✕ Quitar</button>
+      </div>
+    </a>`).join('');
+
+  document.getElementById('secSaved').innerHTML = `<div class="saved-grid">${html}</div>`;
+}
+
+async function removeSaved(e, articleId, savedId) {
+  e.preventDefault(); e.stopPropagation();
+  await _sb.from('saved_articles').delete().eq('id', savedId);
+  _savedIds.delete(articleId);
+  loadSavedArticles();
+}
+
+async function loadHighlights() {
+  const { data } = await _sb.from('highlights')
+    .select('*').eq('user_id', _user.id).order('created_at', { ascending: false });
+  _highlights = data || [];
+  renderHighlights();
+}
+
+function renderHighlights() {
+  if (!_highlights.length) {
+    document.getElementById('secHighlights').innerHTML = `
+      <div class="hl-empty">
+        <div class="saved-empty-icon">✏️</div>
+        <div class="saved-empty-t">No tienes resaltados aún</div>
+        <div class="saved-empty-d">Selecciona texto en cualquier artículo para resaltarlo.</div>
+      </div>`;
+    return;
+  }
+
+  // Group by article_id
+  const groups = {};
+  _highlights.forEach(h => {
+    if (!groups[h.article_id]) groups[h.article_id] = { title: h.article_title || h.article_id, items: [] };
+    groups[h.article_id].items.push(h);
+  });
+
+  const html = Object.entries(groups).map(([articleId, g]) => `
+    <div class="hl-group">
+      <div class="hl-group-title">
+        <a href="article.html?id=${esc(articleId)}">${esc(g.title)}</a>
+      </div>
+      ${g.items.map(h => `
+        <div class="hl-item hl-${esc(h.color||'yellow')}">
+          <div class="hl-text">
+            "${esc(h.selected_text)}"
+            ${h.note ? `<div class="hl-note">${esc(h.note)}</div>` : ''}
+          </div>
+          <button class="hl-del" onclick="deleteHighlight('${esc(h.id)}')" title="Eliminar resaltado">×</button>
+        </div>`).join('')}
+    </div>`).join('');
+
+  document.getElementById('secHighlights').innerHTML = html;
+}
+
+async function deleteHighlight(id) {
+  await _sb.from('highlights').delete().eq('id', id);
+  _highlights = _highlights.filter(h => h.id !== id);
+  renderHighlights();
+}
+
+function renderEditForm() {
+  const p = _profile || {};
+  document.getElementById('secEdit').innerHTML = `
+    <div class="edit-form">
+      <label class="f-lbl" for="eName">Nombre completo</label>
+      <input class="f-inp" type="text" id="eName" value="${esc(p.full_name || '')}" placeholder="Tu nombre completo"/>
+
+      <label class="f-lbl" for="eRole">Rol o vocación</label>
+      <select class="f-sel" id="eRole">
+        <option value="">Selecciona...</option>
+        ${['Obispo','Sacerdote','Diácono','Pastor','Ministro ordenado',
+           'Maestro de Teología','Seminarista','Estudiante de Teología','Investigador',
+           'Misionero','Teólogo laico','Feligrés interesado','Otro']
+          .map(r => `<option value="${r}" ${p.role===r?'selected':''}>${r}</option>`).join('')}
+      </select>
+
+      <label class="f-lbl" for="eInst">Institución u organización</label>
+      <input class="f-inp" type="text" id="eInst" value="${esc(p.institution || '')}" placeholder="Seminario, iglesia, universidad..."/>
+
+      <label class="f-lbl" for="eBio">Breve presentación</label>
+      <textarea class="f-ta" id="eBio" rows="3" placeholder="Cuéntanos un poco sobre ti...">${esc(p.bio || '')}</textarea>
+
+      <button class="save-btn" id="btnSaveProfile" onclick="saveProfile()">Guardar cambios</button>
+      <div class="edit-ok"  id="editOk"></div>
+      <div class="edit-err" id="editErr"></div>
+    </div>`;
+}
+
+async function saveProfile() {
+  const btn = document.getElementById('btnSaveProfile');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  document.getElementById('editOk').textContent = '';
+  document.getElementById('editErr').textContent = '';
+
+  const payload = {
+    id: _user.id,
+    full_name: document.getElementById('eName').value.trim(),
+    role: document.getElementById('eRole').value || null,
+    institution: document.getElementById('eInst').value.trim() || null,
+    bio: document.getElementById('eBio').value.trim() || null
+  };
+
+  const { error } = await _sb.from('profiles').upsert(payload);
+  if (error) {
+    document.getElementById('editErr').textContent = error.message;
+  } else {
+    _profile = { ..._profile, ...payload };
+    renderHero();
+    document.getElementById('editOk').textContent = '✓ Perfil actualizado.';
+  }
+  btn.disabled = false; btn.textContent = 'Guardar cambios';
+}
+
+function showSection(sec) {
+  ['saved','highlights','edit'].forEach(s => {
+    document.getElementById('sec' + s.charAt(0).toUpperCase() + s.slice(1)).style.display = s === sec ? '' : 'none';
+    document.getElementById('pt' + s.charAt(0).toUpperCase() + s.slice(1)).className = 'ptab' + (s === sec ? ' on' : '');
+  });
+}
+
+async function doSignOut() {
+  await _sb.auth.signOut();
+  window.location.href = 'index.html';
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
