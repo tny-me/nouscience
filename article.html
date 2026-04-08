@@ -777,9 +777,24 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
   let _user=null, _savedRowId=null, _hlPopup=null, _selection=null;
 
   // ── INIT ──
+  // Show save button as soon as article template is ready, regardless of login
+  function initSaveBtn(loggedIn){
+    const attempt=()=>{
+      const btn=document.getElementById('saveBtn');
+      if(!btn){ setTimeout(attempt,150); return; }
+      btn.style.display='inline-flex';
+      if(!loggedIn){
+        const txt=document.getElementById('saveBtnTxt');
+        if(txt) txt.textContent='Iniciar sesión para guardar';
+      }
+    };
+    attempt();
+  }
+
   sb.auth.getSession().then(async({data:{session}})=>{
-    if(!session) return;
+    if(!session){ initSaveBtn(false); return; }
     _user=session.user;
+    initSaveBtn(true);
 
     // Update nav
     const nr=document.getElementById('navRight');
@@ -792,10 +807,6 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
         <a href="profile.html" class="nav-user-name">${name.split(' ')[0]||'Mi perfil'}</a>
       `;
     }
-
-    // Show save button
-    const btn=document.getElementById('saveBtn');
-    if(btn) btn.style.display='inline-flex';
 
     if(!articleId) return;
     await Promise.all([checkSaved(), loadHighlights()]);
@@ -892,13 +903,16 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
 
   // ── HIGHLIGHT POPUP on text selection ──
   document.addEventListener('mouseup',e=>{
-    if(!_user) return;
     if(_hlPopup&&_hlPopup.contains(e.target)) return;
     hidePopup();
     const sel=window.getSelection();
     if(!sel||sel.isCollapsed||!sel.toString().trim()) return;
     const contentEl=document.getElementById('artContent');
     if(!contentEl||!contentEl.contains(sel.anchorNode)) return;
+    if(!_user){
+      artToast('Inicia sesión para resaltar texto');
+      return;
+    }
     _selection=sel;
     showPopup(e.clientX,e.clientY);
   });
