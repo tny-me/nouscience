@@ -474,7 +474,7 @@ async function saveDraft(){
   if(!validate())return;
   const ex=cache.find(a=>a.id===curId);
   let code=ex?.articleCode||null;
-  if(!curId) code=await generateArticleCode(document.getElementById('fDisc').value);
+  if(!code) code=await generateArticleCode(document.getElementById('fDisc').value);
   const art=buildData(ex?.published||false,code);
   const isNew=!curId;
   if(!curId) curId=art.id;
@@ -501,7 +501,7 @@ async function togglePublish(){
   }
   const ex=cache.find(a=>a.id===curId);
   let code=ex?.articleCode||null;
-  if(!curId) code=await generateArticleCode(document.getElementById('fDisc').value);
+  if(!code) code=await generateArticleCode(document.getElementById('fDisc').value);
   const art=buildData(!(ex?.published||false),code);
   const isNew=!curId;
   if(!curId) curId=art.id;
@@ -511,6 +511,7 @@ async function togglePublish(){
     updateCache(art);
     setStatus(art.published,art.updatedAt);
     document.getElementById('btnPrev').href='article.html?id='+curId;
+    document.getElementById('fCode').value=art.articleCode||'';
     document.getElementById('btnPub').textContent=art.published?'✓ Publicado':'Publicar artículo';
     document.getElementById('btnPub').classList.toggle('is-pub',art.published);
     toast(art.published?'¡Artículo publicado!':'Artículo despublicado',art.published);
