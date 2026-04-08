@@ -98,9 +98,10 @@ nav{
 .art-badge.rd{background:#FFF0F2;color:var(--red);}
 
 /* Article type label */
-.art-type-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.art-type-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;}
 .art-type-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4);}
 .art-oa-badge{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:#E8F5E9;color:#1B7F3B;padding:2px 8px;border:1px solid #C3E8D4;}
+.art-code{font-size:9px;font-weight:600;letter-spacing:.1em;font-family:'Courier New',monospace;color:var(--ink4);margin-left:auto;}
 
 /* Tags */
 .art-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
@@ -323,6 +324,10 @@ footer{background:var(--ink);padding:0;}
     font-size:7.5pt;text-transform:uppercase;letter-spacing:.12em;
     color:#555;font-family:'Inter',Arial,sans-serif;font-weight:600;
   }
+  .art-code{
+    font-size:7.5pt;font-family:'Courier New',monospace;
+    color:#666;letter-spacing:.08em;margin-left:auto;
+  }
 
   .art-title{
     font-size:17pt!important;font-weight:bold;line-height:1.18;
@@ -539,11 +544,12 @@ footer{background:var(--ink);padding:0;}
   if (!a) { notFound(); return; }
 
   // Supabase usa snake_case — mapeamos
-  a.authorTitle = a.author_title || '';
-  a.readTime    = a.read_time    || '';
-  a.publishedAt = a.published_at || a.updated_at || a.created_at;
-  a.abstract    = a.abstract     || '';
-  a.tags        = a.tags         || [];
+  a.authorTitle  = a.author_title  || '';
+  a.readTime     = a.read_time     || '';
+  a.publishedAt  = a.published_at  || a.updated_at || a.created_at;
+  a.abstract     = a.abstract      || '';
+  a.tags         = a.tags          || [];
+  a.articleCode  = a.article_code  || '';
 
   // Update page meta
   document.getElementById('pageTitle').textContent  = a.title + ' — Nouscience';
@@ -590,6 +596,7 @@ footer{background:var(--ink);padding:0;}
         <div class="art-type-row">
           <span class="art-type-lbl">Artículo de Investigación</span>
           <span class="art-oa-badge">Acceso Libre</span>
+          ${a.articleCode ? `<span class="art-code">${esc(a.articleCode)}</span>` : ''}
         </div>
 
         <h1 class="art-title">${esc(a.title)}</h1>
