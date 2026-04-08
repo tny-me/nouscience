@@ -69,12 +69,6 @@ nav{
 }
 .nf-btn:hover{background:var(--bluemid);}
 
-/* ── JOURNAL STRIP ── */
-.art-journal-strip{background:var(--blue);padding:9px 0;}
-.art-journal-strip-inner{max-width:1120px;margin:0 auto;padding:0 48px;display:flex;align-items:center;justify-content:space-between;}
-.ajstrip-name{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#fff;}
-.ajstrip-meta{font-size:9px;color:rgba(255,255,255,.55);letter-spacing:.1em;}
-
 /* ── ARTICLE HEADER ── */
 .art-header{
   background:var(--surface);padding:44px 0 40px;
@@ -161,6 +155,7 @@ nav{
 /* ── ARTICLE BODY + TOC LAYOUT ── */
 .article-layout{
   max-width:1120px;margin:0 auto;padding:56px 48px 80px;
+  background:var(--surface);
 }
 .article-layout.has-toc{
   display:grid;grid-template-columns:1fr 240px;gap:64px;align-items:start;
@@ -426,14 +421,6 @@ footer{background:var(--ink);padding:0;}
   const readTime = a.readTime ? a.readTime : '';
 
   page.innerHTML = `
-    <!-- JOURNAL STRIP -->
-    <div class="art-journal-strip">
-      <div class="art-journal-strip-inner">
-        <span class="ajstrip-name">Nouscience Institute of Theology</span>
-        <span class="ajstrip-meta">Acceso Abierto · Teología &amp; Ciencias Bíblicas</span>
-      </div>
-    </div>
-
     <!-- HEADER -->
     <div class="art-header">
       <div class="art-header-inner">
@@ -447,13 +434,13 @@ footer{background:var(--ink);padding:0;}
           <span class="art-oa-badge">Acceso Libre</span>
         </div>
 
-        <div class="art-badge ${discClass(a.discipline)}">${esc(a.discipline || 'Teología')}</div>
-
-        ${tags.length ? `<div class="art-tags">${tags.map(t=>`<span class="art-tag">${esc(t)}</span>`).join('')}</div>` : ''}
-
         <h1 class="art-title">${esc(a.title)}</h1>
 
         ${a.subtitle ? `<p class="art-subtitle">${esc(a.subtitle)}</p>` : ''}
+
+        <div class="art-badge ${discClass(a.discipline)}">${esc(a.discipline || 'Teología')}</div>
+
+        ${tags.length ? `<div class="art-tags">${tags.map(t=>`<span class="art-tag">${esc(t)}</span>`).join('')}</div>` : ''}
 
         <div class="art-meta-row">
           ${a.author ? `
