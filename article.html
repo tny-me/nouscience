@@ -799,8 +799,8 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     // Update nav
     const nr=document.getElementById('navRight');
     if(nr){
-      const meta=session.user.user_metadata||{};
-      const name=(meta.full_name||session.user.email||'').trim();
+      const {data:prof}=await sb.from('profiles').select('full_name').eq('id',session.user.id).single();
+      const name=(prof?.full_name||session.user.user_metadata?.full_name||session.user.email||'').trim();
       const initials=name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()||'U';
       nr.innerHTML=`
         <a href="profile.html" class="nav-avatar" title="Mi perfil">${initials}</a>
@@ -848,12 +848,16 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
 
   // ── HIGHLIGHTS ──
   async function loadHighlights(){
-    const contentEl=document.getElementById('artContent');
-    if(!contentEl) return;
-    const {data}=await sb.from('highlights')
-      .select('*').eq('user_id',_user.id).eq('article_id',articleId);
-    if(!data||!data.length) return;
-    data.forEach(h=>applyHighlightDOM(contentEl,h.position_start,h.position_end,h.color,h.id));
+    const attempt=async()=>{
+      const contentEl=document.getElementById('artContent');
+      if(!contentEl||!contentEl.textContent.trim()){ setTimeout(attempt,200); return; }
+      const {data,error}=await sb.from('highlights')
+        .select('*').eq('user_id',_user.id).eq('article_id',articleId);
+      if(error){ artToast('Error cargando resaltados: '+error.message); return; }
+      if(!data||!data.length) return;
+      data.forEach(h=>applyHighlightDOM(contentEl,h.position_start,h.position_end,h.color,h.id));
+    };
+    attempt();
   }
 
   function getTextOffsets(container,sel){
