@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Acceder — Nouscience Institute of Theology</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="apple-touch-icon" href="favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#F5F4F0;--surface:#fff;--ink:#080806;--ink2:#2C2C28;
+  --ink3:#706F68;--ink4:#AEADA6;--blue:#1240AB;--bluemid:#1A52CC;
+  --bluepale:#EBF0FF;--rule:#E2E0D8;--red:#C41E3A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:'Inter','Arial',sans-serif;font-weight:300;line-height:1.65;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;
+}
+.auth-wrap{width:100%;max-width:430px;}
+
+/* Logo */
+.auth-logo{display:flex;justify-content:center;margin-bottom:32px;}
+.auth-logo-box{width:90px;height:90px;overflow:hidden;position:relative;}
+.auth-logo-box img{position:absolute;height:270px;width:auto;left:50%;top:50%;transform:translate(-50%,-50%);}
+
+/* Card */
+.auth-card{background:var(--surface);border:1px solid var(--rule);padding:36px 40px;}
+
+/* Tabs */
+.auth-tabs{display:flex;margin-bottom:28px;border-bottom:1px solid var(--rule);}
+.auth-tab{
+  flex:1;padding:10px 0;font-size:11px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink4);background:none;border:none;
+  border-bottom:2px solid transparent;cursor:pointer;transition:color .2s,border-color .2s;
+  font-family:inherit;margin-bottom:-1px;
+}
+.auth-tab.on{color:var(--blue);border-bottom-color:var(--blue);}
+
+/* Form */
+.f-lbl{display:block;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.f-inp{
+  display:block;width:100%;padding:10px 12px;
+  border:1px solid var(--rule);font-family:inherit;font-size:14px;
+  color:var(--ink);background:var(--surface);outline:none;margin-bottom:16px;
+  transition:border-color .2s;
+}
+.f-inp:focus{border-color:var(--blue);}
+.f-sel{
+  display:block;width:100%;padding:10px 12px;
+  border:1px solid var(--rule);font-family:inherit;font-size:14px;
+  color:var(--ink);background:var(--surface);outline:none;margin-bottom:16px;
+  appearance:none;cursor:pointer;transition:border-color .2s;
+}
+.f-sel:focus{border-color:var(--blue);}
+.auth-btn{
+  display:block;width:100%;padding:13px;background:var(--blue);color:#fff;
+  border:none;font-family:inherit;font-size:12px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  transition:background .2s;margin-top:4px;
+}
+.auth-btn:hover{background:var(--bluemid);}
+.auth-btn:disabled{opacity:.55;cursor:default;}
+.auth-err{font-size:12px;color:var(--red);margin-top:10px;min-height:16px;line-height:1.4;}
+.auth-ok{font-size:12px;color:#1B7F3B;margin-top:10px;min-height:16px;line-height:1.4;}
+.sec-sep{
+  font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink4);display:flex;align-items:center;gap:10px;
+  margin:8px 0 18px;
+}
+.sec-sep::before,.sec-sep::after{content:'';flex:1;height:1px;background:var(--rule);}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* Back link */
+.auth-back{text-align:center;margin-top:20px;font-size:12px;color:var(--ink4);}
+.auth-back a{color:var(--blue);text-decoration:none;}
+.auth-back a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+
+  <div class="auth-logo">
+    <div class="auth-logo-box">
+      <img src="NIT logo.png" alt="Nouscience Institute of Theology"/>
+    </div>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="tabLogin" onclick="showTab('login')">Iniciar sesión</button>
+      <button class="auth-tab" id="tabReg" onclick="showTab('reg')">Crear cuenta</button>
+    </div>
+
+    <!-- ── LOGIN ── -->
+    <form id="formLogin" onsubmit="doLogin(event)">
+      <label class="f-lbl" for="lEmail">Correo electrónico</label>
+      <input class="f-inp" type="email" id="lEmail" placeholder="tu@correo.com" required/>
+
+      <label class="f-lbl" for="lPass">Contraseña</label>
+      <input class="f-inp" type="password" id="lPass" placeholder="••••••••" required/>
+
+      <button class="auth-btn" id="btnLogin" type="submit">Entrar →</button>
+      <div class="auth-err" id="lErr"></div>
+    </form>
+
+    <!-- ── REGISTER ── -->
+    <form id="formReg" onsubmit="doRegister(event)" style="display:none">
+      <label class="f-lbl" for="rName">Nombre completo *</label>
+      <input class="f-inp" type="text" id="rName" placeholder="Tu nombre completo" required/>
+
+      <div class="f-row">
+        <div>
+          <label class="f-lbl" for="rEmail">Correo electrónico *</label>
+          <input class="f-inp" type="email" id="rEmail" placeholder="tu@correo.com" required/>
+        </div>
+        <div>
+          <label class="f-lbl" for="rPass">Contraseña *</label>
+          <input class="f-inp" type="password" id="rPass" placeholder="Mín. 8 caracteres" required minlength="8"/>
+        </div>
+      </div>
+
+      <div class="sec-sep">Información ministerial</div>
+
+      <label class="f-lbl" for="rRole">Rol o vocación *</label>
+      <select class="f-sel" id="rRole" required>
+        <option value="">Selecciona tu rol...</option>
+        <optgroup label="Clero ordenado">
+          <option value="Obispo">Obispo</option>
+          <option value="Sacerdote">Sacerdote / Presbítero</option>
+          <option value="Diácono">Diácono</option>
+          <option value="Pastor">Pastor evangélico</option>
+          <option value="Ministro ordenado">Ministro ordenado</option>
+        </optgroup>
+        <optgroup label="Académico y formación">
+          <option value="Maestro de Teología">Maestro / Profesor de Teología</option>
+          <option value="Seminarista">Seminarista</option>
+          <option value="Estudiante de Teología">Estudiante de Teología</option>
+          <option value="Investigador">Investigador teológico</option>
+        </optgroup>
+        <optgroup label="Laico y otros">
+          <option value="Misionero">Misionero</option>
+          <option value="Teólogo laico">Teólogo laico</option>
+          <option value="Feligrés interesado">Feligrés interesado</option>
+          <option value="Otro">Otro</option>
+        </optgroup>
+      </select>
+
+      <label class="f-lbl" for="rInst">Institución u organización</label>
+      <input class="f-inp" type="text" id="rInst" placeholder="Seminario, iglesia, universidad... (opcional)"/>
+
+      <button class="auth-btn" id="btnReg" type="submit">Crear cuenta →</button>
+      <div class="auth-err" id="rErr"></div>
+      <div class="auth-ok"  id="rOk"></div>
+    </form>
+  </div>
+
+  <div class="auth-back"><a href="index.html">← Volver a Nouscience</a></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const _sb = supabase.createClient(
+  'https://xduylfmrmxqnbtpyyjvb.supabase.co',
+  'sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65'
+);
+
+// Redirect if already logged in
+_sb.auth.getSession().then(({data:{session}})=>{
+  if(session) window.location.href='profile.html';
+});
+
+function showTab(tab){
+  document.getElementById('formLogin').style.display = tab==='login'?'':'none';
+  document.getElementById('formReg').style.display   = tab==='reg'  ?'':'none';
+  document.getElementById('tabLogin').className='auth-tab'+(tab==='login'?' on':'');
+  document.getElementById('tabReg').className  ='auth-tab'+(tab==='reg'  ?' on':'');
+}
+
+async function doLogin(e){
+  e.preventDefault();
+  const btn=document.getElementById('btnLogin');
+  const err=document.getElementById('lErr');
+  btn.disabled=true; btn.textContent='Entrando...'; err.textContent='';
+
+  const {error}=await _sb.auth.signInWithPassword({
+    email:document.getElementById('lEmail').value.trim(),
+    password:document.getElementById('lPass').value
+  });
+
+  if(error){
+    err.textContent=error.message==='Invalid login credentials'
+      ?'Correo o contraseña incorrectos.'
+      :error.message;
+    btn.disabled=false; btn.textContent='Entrar →';
+  } else {
+    const ret=new URLSearchParams(location.search).get('return')||'index.html';
+    window.location.href=ret;
+  }
+}
+
+async function doRegister(e){
+  e.preventDefault();
+  const btn=document.getElementById('btnReg');
+  const err=document.getElementById('rErr');
+  const ok =document.getElementById('rOk');
+  btn.disabled=true; btn.textContent='Creando cuenta...';
+  err.textContent=''; ok.textContent='';
+
+  const email=document.getElementById('rEmail').value.trim();
+  const pass =document.getElementById('rPass').value;
+  const name =document.getElementById('rName').value.trim();
+  const role =document.getElementById('rRole').value;
+  const inst =document.getElementById('rInst').value.trim();
+
+  const {data,error}=await _sb.auth.signUp({email,password:pass});
+
+  if(error){
+    err.textContent=error.message;
+    btn.disabled=false; btn.textContent='Crear cuenta →';
+    return;
+  }
+
+  // Create profile row
+  if(data.user){
+    await _sb.from('profiles').insert({
+      id:data.user.id,
+      full_name:name,
+      role:role||null,
+      institution:inst||null
+    });
+  }
+
+  if(!data.session){
+    // Email confirmation required
+    ok.textContent='✓ Cuenta creada. Revisa tu correo para confirmar y luego inicia sesión.';
+    btn.textContent='Cuenta creada';
+  } else {
+    window.location.href='profile.html';
+  }
+}
+</script>
+</body>
+</html>

@@ -268,6 +268,37 @@ footer{background:var(--ink);padding:0;}
 .ft-copy{font-size:11px;color:rgba(255,255,255,.2);letter-spacing:.04em;}
 .ft-motto{font-size:11px;color:rgba(255,255,255,.15);font-style:italic;}
 
+/* ── NAV AUTH ── */
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;text-decoration:none;flex-shrink:0;letter-spacing:-.01em;}
+.nav-user-name{font-size:12px;font-weight:500;color:var(--ink2);text-decoration:none;white-space:nowrap;}
+
+/* ── SAVE BUTTON ── */
+.save-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink3);border:1.5px solid var(--rule);background:transparent;
+  padding:8px 16px;cursor:pointer;transition:all .2s;font-family:inherit;
+}
+.save-btn:hover{color:var(--blue);border-color:var(--blue);}
+.save-btn.saved{color:var(--blue);border-color:var(--blue);background:var(--bluepale);}
+.save-btn svg{flex-shrink:0;}
+
+/* ── TEXT HIGHLIGHTS ── */
+mark.hl{cursor:pointer;border-radius:1px;}
+mark.hl-yellow{background:#FFF176;color:inherit;}
+mark.hl-blue{background:#C7E0FF;color:inherit;}
+mark.hl-green{background:#C8F0C8;color:inherit;}
+.hl-popup{
+  position:fixed;z-index:500;background:var(--ink);border-radius:3px;
+  padding:8px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
+.hl-popup-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);}
+.hl-color{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0;}
+.hl-color:hover{transform:scale(1.2);}
+.hl-color.yellow{background:#FFF176;border-color:#F5C500;}
+.hl-color.blue{background:#C7E0FF;border-color:#4A90D9;}
+.hl-color.green{background:#C8F0C8;border-color:#3A9E5C;}
+
 /* ── PDF BUTTON ── */
 .art-actions{display:flex;align-items:center;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--rule);}
 .pdf-btn{
@@ -450,8 +481,8 @@ footer{background:var(--ink);padding:0;}
     <a class="nav-link" href="index.html#disciplines">Disciplinas</a>
     <a class="nav-link" href="index.html#manifesto">Misión</a>
   </div>
-  <div class="nav-right">
-    <a class="nav-cta" href="index.html#subscribe">Suscribirse</a>
+  <div class="nav-right" id="navRight">
+    <a class="nav-cta" href="auth.html" id="navAuthBtn">Acceder</a>
   </div>
 </nav>
 
@@ -623,6 +654,10 @@ footer{background:var(--ink);padding:0;}
           ${a.featured ? '<div class="art-featured-badge">✦ Destacado</div>' : ''}
         </div>
         <div class="art-actions">
+          <button class="save-btn" id="saveBtn" onclick="toggleSave()" style="display:none">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span id="saveBtnTxt">Guardar artículo</span>
+          </button>
           <button class="pdf-btn" onclick="downloadPDF()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
@@ -725,6 +760,199 @@ footer{background:var(--ink);padding:0;}
   function esc(str) {
     return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+
+})();
+</script>
+
+<!-- ── AUTH + SAVE + HIGHLIGHTS ── -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+  const sb=supabase.createClient(
+    'https://xduylfmrmxqnbtpyyjvb.supabase.co',
+    'sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65'
+  );
+  const params=new URLSearchParams(location.search);
+  const articleId=params.get('id')||'';
+  let _user=null, _savedRowId=null, _hlPopup=null, _selection=null;
+
+  // ── INIT ──
+  sb.auth.getSession().then(async({data:{session}})=>{
+    if(!session) return;
+    _user=session.user;
+
+    // Update nav
+    const nr=document.getElementById('navRight');
+    if(nr){
+      const meta=session.user.user_metadata||{};
+      const name=(meta.full_name||session.user.email||'').trim();
+      const initials=name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()||'U';
+      nr.innerHTML=`
+        <a href="profile.html" class="nav-avatar" title="Mi perfil">${initials}</a>
+        <a href="profile.html" class="nav-user-name">${name.split(' ')[0]||'Mi perfil'}</a>
+      `;
+    }
+
+    // Show save button
+    const btn=document.getElementById('saveBtn');
+    if(btn) btn.style.display='inline-flex';
+
+    if(!articleId) return;
+    await Promise.all([checkSaved(), loadHighlights()]);
+  });
+
+  // ── SAVE / UNSAVE ──
+  async function checkSaved(){
+    const {data}=await sb.from('saved_articles')
+      .select('id').eq('user_id',_user.id).eq('article_id',articleId).maybeSingle();
+    if(data){ _savedRowId=data.id; setSaved(true); }
+  }
+
+  function setSaved(on){
+    const btn=document.getElementById('saveBtn');
+    const txt=document.getElementById('saveBtnTxt');
+    if(!btn) return;
+    btn.classList.toggle('saved',on);
+    const svgPath=on
+      ? '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" fill="currentColor"/>'
+      : '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>';
+    btn.querySelector('svg').innerHTML=svgPath;
+    if(txt) txt.textContent=on?'Guardado':'Guardar artículo';
+  }
+
+  window.toggleSave=async function(){
+    if(!_user){ window.location.href='auth.html?return='+encodeURIComponent(location.href); return; }
+    if(_savedRowId){
+      await sb.from('saved_articles').delete().eq('id',_savedRowId);
+      _savedRowId=null; setSaved(false);
+    } else {
+      // Get article title for profile display
+      const titleEl=document.querySelector('.art-title');
+      const title=titleEl?titleEl.textContent.trim():'';
+      const {data}=await sb.from('saved_articles').insert({
+        user_id:_user.id, article_id:articleId, article_title:title
+      }).select('id').single();
+      if(data){ _savedRowId=data.id; setSaved(true); }
+    }
+  };
+
+  // ── HIGHLIGHTS ──
+  async function loadHighlights(){
+    const contentEl=document.getElementById('artContent');
+    if(!contentEl) return;
+    const {data}=await sb.from('highlights')
+      .select('*').eq('user_id',_user.id).eq('article_id',articleId);
+    if(!data||!data.length) return;
+    data.forEach(h=>applyHighlightDOM(contentEl,h.position_start,h.position_end,h.color,h.id));
+  }
+
+  function getTextOffsets(container,sel){
+    const range=sel.getRangeAt(0);
+    const pre=document.createRange();
+    pre.selectNodeContents(container);
+    pre.setEnd(range.startContainer,range.startOffset);
+    const start=pre.toString().length;
+    return{start,end:start+range.toString().length,text:range.toString()};
+  }
+
+  function applyHighlightDOM(container,start,end,color,hlId){
+    let pos=0;
+    const walker=document.createTreeWalker(container,NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode()){
+      const node=walker.currentNode;
+      const nEnd=pos+node.length;
+      if(nEnd>start&&pos<end){
+        nodes.push({node,from:Math.max(0,start-pos),to:Math.min(node.length,end-pos)});
+      }
+      pos+=node.length;
+      if(pos>=end) break;
+    }
+    [...nodes].reverse().forEach(({node,from,to})=>{
+      try{
+        const range=document.createRange();
+        range.setStart(node,from);
+        range.setEnd(node,to);
+        const mark=document.createElement('mark');
+        mark.className=`hl hl-${color}`;
+        mark.dataset.hlId=hlId;
+        mark.title='Clic para eliminar resaltado';
+        mark.onclick=()=>removeHighlight(hlId,mark);
+        range.surroundContents(mark);
+      }catch(e){}
+    });
+  }
+
+  async function removeHighlight(hlId,markEl){
+    if(!confirm('¿Eliminar este resaltado?')) return;
+    await sb.from('highlights').delete().eq('id',hlId);
+    if(markEl&&markEl.parentNode){
+      markEl.parentNode.replaceChild(document.createTextNode(markEl.textContent),markEl);
+    }
+  }
+
+  // ── HIGHLIGHT POPUP on text selection ──
+  document.addEventListener('mouseup',e=>{
+    if(!_user) return;
+    if(_hlPopup&&_hlPopup.contains(e.target)) return;
+    hidePopup();
+    const sel=window.getSelection();
+    if(!sel||sel.isCollapsed||!sel.toString().trim()) return;
+    const contentEl=document.getElementById('artContent');
+    if(!contentEl||!contentEl.contains(sel.anchorNode)) return;
+    _selection=sel;
+    showPopup(e.clientX,e.clientY);
+  });
+
+  function showPopup(x,y){
+    hidePopup();
+    _hlPopup=document.createElement('div');
+    _hlPopup.className='hl-popup';
+    _hlPopup.innerHTML=`
+      <span class="hl-popup-label">Resaltar</span>
+      <div class="hl-color yellow" title="Amarillo" onclick="saveHL('yellow')"></div>
+      <div class="hl-color blue"   title="Azul"     onclick="saveHL('blue')"></div>
+      <div class="hl-color green"  title="Verde"    onclick="saveHL('green')"></div>
+    `;
+    const px=Math.min(x,window.innerWidth-180);
+    const py=Math.max(y-50,8);
+    _hlPopup.style.left=px+'px';
+    _hlPopup.style.top=py+'px';
+    document.body.appendChild(_hlPopup);
+  }
+
+  function hidePopup(){
+    if(_hlPopup){_hlPopup.remove();_hlPopup=null;}
+  }
+
+  window.saveHL=async function(color){
+    hidePopup();
+    if(!_selection||_selection.isCollapsed) return;
+    const contentEl=document.getElementById('artContent');
+    if(!contentEl) return;
+    const {start,end,text}=getTextOffsets(contentEl,_selection);
+    if(!text.trim()) return;
+    const titleEl=document.querySelector('.art-title');
+    const title=titleEl?titleEl.textContent.trim():'';
+    const {data,error}=await sb.from('highlights').insert({
+      user_id:_user.id,
+      article_id:articleId,
+      article_title:title,
+      selected_text:text.slice(0,500),
+      color,
+      position_start:start,
+      position_end:end
+    }).select('id').single();
+    if(!error&&data){
+      applyHighlightDOM(contentEl,start,end,color,data.id);
+    }
+    window.getSelection()?.removeAllRanges();
+    _selection=null;
+  };
+
+  document.addEventListener('mousedown',e=>{
+    if(_hlPopup&&!_hlPopup.contains(e.target)) hidePopup();
+  });
 
 })();
 </script>
