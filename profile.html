@@ -349,7 +349,7 @@ function renderHighlights() {
   // Group by article_id
   const groups = {};
   _highlights.forEach(h => {
-    if (!groups[h.article_id]) groups[h.article_id] = { title: h.article_title || h.article_id, items: [] };
+    if (!groups[h.article_id]) groups[h.article_id] = { title: h.article_title || 'Artículo', items: [] };
     groups[h.article_id].items.push(h);
   });
 
