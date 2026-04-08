@@ -637,9 +637,9 @@ footer{background:var(--ink);padding:0;}
     headings.forEach(h => io.observe(h));
   }
 
-  function downloadPDF() {
+  window.downloadPDF = function() {
     window.print();
-  }
+  };
 
   function esc(str) {
     return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
