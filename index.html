@@ -150,8 +150,11 @@ nav{
 .art-row-abstract{font-size:13px;font-weight:300;line-height:1.72;color:var(--ink3);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 
 /* ── PDF THUMBNAIL ── */
-.pdf-thumb{width:128px;height:181px;flex-shrink:0;overflow:hidden;position:relative;border:1px solid var(--rule);box-shadow:0 2px 12px rgba(8,8,6,.08);background:#fff;}
-.pt-page{width:595px;transform:scale(0.2151);transform-origin:top left;position:absolute;top:0;left:0;background:#fff;padding:28px 32px;font-family:'Inter','Arial',sans-serif;pointer-events:none;}
+.pdf-thumb{
+  width:140px;height:198px;flex-shrink:0;overflow:hidden;
+  border:1px solid var(--rule);box-shadow:0 2px 10px rgba(8,8,6,.09);
+  background:#fff;display:flex;flex-direction:column;cursor:pointer;
+}
 
 /* ── TABLE OF CONTENTS ── */
 .art-toc{background:#fff;border:1px solid var(--rule);padding:40px;}
@@ -368,8 +371,8 @@ footer{background:#06060A;}
   .articles,.disciplines{padding:44px 20px;}
   .art-row{padding:24px 20px;gap:16px;}
   .art-row-title{font-size:18px;}
-  .pdf-thumb{width:88px;height:124px;}
-  .pt-page{transform:scale(0.148);}
+  .pdf-thumb{width:100px;height:141px;}
+  .pdf-thumb .pt-title{font-size:7.5px!important;}
   .art-toc{padding:32px 20px;}
   .toc-row{grid-template-columns:1fr;gap:4px;padding:10px 0;}
   .toc-code{display:block;}
@@ -592,35 +595,34 @@ async function loadDynamicArticles(){
 
   // ── Auto-generate PDF first-page thumbnail ──
   function makePdfThumb(a){
-    const t=esc(a.title||'');
-    const short=esc((a.title||'').slice(0,40))+((a.title||'').length>40?'…':'');
+    const t=esc((a.title||'').slice(0,72));
     const d=esc(a.discipline||'Teología');
-    const author=esc(a.author||'');
-    const code=esc(a.article_code||'');
-    const date=esc(fmtDate(a.published_at));
-    const rt=esc(a.read_time||'');
-    const abs=esc((a.abstract||'').slice(0,280));
     const bg=badgeColor(a.discipline);
-    const lines=(h)=>`<div style="background:repeating-linear-gradient(to bottom,#E2E0D8 0,#E2E0D8 1px,transparent 1px,transparent ${h}px);height:160px;"></div>`;
+    // Line-bar helper: simulate unreadable body text as horizontal bars
+    const lb=(w,c='#D4D2CB',h=1.5)=>`<div style="height:${h}px;width:${w}%;background:${c};border-radius:1px;margin-bottom:2.5px;"></div>`;
+    const textCol=`<div>${[100,84,93,76,97,69,88,80].map(w=>lb(w)).join('')}</div>`;
     return `
-      <div style="display:flex;justify-content:space-between;align-items:center;font-size:7px;color:#706F68;padding-bottom:5px;border-bottom:.5px solid #E2E0D8;margin-bottom:12px;">
-        <span style="font-weight:600;">Nouscience Institute of Theology</span>
-        <span style="font-style:italic;">${short}</span>
+      <div style="height:3px;background:${bg};flex-shrink:0;"></div>
+      <div style="padding:4px 7px 3px;border-bottom:.5px solid #EEECEA;display:flex;justify-content:space-between;align-items:center;gap:4px;">
+        ${lb(46,'#B8B7B0',1.5)}
+        <div style="flex:1"></div>
+        ${lb(26,'#B8B7B0',1.5)}
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
-        <span style="font-size:7px;font-weight:700;letter-spacing:1.1px;color:#AEADA6;text-transform:uppercase;">Artículo de Investigación</span>
-        <span style="font-family:'Courier New',monospace;font-size:6.5px;color:#AEADA6;">${code}</span>
-      </div>
-      <div style="height:.5px;background:#E2E0D8;margin-bottom:14px;"></div>
-      <div style="font-size:17px;font-weight:800;line-height:1.12;letter-spacing:-.4px;color:#080806;margin-bottom:14px;">${t}</div>
-      <div style="display:inline-block;font-size:7px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#fff;background:${bg};padding:3px 9px;margin-bottom:12px;">${d}</div>
-      <div style="font-size:8px;font-weight:700;color:#080806;margin-bottom:2px;">${author}</div>
-      <div style="font-size:7px;color:#706F68;margin-bottom:14px;">${date}${rt?' · '+rt+' lectura':''}</div>
-      <div style="border:.5px solid #E2E0D8;padding:10px 12px;margin-bottom:14px;background:#FAFAF8;">
-        <div style="font-size:6.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#AEADA6;margin-bottom:5px;">Resumen</div>
-        <div style="font-size:7.5px;font-style:italic;line-height:1.55;color:#2C2C28;">${abs}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">${lines(7)}${lines(7)}</div>`;
+      <div style="padding:5px 7px 0;flex:1;overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+          ${lb(54,'#C8C6BC',1.5)}
+          <div style="font-family:'Courier New',monospace;font-size:4.5px;color:#AEADA6;white-space:nowrap;margin-left:4px;">${esc(a.article_code||'')}</div>
+        </div>
+        <div style="height:.5px;background:#E2E0D8;margin-bottom:5px;"></div>
+        <div class="pt-title" style="font-family:'Inter',Arial,sans-serif;font-size:9px;font-weight:800;line-height:1.18;letter-spacing:-.2px;color:#080806;margin-bottom:5px;">${t}</div>
+        <div style="display:inline-block;font-size:5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#fff;background:${bg};padding:1.5px 4px;margin-bottom:4px;">${d}</div>
+        <div style="margin-bottom:4px;">${lb(44,'#2C2C28',1.5)}${lb(60,'#C8C6BC',1.5)}</div>
+        <div style="border:.5px solid #E2E0D8;padding:3px 4px;margin-bottom:4px;background:#F8F7F4;">
+          ${lb(26,'#AEADA6',1.5)}
+          ${[98,86,92,74].map(w=>lb(w,'#C0BEB8',1.5)).join('')}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">${textCol}${textCol}</div>
+      </div>`;
   }
 
   let published=[];
@@ -663,7 +665,7 @@ async function loadDynamicArticles(){
         </div>
         ${abst(a)?`<p class="art-row-abstract">${esc(abst(a))}</p>`:''}
       </div>
-      <div class="pdf-thumb"><div class="pt-page">${makePdfThumb(a)}</div></div>
+      <div class="pdf-thumb">${makePdfThumb(a)}</div>
     </a>`;
   });
   grid.innerHTML=html;
