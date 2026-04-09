@@ -615,16 +615,16 @@ async function loadDynamicArticles(){
     const initials=(author||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
     return `
       <div style="${f}overflow:hidden;flex:1;display:flex;flex-direction:column;">
-        <!-- Colored header strip with white NIT logo -->
-        <div style="background:${bg};padding:5px 9px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-          <div style="font-size:5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,0.8);">${disc}</div>
-          <img src="NIT logo Black.png" style="height:14px;width:auto;object-fit:contain;filter:invert(1);mix-blend-mode:screen;" alt="NIT">
-        </div>
-        <!-- Breadcrumb -->
-        <div style="padding:5px 9px 3px;font-size:5px;color:#AEADA6;letter-spacing:.04em;display:flex;align-items:center;gap:3px;">
-          <span>ARTÍCULOS</span>
-          <span style="color:#D0CECC;">/</span>
-          <span style="color:${bg};font-weight:700;">${disc}</span>
+        <!-- Thin discipline-color top border -->
+        <div style="height:3px;background:${bg};flex-shrink:0;"></div>
+        <!-- Header: breadcrumb left · NIT logo right (white bg → multiply removes PNG white) -->
+        <div style="padding:5px 9px 4px;display:flex;align-items:center;justify-content:space-between;border-bottom:.5px solid #E2E0D8;background:#fff;">
+          <div style="font-size:5px;color:#AEADA6;letter-spacing:.04em;display:flex;align-items:center;gap:3px;">
+            <span>ARTÍCULOS</span>
+            <span style="color:#D0CECC;">/</span>
+            <span style="color:${bg};font-weight:700;">${disc}</span>
+          </div>
+          <img src="NIT logo.png" style="height:18px;width:auto;object-fit:contain;mix-blend-mode:multiply;" alt="NIT">
         </div>
         <!-- Title -->
         <div style="padding:0 9px 5px;font-size:13px;font-weight:800;line-height:1.12;letter-spacing:-.3px;color:#080806;">${title}</div>
