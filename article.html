@@ -770,38 +770,70 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     const f="font-family:'Inter',Arial,sans-serif;";
     const pca="-webkit-print-color-adjust:exact;print-color-adjust:exact;";
     return `<div style="${f}${pca}width:100%;height:100%;display:flex;flex-direction:column;background:#fff;overflow:hidden;">
-      <div style="${pca}background:${colBg};flex:0 0 42%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:-80px;right:-80px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
-        <div style="position:absolute;bottom:-60px;left:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
-        <img src="NIT logo Black.png" alt="NIT" style="height:70px;width:auto;filter:brightness(0) invert(1);margin-bottom:18px;object-fit:contain;position:relative;z-index:1;">
-        <div style="font-size:9pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,0.85);margin-bottom:5px;position:relative;z-index:1;">Nouscience Institute of Theology</div>
-        <div style="font-size:7pt;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.55);position:relative;z-index:1;">Revista de Investigación Teológica</div>
-        <div style="margin-top:22px;padding:5px 18px;border:1px solid rgba(255,255,255,0.4);font-size:7.5pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;position:relative;z-index:1;">${esc(disc_)}</div>
-      </div>
-      <div style="flex:1;display:flex;flex-direction:column;padding:36px 48px 28px;background:#fff;overflow:hidden;">
-        <div style="font-size:7pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${colBg};margin-bottom:14px;display:flex;align-items:center;gap:12px;">
-          <span>Artículo de Investigación</span>
-          ${code_?`<span style="color:#ddd;">·</span><span style="font-family:'Courier New',monospace;font-size:6.5pt;color:#aaa;">${esc(code_)}</span>`:''}
+      <!-- Thin top color bar -->
+      <div style="${pca}background:${colBg};height:10px;flex-shrink:0;"></div>
+
+      <!-- Main white area (position:relative so watermark can be absolute) -->
+      <div style="flex:1;position:relative;display:flex;flex-direction:column;overflow:hidden;background:#fff;">
+
+        <!-- Watermark logo: large, centered, grayscale, very low opacity.
+             mix-blend-mode:multiply makes the white PNG background vanish on white. -->
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                    width:80%;z-index:0;pointer-events:none;
+                    opacity:0.07;mix-blend-mode:multiply;filter:grayscale(1);">
+          <img src="NIT logo.png" alt="" style="width:100%;height:auto;display:block;">
         </div>
-        <h1 style="font-size:22pt;font-weight:800;line-height:1.1;letter-spacing:-.02em;color:#080806;margin:0 0 16px 0;">${esc(art.title||'')}</h1>
-        <div style="height:1px;background:#E2E0D8;margin-bottom:16px;"></div>
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-          <div style="${pca}width:38px;height:38px;border-radius:50%;background:${colBg};display:flex;align-items:center;justify-content:center;font-size:12pt;font-weight:800;color:#fff;flex-shrink:0;">${esc(ini)}</div>
-          <div>
-            <div style="font-size:10pt;font-weight:700;color:#080806;">${esc(author_)}</div>
-            ${authorTitle_?`<div style="font-size:8pt;color:#706F68;margin-top:2px;">${esc(authorTitle_)}</div>`:''}
-            <div style="font-size:7.5pt;color:#AEADA6;margin-top:1px;">Nouscience Institute of Theology</div>
+
+        <!-- All content sits above the watermark -->
+        <div style="position:relative;z-index:1;display:flex;flex-direction:column;flex:1;padding:36px 52px 28px;">
+
+          <!-- Header: institution + discipline badge -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+            <div>
+              <div style="font-size:8pt;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:${colBg};line-height:1;">Nouscience Institute of Theology</div>
+              <div style="font-size:6.5pt;letter-spacing:.1em;text-transform:uppercase;color:#AEADA6;margin-top:4px;">Revista de Investigación Teológica</div>
+            </div>
+            <div style="${pca}padding:4px 14px;background:${colBg};font-size:7pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;">${esc(disc_)}</div>
+          </div>
+
+          <!-- Article type + code -->
+          <div style="font-size:7pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#AEADA6;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+            <span>Artículo de Investigación</span>
+            ${code_?`<span style="color:#ddd;">·</span><span style="font-family:'Courier New',monospace;font-size:6.5pt;color:#aaa;">${esc(code_)}</span>`:''}
+          </div>
+
+          <!-- Title -->
+          <h1 style="font-size:24pt;font-weight:800;line-height:1.08;letter-spacing:-.025em;color:#080806;margin:0 0 18px 0;">${esc(art.title||'')}</h1>
+
+          <!-- Rule -->
+          <div style="${pca}height:2px;background:${colBg};margin-bottom:18px;width:60px;"></div>
+
+          <!-- Author -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="${pca}width:40px;height:40px;border-radius:50%;background:${colBg};display:flex;align-items:center;justify-content:center;font-size:13pt;font-weight:800;color:#fff;flex-shrink:0;">${esc(ini)}</div>
+            <div>
+              <div style="font-size:10.5pt;font-weight:700;color:#080806;">${esc(author_)}</div>
+              ${authorTitle_?`<div style="font-size:8pt;color:#706F68;margin-top:2px;">${esc(authorTitle_)}</div>`:''}
+              <div style="font-size:7.5pt;color:#AEADA6;margin-top:1px;">Nouscience Institute of Theology</div>
+            </div>
+          </div>
+
+          <!-- Abstract -->
+          ${abstract_?`<div style="${pca}border-left:3px solid ${colBg};padding:10px 14px;background:rgba(249,249,247,0.9);flex:1;overflow:hidden;">
+            <div style="font-size:6.5pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${colBg};margin-bottom:6px;">Resumen</div>
+            <div style="font-size:8.5pt;line-height:1.52;color:#2C2C28;font-style:italic;">${esc(abstract_)}</div>
+          </div>`:'<div style="flex:1;"></div>'}
+
+          <!-- Footer -->
+          <div style="margin-top:16px;padding-top:14px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #E2E0D8;">
+            ${pubDate_?`<div style="font-size:7pt;color:#706F68;">Publicado: <strong style="color:#080806;">${pubDate_}</strong></div>`:'<div></div>'}
+            <div style="font-size:6.5pt;color:#AEADA6;letter-spacing:.1em;text-transform:uppercase;">Acceso Libre · nouscience.com</div>
           </div>
         </div>
-        ${abstract_?`<div style="${pca}border-left:3px solid ${colBg};padding:10px 14px;background:#F9F9F7;overflow:hidden;flex:1;">
-          <div style="font-size:6.5pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${colBg};margin-bottom:6px;">Resumen</div>
-          <div style="font-size:8.5pt;line-height:1.52;color:#2C2C28;font-style:italic;">${esc(abstract_)}</div>
-        </div>`:'<div style="flex:1;"></div>'}
-        <div style="margin-top:16px;padding-top:14px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #E2E0D8;">
-          ${pubDate_?`<div style="font-size:7pt;color:#706F68;">Publicado: <strong style="color:#080806;">${pubDate_}</strong></div>`:'<div></div>'}
-          <div style="font-size:6.5pt;color:#AEADA6;letter-spacing:.1em;text-transform:uppercase;">Acceso Libre · nouscience.com</div>
-        </div>
       </div>
+
+      <!-- Thin bottom color bar -->
+      <div style="${pca}background:${colBg};height:6px;flex-shrink:0;"></div>
     </div>`;
   }
 
