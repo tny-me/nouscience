@@ -151,12 +151,12 @@ nav{
 
 /* ── PDF THUMBNAIL ── */
 .pdf-thumb{
-  width:220px;height:311px;flex-shrink:0;overflow:hidden;
-  border:1px solid var(--rule);box-shadow:0 3px 16px rgba(8,8,6,.10);
-  background:#fff;display:flex;flex-direction:column;cursor:pointer;
+  width:168px;height:238px;flex-shrink:0;overflow:hidden;
+  border:1px solid var(--rule);box-shadow:0 2px 10px rgba(8,8,6,.08);
+  background:#fff;display:flex;flex-direction:column;
   transition:box-shadow .2s;
 }
-.pdf-thumb:hover{box-shadow:0 6px 24px rgba(8,8,6,.16);}
+.art-row:hover .pdf-thumb{box-shadow:0 4px 18px rgba(8,8,6,.13);}
 
 /* ── TABLE OF CONTENTS ── */
 .art-toc{background:#fff;border:1px solid var(--rule);padding:40px;}
@@ -373,7 +373,7 @@ footer{background:#06060A;}
   .articles,.disciplines{padding:44px 20px;}
   .art-row{padding:24px 20px;gap:16px;}
   .art-row-title{font-size:18px;}
-  .pdf-thumb{width:130px;height:184px;}
+  .pdf-thumb{display:none;}
   .art-row{gap:20px;}
   .art-toc{padding:32px 20px;}
   .toc-row{grid-template-columns:1fr;gap:4px;padding:10px 0;}
@@ -595,45 +595,67 @@ async function loadDynamicArticles(){
     return c==='am'?'#D4820A':c==='rd'?'#C41E3A':'#1240AB';
   }
 
-  // ── Auto-generate PDF first-page thumbnail ──
+  // ── Generate article-page thumbnail (mimics online article view) ──
   function makePdfThumb(a){
-    const S=(tag,style,content)=>`<${tag} style="${style}">${content}</${tag}>`;
-    const div=(style,content)=>S('div',style,content);
+    const f='font-family:\'Inter\',Arial,sans-serif;';
     const title=esc(a.title||'');
-    const discipline=esc(a.discipline||'Teología');
+    const disc=esc(a.discipline||'Teología');
     const author=esc(a.author||'');
     const code=esc(a.article_code||'');
     const date=esc(fmtDate(a.published_at));
     const rt_=esc(a.read_time||'');
-    const abstract_=esc((a.abstract||'').slice(0,220));
+    const abstract_=esc((a.abstract||'').slice(0,200));
+    const tagline=esc((a.subtitle||a.abstract||'').slice(0,90));
     const bg=badgeColor(a.discipline);
-    const bodyLines=`background:repeating-linear-gradient(to bottom,#D4D2CB 0,#D4D2CB 1px,transparent 1px,transparent 8px);`;
+    const c=discColor(a.discipline);
+    // Badge text/bg for the discipline pill
+    const badgeTxt=c==='am'?'#D4820A':c==='rd'?'#C41E3A':'#1240AB';
+    const badgeBg=c==='am'?'#FFF3DC':c==='rd'?'#FFF0F2':'#EBF0FF';
+    // Author initials
+    const initials=(author||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
     return `
-      ${div(`height:5px;background:${bg};flex-shrink:0;`,'')}
-      ${div(`padding:6px 10px 5px;border-bottom:.5px solid #E2E0D8;display:flex;justify-content:space-between;align-items:center;font-family:'Inter',Arial,sans-serif;`,`
-        ${S('span','font-size:6px;color:#706F68;font-weight:500;','Nouscience Institute of Theology')}
-        ${S('span','font-size:5.5px;color:#AEADA6;font-style:italic;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;',title.slice(0,30)+(title.length>30?'…':''))}
-      `)}
-      ${div('padding:8px 10px 0;flex:1;overflow:hidden;font-family:\'Inter\',Arial,sans-serif;',`
-        ${div('display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;',`
-          ${S('span','font-size:6px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#AEADA6;','Artículo de Investigación')}
-          ${S('span','font-family:\'Courier New\',monospace;font-size:6px;color:#AEADA6;',code)}
-        `)}
-        ${div('height:.5px;background:#E2E0D8;margin-bottom:10px;','')}
-        ${div('font-size:14px;font-weight:800;line-height:1.15;letter-spacing:-.3px;color:#080806;margin-bottom:10px;',title)}
-        ${div('margin-bottom:8px;',S('span',`font-size:7px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#fff;background:${bg};padding:2.5px 7px;`,discipline))}
-        ${div('margin-bottom:2px;',S('span','font-size:8px;font-weight:700;color:#080806;',author))}
-        ${div('margin-bottom:8px;font-size:7px;color:#706F68;',`${date}${rt_?' · '+rt_+' lectura':''}`)}
-        ${div('border:.5px solid #E2E0D8;padding:6px 7px;margin-bottom:8px;background:#F8F7F4;',`
-          ${S('div','font-size:5.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#AEADA6;margin-bottom:4px;','Resumen')}
-          ${S('div','font-size:6.5px;font-style:italic;line-height:1.55;color:#2C2C28;',abstract_)}
-        `)}
-        ${div('display:grid;grid-template-columns:1fr 1fr;gap:8px;',`
-          ${div(bodyLines+'height:80px;','')}
-          ${div(bodyLines+'height:80px;','')}
-        `)}
-      `)}`;
-  }
+      <div style="${f}overflow:hidden;flex:1;display:flex;flex-direction:column;">
+        <!-- Breadcrumb -->
+        <div style="padding:7px 9px 4px;font-size:5.5px;color:#AEADA6;letter-spacing:.04em;display:flex;align-items:center;gap:3px;">
+          <span>ARTÍCULOS</span>
+          <span style="color:#D0CECC;">/</span>
+          <span style="color:${bg};font-weight:700;">${disc}</span>
+        </div>
+        <!-- Type + badge -->
+        <div style="padding:0 9px 5px;display:flex;align-items:center;gap:5px;">
+          <span style="font-size:5.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:#AEADA6;">Artículo de Investigación</span>
+          <span style="font-size:5px;font-weight:700;color:#1B7F3B;border:1px solid #1B7F3B;padding:0 3px;letter-spacing:.04em;">ACCESO LIBRE</span>
+        </div>
+        <!-- Title -->
+        <div style="padding:0 9px 5px;font-size:13px;font-weight:800;line-height:1.12;letter-spacing:-.3px;color:#080806;">${title}</div>
+        <!-- Tagline -->
+        ${tagline?`<div style="padding:0 9px 5px;font-size:6.5px;color:#706F68;line-height:1.45;font-style:italic;">${tagline}</div>`:''}
+        <!-- Discipline pill -->
+        <div style="padding:0 9px 5px;">
+          <span style="font-size:6px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:${badgeTxt};background:${badgeBg};padding:2px 6px;">${disc}</span>
+        </div>
+        <!-- Divider -->
+        <div style="height:.5px;background:#E2E0D8;margin:0 9px 5px;"></div>
+        <!-- Author + meta -->
+        <div style="padding:0 9px 5px;display:flex;align-items:center;gap:5px;">
+          <div style="width:14px;height:14px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;font-size:5px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:6.5px;font-weight:700;color:#080806;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${author}</div>
+            <div style="font-size:5px;color:#706F68;">Nouscience Institute of Theology</div>
+          </div>
+        </div>
+        <div style="padding:0 9px 5px;font-size:5.5px;color:#706F68;display:flex;gap:8px;">
+          ${date?`<span>Publicado <strong style="color:#080806;">${date}</strong></span>`:''}
+          ${rt_?`<span>${rt_} lectura</span>`:''}
+        </div>
+        <!-- Divider -->
+        <div style="height:.5px;background:#E2E0D8;margin:0 9px 6px;"></div>
+        <!-- RESUMEN -->
+        <div style="padding:0 9px;flex:1;overflow:hidden;">
+          <div style="font-size:5.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:${bg};margin-bottom:4px;">Resumen</div>
+          <div style="border-left:2px solid ${bg};padding-left:5px;font-size:6px;line-height:1.5;color:#2C2C28;">${abstract_}</div>
+        </div>
+      </div>`;};
 
   let published=[];
   try{
