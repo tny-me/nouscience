@@ -115,7 +115,7 @@ nav{
 /* ── JOURNAL ISSUE BAR ── */
 .journal-issue{
   display:flex;align-items:baseline;justify-content:space-between;
-  padding-bottom:12px;border-bottom:1px solid var(--ink);margin-bottom:48px;
+  padding-bottom:12px;border-bottom:1px solid var(--ink);margin-bottom:40px;
 }
 .ji-kicker{display:none;}
 .ji-name{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);}
@@ -123,122 +123,55 @@ nav{
 .ji-meta{font-size:10px;color:var(--ink3);letter-spacing:.04em;}
 .ji-issn{display:none;}
 
-/* ── MAIN GRID: 63% featured + 37% sidebar ── */
-.art-grid{
-  display:grid;grid-template-columns:1fr 320px;
-  border:1px solid var(--rule);margin-bottom:2px;
-}
+/* ── ARTICLE LIST ── */
+.art-grid{display:block;border:1px solid var(--rule);background:#fff;margin-bottom:2px;}
 
-/* Featured */
-.art-featured{
-  background:#fff;padding:44px 52px;border-right:1px solid var(--rule);
-  text-decoration:none;display:block;transition:background .2s;
-  border-top:3px solid var(--blue);
+.art-row{
+  display:flex;align-items:flex-start;gap:32px;
+  padding:32px 40px;border-bottom:1px solid var(--rule);
+  text-decoration:none;transition:background .18s;
 }
-.art-featured::before{display:none;}
-.art-featured:hover{background:#FAFAF9;}
+.art-row:last-child{border-bottom:none;}
+.art-row:hover{background:var(--bg);}
+.art-row-content{flex:1;min-width:0;}
+.art-row-labels{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.art-row-type{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);}
+.art-row-disc{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);}
+.art-row-disc.am{color:var(--amber);}
+.art-row-disc.rd{color:var(--red);}
+.art-row-sep{color:var(--rule);font-size:12px;}
+.art-row-oa{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1B7F3B;border:1px solid #1B7F3B;padding:1px 6px;}
+.art-row-title{font-size:22px;font-weight:800;line-height:1.12;letter-spacing:-.02em;color:var(--ink);margin-bottom:8px;}
+.art-row-byline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.art-row-date{font-size:11px;color:var(--ink3);}
+.art-row-dot{color:var(--ink4);font-size:10px;}
+.art-row-author{font-size:12px;font-weight:600;color:var(--ink2);}
+.art-row-code{font-family:'Courier New',monospace;font-size:10px;color:var(--ink3);}
+.art-row-abstract{font-size:13px;font-weight:300;line-height:1.72;color:var(--ink3);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 
-.art-feat-hd{margin-bottom:16px;padding-left:0;}
-.art-feat-type{display:none;}
-.art-feat-sep{display:none;}
-.art-feat-disc{
-  font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--blue);background:none;padding:0;
-}
-.art-feat-disc.am{color:var(--amber);background:none;}
-.art-feat-disc.rd{color:var(--red);background:none;}
-
-.art-feat-title{
-  font-family:'Inter','Arial',sans-serif;font-size:clamp(36px,3.8vw,52px);
-  font-weight:800;line-height:1.06;letter-spacing:-.03em;color:var(--ink);
-  margin-bottom:20px;padding-left:0;
-}
-.art-feat-byline{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  margin-bottom:20px;padding-left:0;
-}
-.art-feat-author{font-size:12px;font-weight:600;color:var(--ink2);}
-.art-feat-dot{width:3px;height:3px;background:var(--ink4);border-radius:50%;flex-shrink:0;}
-.art-feat-code{font-family:'Courier New',monospace;font-size:10px;color:var(--ink3);}
-.art-feat-date{font-size:11px;color:var(--ink3);}
-.art-feat-rt{font-size:11px;color:var(--ink3);}
-
-.art-feat-abstract{
-  font-size:14px;font-weight:300;line-height:1.78;color:var(--ink3);
-  border-left:none;padding-left:0;margin-left:0;margin-bottom:28px;
-  max-width:580px;
-}
-.art-feat-cta{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--blue);background:none;padding:0;margin-left:0;
-  transition:gap .2s;
-}
-.art-feat-cta::after{content:'→';}
-.art-feat-cta:hover{background:none;gap:14px;}
-
-/* Sidebar */
-.art-sidebar{background:#fff;display:flex;flex-direction:column;}
-.art-sb-head{
-  font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);
-  font-weight:600;padding:20px 28px 14px;border-bottom:1px solid var(--rule);background:none;
-}
-.art-sb-item{
-  display:block;padding:18px 28px;border-bottom:1px solid var(--rule);
-  text-decoration:none;transition:background .15s;
-}
-.art-sb-item:hover{background:var(--bg);}
-.art-sb-item:last-child{border-bottom:none;}
-.art-sb-top{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.art-sb-n{font-size:12px;font-weight:800;color:var(--rule);flex-shrink:0;width:20px;}
-.art-sb-disc{
-  font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--blue);background:none;padding:0;
-}
-.art-sb-disc.am{color:var(--amber);background:none;}
-.art-sb-disc.rd{color:var(--red);background:none;}
-.art-sb-title{
-  font-size:13px;font-weight:700;line-height:1.35;color:var(--ink);
-  margin-bottom:5px;padding-left:28px;
-}
-.art-sb-meta{display:flex;align-items:center;gap:7px;padding-left:28px;}
-.art-sb-author{font-size:10px;font-weight:500;color:var(--ink3);}
-.art-sb-code{font-family:'Courier New',monospace;font-size:9px;color:var(--ink4);}
+/* ── PDF THUMBNAIL ── */
+.pdf-thumb{width:128px;height:181px;flex-shrink:0;overflow:hidden;position:relative;border:1px solid var(--rule);box-shadow:0 2px 12px rgba(8,8,6,.08);background:#fff;}
+.pt-page{width:595px;transform:scale(0.2151);transform-origin:top left;position:absolute;top:0;left:0;background:#fff;padding:28px 32px;font-family:'Inter','Arial',sans-serif;pointer-events:none;}
 
 /* ── TABLE OF CONTENTS ── */
-.art-toc{
-  background:#fff;border:1px solid var(--rule);padding:44px 52px;
-}
-.art-toc-hd{
-  display:flex;align-items:baseline;gap:14px;
-  margin-bottom:28px;padding-bottom:12px;border-bottom:2px solid var(--ink);
-}
+.art-toc{background:#fff;border:1px solid var(--rule);padding:40px;}
+.art-toc-hd{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--ink);}
 .art-toc-kicker{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);font-weight:600;}
 .art-toc-name{font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
-
-.toc-group{margin-bottom:20px;}
+.toc-group{margin-bottom:18px;}
 .toc-group:last-child{margin-bottom:0;}
-.toc-group-hd{
-  font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;
-  color:var(--blue);background:none;padding:8px 0;margin-bottom:0;display:flex;
-  align-items:center;gap:12px;
-}
+.toc-group-hd{font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:12px;padding:6px 0;background:none;}
 .toc-group-hd::after{content:'';flex:1;height:1px;background:var(--rule);}
 .toc-group-hd.am{color:var(--amber);}
 .toc-group-hd.rd{color:var(--red);}
-
-.toc-row{
-  display:grid;grid-template-columns:136px 1fr 160px 96px;
-  gap:20px;align-items:baseline;padding:11px 0;
-  border-bottom:1px solid var(--rule);text-decoration:none;
-  transition:background .15s;
-}
+.toc-row{display:grid;grid-template-columns:136px 1fr 160px 96px;gap:20px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--rule);text-decoration:none;transition:background .15s;}
 .toc-row:hover{background:var(--bg);margin:0 -12px;padding:11px 12px;}
 .toc-row:last-child{border-bottom:none;}
 .toc-code{font-family:'Courier New',monospace;font-size:10px;color:var(--ink3);}
 .toc-title{font-size:15px;font-weight:600;line-height:1.3;color:var(--ink);}
 .toc-author{font-size:11px;color:var(--ink3);}
 .toc-date{font-size:10px;color:var(--ink3);text-align:right;}
+
 
 /* DISCIPLINES */
 .disciplines{background:var(--surface);padding:80px;border-top:1px solid var(--rule);}
@@ -420,8 +353,6 @@ footer{background:#06060A;}
 @media(max-width:1100px){
   .articles,.disciplines,.manifesto{padding:60px 40px;}
   .filterbar{padding:0 40px;}
-  .art-grid{grid-template-columns:1fr;}
-  .art-sidebar{border-top:2px solid var(--ink);}
   .art-toc{padding:36px 40px;}
   .toc-row{grid-template-columns:110px 1fr;}
   .toc-author,.toc-date{display:none;}
@@ -435,9 +366,10 @@ footer{background:#06060A;}
 @media(max-width:700px){
   .nav-links,.nav-right .nav-link{display:none;}
   .articles,.disciplines{padding:44px 20px;}
-  .art-grid{grid-template-columns:1fr;}
-  .art-featured{padding:28px 24px;}
-  .art-feat-title{font-size:30px;}
+  .art-row{padding:24px 20px;gap:16px;}
+  .art-row-title{font-size:18px;}
+  .pdf-thumb{width:88px;height:124px;}
+  .pt-page{transform:scale(0.148);}
   .art-toc{padding:32px 20px;}
   .toc-row{grid-template-columns:1fr;gap:4px;padding:10px 0;}
   .toc-code{display:block;}
@@ -646,12 +578,49 @@ async function loadDynamicArticles(){
   function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function fmtDate(iso){
     if(!iso)return'';
-    try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});}catch{return'';}
+    try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});}catch{return'';}
   }
   function discColor(d){
     const am=['Teología Moral','Soteriología','Pneumatología','Escatología','Teología Histórica'];
     const rd=['Cristología','Apologética','Hermenéutica'];
     if(am.includes(d))return'am'; if(rd.includes(d))return'rd'; return'';
+  }
+  function badgeColor(d){
+    const c=discColor(d);
+    return c==='am'?'#D4820A':c==='rd'?'#C41E3A':'#1240AB';
+  }
+
+  // ── Auto-generate PDF first-page thumbnail ──
+  function makePdfThumb(a){
+    const t=esc(a.title||'');
+    const short=esc((a.title||'').slice(0,40))+((a.title||'').length>40?'…':'');
+    const d=esc(a.discipline||'Teología');
+    const author=esc(a.author||'');
+    const code=esc(a.article_code||'');
+    const date=esc(fmtDate(a.published_at));
+    const rt=esc(a.read_time||'');
+    const abs=esc((a.abstract||'').slice(0,280));
+    const bg=badgeColor(a.discipline);
+    const lines=(h)=>`<div style="background:repeating-linear-gradient(to bottom,#E2E0D8 0,#E2E0D8 1px,transparent 1px,transparent ${h}px);height:160px;"></div>`;
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:7px;color:#706F68;padding-bottom:5px;border-bottom:.5px solid #E2E0D8;margin-bottom:12px;">
+        <span style="font-weight:600;">Nouscience Institute of Theology</span>
+        <span style="font-style:italic;">${short}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+        <span style="font-size:7px;font-weight:700;letter-spacing:1.1px;color:#AEADA6;text-transform:uppercase;">Artículo de Investigación</span>
+        <span style="font-family:'Courier New',monospace;font-size:6.5px;color:#AEADA6;">${code}</span>
+      </div>
+      <div style="height:.5px;background:#E2E0D8;margin-bottom:14px;"></div>
+      <div style="font-size:17px;font-weight:800;line-height:1.12;letter-spacing:-.4px;color:#080806;margin-bottom:14px;">${t}</div>
+      <div style="display:inline-block;font-size:7px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#fff;background:${bg};padding:3px 9px;margin-bottom:12px;">${d}</div>
+      <div style="font-size:8px;font-weight:700;color:#080806;margin-bottom:2px;">${author}</div>
+      <div style="font-size:7px;color:#706F68;margin-bottom:14px;">${date}${rt?' · '+rt+' lectura':''}</div>
+      <div style="border:.5px solid #E2E0D8;padding:10px 12px;margin-bottom:14px;background:#FAFAF8;">
+        <div style="font-size:6.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#AEADA6;margin-bottom:5px;">Resumen</div>
+        <div style="font-size:7.5px;font-style:italic;line-height:1.55;color:#2C2C28;">${abs}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">${lines(7)}${lines(7)}</div>`;
   }
 
   let published=[];
@@ -673,69 +642,40 @@ async function loadDynamicArticles(){
   const disc=a=>a.discipline, abst=a=>a.abstract,
         rt=a=>a.read_time, au=a=>a.author, pid=a=>a.published_at;
 
-  const featured=published.find(a=>a.featured)||published[0];
-  const sideItems=published.filter(a=>a.id!==featured.id);
-  const cl=discColor(disc(featured));
-
-  // ── Featured article ──
-  let html=`
-    <a href="article.html?id=${esc(featured.id)}" class="art-featured">
-      <div class="art-feat-hd">
-        <span class="art-feat-type">Artículo de Investigación</span>
-        <span class="art-feat-sep">·</span>
-        <span class="art-feat-disc${cl?' '+cl:''}">${esc(disc(featured)||'Teología')}</span>
+  // ── Article list with thumbnails ──
+  let html='';
+  published.forEach(a=>{
+    const c=discColor(disc(a));
+    html+=`<a href="article.html?id=${esc(a.id)}" class="art-row">
+      <div class="art-row-content">
+        <div class="art-row-labels">
+          <span class="art-row-type">Artículo</span>
+          <span class="art-row-sep">·</span>
+          <span class="art-row-disc${c?' '+c:''}">${esc(disc(a)||'Teología')}</span>
+          <span class="art-row-sep">·</span>
+          <span class="art-row-oa">Acceso Libre</span>
+        </div>
+        <h2 class="art-row-title">${esc(a.title)}</h2>
+        <div class="art-row-byline">
+          ${pid(a)?`<span class="art-row-date">${fmtDate(pid(a))}</span>`:''}
+          ${au(a)?`<span class="art-row-dot">·</span><span class="art-row-author">${esc(au(a))}</span>`:''}
+          ${a.article_code?`<span class="art-row-dot">·</span><span class="art-row-code">${esc(a.article_code)}</span>`:''}
+        </div>
+        ${abst(a)?`<p class="art-row-abstract">${esc(abst(a))}</p>`:''}
       </div>
-      <h2 class="art-feat-title">${esc(featured.title)}</h2>
-      <div class="art-feat-byline">
-        ${au(featured)?`<span class="art-feat-author">${esc(au(featured))}</span>`:''}
-        ${au(featured)&&(featured.article_code||pid(featured))?`<span class="art-feat-dot"></span>`:''}
-        ${featured.article_code?`<span class="art-feat-code">${esc(featured.article_code)}</span>`:''}
-        ${featured.article_code&&pid(featured)?`<span class="art-feat-dot"></span>`:''}
-        ${pid(featured)?`<span class="art-feat-date">${fmtDate(pid(featured))}</span>`:''}
-        ${rt(featured)?`<span class="art-feat-dot"></span><span class="art-feat-rt">${esc(rt(featured))} lectura</span>`:''}
-      </div>
-      ${abst(featured)?`<p class="art-feat-abstract">${esc(abst(featured))}</p>`:''}
-      <span class="art-feat-cta">Leer artículo</span>
+      <div class="pdf-thumb"><div class="pt-page">${makePdfThumb(a)}</div></div>
     </a>`;
-
-  // ── Sidebar ──
-  html+=`<div class="art-sidebar"><div class="art-sb-head">Últimas Publicaciones</div>`;
-  if(sideItems.length){
-    sideItems.slice(0,7).forEach((a,i)=>{
-      const c=discColor(disc(a));
-      const n=String(i+1).padStart(2,'0');
-      html+=`<a href="article.html?id=${esc(a.id)}" class="art-sb-item">
-        <div class="art-sb-top">
-          <span class="art-sb-n">${n}</span>
-          <span class="art-sb-disc${c?' '+c:''}">${esc(disc(a)||'Teología')}</span>
-        </div>
-        <div class="art-sb-title">${esc(a.title)}</div>
-        <div class="art-sb-meta">
-          ${au(a)?`<span class="art-sb-author">${esc(au(a))}</span>`:''}
-          ${a.article_code?`<span class="art-sb-code">${esc(a.article_code)}</span>`:''}
-        </div>
-      </a>`;
-    });
-  } else {
-    html+=`<div style="padding:32px 24px;font-size:11px;color:var(--ink4);letter-spacing:.07em;text-transform:uppercase;">Más artículos próximamente</div>`;
-  }
-  html+=`</div>`;
+  });
   grid.innerHTML=html;
 
   // ── Tabla de Contenidos ──
   if(tocEl){
     const byDisc={};
-    published.forEach(a=>{
-      const d=disc(a)||'General'; if(!byDisc[d])byDisc[d]=[];byDisc[d].push(a);
-    });
-    let tocHtml=`<div class="art-toc-hd">
-      <span class="art-toc-kicker">Índice</span>
-      <span class="art-toc-name">Tabla de Contenidos</span>
-    </div>`;
+    published.forEach(a=>{const d=disc(a)||'General';if(!byDisc[d])byDisc[d]=[];byDisc[d].push(a);});
+    let tocHtml=`<div class="art-toc-hd"><span class="art-toc-kicker">Índice</span><span class="art-toc-name">Tabla de Contenidos</span></div>`;
     Object.entries(byDisc).forEach(([discipline,arts])=>{
       const dc=discColor(discipline);
-      tocHtml+=`<div class="toc-group">
-        <div class="toc-group-hd${dc?' '+dc:''}">${esc(discipline)}</div>`;
+      tocHtml+=`<div class="toc-group"><div class="toc-group-hd${dc?' '+dc:''}">${esc(discipline)}</div>`;
       arts.forEach(a=>{
         tocHtml+=`<a href="article.html?id=${esc(a.id)}" class="toc-row">
           <span class="toc-code">${esc(a.article_code||'—')}</span>
