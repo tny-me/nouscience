@@ -595,68 +595,101 @@ async function loadDynamicArticles(){
     return c==='am'?'#D4820A':c==='rd'?'#C41E3A':'#1240AB';
   }
 
-  // ── Generate article-page thumbnail (mimics online article view) ──
-  function makePdfThumb(a){
-    const f='font-family:\'Inter\',Arial,sans-serif;';
-    const title=esc(a.title||'');
-    const disc=esc(a.discipline||'Teología');
-    const author=esc(a.author||'');
-    const code=esc(a.article_code||'');
-    const date=esc(fmtDate(a.published_at));
-    const rt_=esc(a.read_time||'');
-    const abstract_=esc((a.abstract||'').slice(0,200));
-    const tagline=esc((a.subtitle||a.abstract||'').slice(0,90));
-    const bg=badgeColor(a.discipline);
-    const c=discColor(a.discipline);
-    // Badge text/bg for the discipline pill
-    const badgeTxt=c==='am'?'#D4820A':c==='rd'?'#C41E3A':'#1240AB';
-    const badgeBg=c==='am'?'#FFF3DC':c==='rd'?'#FFF0F2':'#EBF0FF';
-    // Author initials
-    const initials=(author||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
-    return `
-      <div style="${f}overflow:hidden;flex:1;display:flex;flex-direction:column;">
-        <!-- Thin discipline-color top border -->
-        <div style="height:3px;background:${bg};flex-shrink:0;"></div>
-        <!-- Header: breadcrumb left · NIT logo right (white bg → multiply removes PNG white) -->
-        <div style="padding:5px 9px 4px;display:flex;align-items:center;justify-content:space-between;border-bottom:.5px solid #E2E0D8;background:#fff;">
-          <div style="font-size:5px;color:#AEADA6;letter-spacing:.04em;display:flex;align-items:center;gap:3px;">
-            <span>ARTÍCULOS</span>
-            <span style="color:#D0CECC;">/</span>
-            <span style="color:${bg};font-weight:700;">${disc}</span>
-          </div>
-          <img src="NIT logo.png" style="height:28px;width:auto;object-fit:contain;mix-blend-mode:multiply;" alt="NIT">
-        </div>
-        <!-- Title -->
-        <div style="padding:0 9px 5px;font-size:13px;font-weight:800;line-height:1.12;letter-spacing:-.3px;color:#080806;">${title}</div>
-        <!-- Tagline -->
-        ${tagline?`<div style="padding:0 9px 5px;font-size:6.5px;color:#706F68;line-height:1.45;font-style:italic;">${tagline}</div>`:''}
-        <!-- Discipline pill -->
-        <div style="padding:0 9px 5px;">
-          <span style="font-size:6px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:${badgeTxt};background:${badgeBg};padding:2px 6px;">${disc}</span>
-        </div>
-        <!-- Divider -->
-        <div style="height:.5px;background:#E2E0D8;margin:0 9px 5px;"></div>
-        <!-- Author + meta -->
-        <div style="padding:0 9px 5px;display:flex;align-items:center;gap:5px;">
-          <div style="width:14px;height:14px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;font-size:5px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:6.5px;font-weight:700;color:#080806;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${author}</div>
-            <div style="font-size:5px;color:#706F68;">Nouscience Institute of Theology</div>
-          </div>
-        </div>
-        <div style="padding:0 9px 5px;font-size:5.5px;color:#706F68;display:flex;gap:8px;">
-          ${date?`<span>Publicado <strong style="color:#080806;">${date}</strong></span>`:''}
-          ${rt_?`<span>${rt_} lectura</span>`:''}
-        </div>
-        <!-- Divider -->
-        <div style="height:.5px;background:#E2E0D8;margin:0 9px 6px;"></div>
-        <!-- RESUMEN -->
-        <div style="padding:0 9px;flex:1;overflow:hidden;">
-          <div style="font-size:5.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:${bg};margin-bottom:4px;">Resumen</div>
-          <div style="border-left:2px solid ${bg};padding-left:5px;font-size:6px;line-height:1.5;color:#2C2C28;">${abstract_}</div>
-        </div>
-      </div>`;};
+  // ── Cover helpers ───────────────────────────────────────────────────────
+  function artVariant(a){
+    const s=String(a.id||a.title||'');
+    let h=0;for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0;
+    return Math.abs(h)%3;
+  }
+  function svgCross(sz,op,col){
+    const t=Math.round(sz*.22),cx=Math.round((sz-t)/2);
+    return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" fill="none" style="position:absolute;opacity:${op};"><rect x="${cx}" y="0" width="${t}" height="${sz}" fill="${col}"/><rect x="0" y="${cx}" width="${sz}" height="${t}" fill="${col}"/></svg>`;
+  }
+  function svgArcs(sz,col,op){
+    const c=sz/2;let ci='';
+    for(let i=0;i<5;i++){const r=Math.max(4,Math.round(c*.92-i*c*.18));ci+=`<circle cx="${c}" cy="${c}" r="${r}" stroke="${col}" stroke-width="${i===4?1.5:.7}" fill="none"/>`;}
+    return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" fill="none" style="position:absolute;opacity:${op};">${ci}</svg>`;
+  }
 
+  // ── Magazine cover thumbnail — 168×238px, 3 rotating layouts ────────────
+  function makePdfThumb(a){
+    const f="font-family:'Inter',Arial,sans-serif;";
+    const p="-webkit-print-color-adjust:exact;print-color-adjust:exact;";
+    const cb=badgeColor(a.discipline);
+    const v=artVariant(a);
+    const disc_=esc(a.discipline||'Teología');
+    const ttl=esc(a.title||'');
+    const aut=esc(a.author||'');
+    const abs_=esc((a.abstract||'').slice(0,200));
+    const dt=esc(fmtDate(a.published_at));
+    const ini_=(aut||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+    const code_=esc(a.article_code||'');
+    // NIT logo — on white (colors show via multiply)
+    const lM=`<img src="NIT logo.png" alt="NIT" style="height:16px;width:auto;mix-blend-mode:multiply;object-fit:contain;display:block;">`;
+    // NIT logo watermark — on colored bg (inverted+screen shows white logo shape)
+    const wmC=`<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:88%;z-index:0;pointer-events:none;"><img src="NIT logo Black.png" alt="" style="width:100%;height:auto;display:block;filter:invert(1);mix-blend-mode:screen;opacity:.16;"></div>`;
+    // NIT logo watermark — on white bg (very subtle grayscale ghost)
+    const wmW=`<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:88%;z-index:0;pointer-events:none;"><img src="NIT logo.png" alt="" style="width:100%;height:auto;display:block;mix-blend-mode:multiply;opacity:.06;filter:grayscale(1);"></div>`;
+    const av=`<div style="${p}width:15px;height:15px;border-radius:50%;background:${cb};display:flex;align-items:center;justify-content:center;font-size:4.5px;font-weight:800;color:#fff;flex-shrink:0;">${ini_}</div>`;
+    const absBox=abs_?`<div style="border-left:2px solid ${cb};padding-left:5px;flex:1;overflow:hidden;position:relative;z-index:1;"><div style="font-size:3px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:${cb};margin-bottom:2px;">Resumen</div><div style="font-size:4.8px;line-height:1.42;color:#2C2C28;font-style:italic;">${abs_}</div></div>`:'<div style="flex:1;"></div>';
+    const foot=`<div style="padding-top:3px;border-top:.5px solid #E2E0D8;display:flex;justify-content:space-between;position:relative;z-index:1;"><div style="font-size:3.5px;color:#706F68;">${dt}</div><div style="font-size:3px;color:#AEADA6;text-transform:uppercase;letter-spacing:.04em;">nouscience.com</div></div>`;
+
+    if(v===0){
+      // ── CRUX: bold color top, white scholarly bottom ──
+      return `<div style="${f}overflow:hidden;display:flex;flex-direction:column;width:168px;height:238px;">
+        <div style="${p}background:${cb};height:128px;flex-shrink:0;position:relative;overflow:hidden;padding:10px 11px 9px;display:flex;flex-direction:column;box-sizing:border-box;">
+          ${svgCross(155,.1,'white')}${wmC}
+          <div style="position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-start;">
+            <div><div style="font-size:4px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.82);">NOUSCIENCE</div><div style="font-size:2.8px;letter-spacing:.4px;color:rgba(255,255,255,.48);margin-top:1px;">Institute of Theology</div></div>
+            <div style="font-size:3px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:2px 5px;border:.5px solid rgba(255,255,255,.4);color:#fff;">${disc_}</div>
+          </div>
+          <div style="position:relative;z-index:1;margin-top:auto;"><div style="font-size:3px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px;">Artículo de Investigación</div><div style="font-size:12px;font-weight:800;line-height:1.04;letter-spacing:-.3px;color:#fff;">${ttl}</div></div>
+        </div>
+        <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:7px 11px 6px;position:relative;overflow:hidden;box-sizing:border-box;">
+          ${svgArcs(120,cb,.06)}${wmW}
+          ${lM}<div style="height:.5px;background:#E2E0D8;margin:5px 0;"></div>
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;position:relative;z-index:1;">${av}<div><div style="font-size:6px;font-weight:700;color:#080806;">${aut}</div><div style="font-size:3.5px;color:#AEADA6;">Nouscience Institute of Theology</div></div></div>
+          ${absBox}<div style="margin-top:3px;">${foot}</div>
+        </div>
+      </div>`;
+    }
+
+    if(v===1){
+      // ── CODEX: vertical discipline strip left, white content right ──
+      return `<div style="${f}overflow:hidden;display:flex;width:168px;height:238px;">
+        <div style="${p}background:${cb};width:72px;flex-shrink:0;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:9px 5px;box-sizing:border-box;">
+          ${svgArcs(110,'rgba(255,255,255,.9)',.12)}${wmC}
+          <div style="position:relative;z-index:1;font-size:3px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.82);writing-mode:vertical-rl;transform:rotate(180deg);margin:auto 0;line-height:1.1;">NOUSCIENCE INSTITUTE OF THEOLOGY</div>
+          <div style="position:relative;z-index:1;font-size:3px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:2px 5px;border:.5px solid rgba(255,255,255,.5);color:#fff;margin-top:5px;">${disc_}</div>
+        </div>
+        <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:9px 9px 6px;position:relative;overflow:hidden;box-sizing:border-box;">
+          ${wmW}<div style="height:2px;background:${cb};margin-bottom:6px;position:relative;z-index:1;"></div>
+          <div style="font-size:3px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:${cb};margin-bottom:4px;position:relative;z-index:1;">Artículo de Investigación</div>
+          <div style="font-size:11.5px;font-weight:800;line-height:1.04;letter-spacing:-.3px;color:#080806;margin-bottom:6px;position:relative;z-index:1;">${ttl}</div>
+          <div style="height:.5px;background:#E2E0D8;margin-bottom:5px;position:relative;z-index:1;"></div>
+          <div style="display:flex;align-items:center;gap:3px;margin-bottom:4px;position:relative;z-index:1;">${av}<div style="font-size:5.5px;font-weight:700;color:#080806;">${aut}</div></div>
+          ${absBox}${lM}<div style="margin-top:3px;">${foot}</div>
+        </div>
+      </div>`;
+    }
+
+    // ── GLORIA: dark masthead + white scholarly body ──
+    return `<div style="${f}overflow:hidden;display:flex;flex-direction:column;width:168px;height:238px;">
+      <div style="${p}background:#1A1A18;padding:7px 11px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-sizing:border-box;">
+        <div><div style="font-size:4px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#fff;">NOUSCIENCE</div><div style="font-size:2.8px;letter-spacing:.4px;color:rgba(255,255,255,.36);">Institute of Theology</div></div>
+        <div style="${p}padding:2px 5px;background:${cb};font-size:3px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#fff;">${disc_}</div>
+      </div>
+      <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:8px 11px 6px;position:relative;overflow:hidden;box-sizing:border-box;">
+        ${svgArcs(165,cb,.05)}${wmW}
+        ${lM}<div style="height:.5px;background:#E2E0D8;margin:5px 0;"></div>
+        <div style="font-size:3px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:${cb};margin-bottom:3px;position:relative;z-index:1;">Artículo de Investigación${code_?' · '+code_:''}</div>
+        <div style="font-size:12px;font-weight:800;line-height:1.04;letter-spacing:-.3px;color:#080806;margin-bottom:5px;position:relative;z-index:1;">${ttl}</div>
+        <div style="height:2px;background:${cb};width:22px;margin-bottom:4px;position:relative;z-index:1;"></div>
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;position:relative;z-index:1;">${av}<div><div style="font-size:6px;font-weight:700;color:#080806;">${aut}</div><div style="font-size:3.5px;color:#AEADA6;">Nouscience Institute of Theology</div></div></div>
+        ${absBox}<div style="margin-top:3px;">${foot}</div>
+      </div>
+    </div>`;
+  }
   let published=[];
   try{
     const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=created_at.desc',

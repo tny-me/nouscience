@@ -807,6 +807,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     const code_=esc(art.articleCode||art.article_code||'');
     const dt=esc(fmtDate(art.publishedAt||art.published_at||''));
     const lM=`<img src="NIT logo.png" alt="NIT" style="height:17px;width:auto;mix-blend-mode:multiply;object-fit:contain;display:block;">`;
+    const wmC=`<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:84%;z-index:0;pointer-events:none;"><img src="NIT logo Black.png" alt="" style="width:100%;height:auto;display:block;filter:invert(1);mix-blend-mode:screen;opacity:.14;"></div>`;
     const av=`<div style="${p}width:17px;height:17px;border-radius:50%;background:${cb};display:flex;align-items:center;justify-content:center;font-size:5.5px;font-weight:800;color:#fff;flex-shrink:0;">${ini_}</div>`;
     const absBox=abs_?`<div style="border-left:2px solid ${cb};padding-left:5px;flex:1;overflow:hidden;position:relative;z-index:1;"><div style="font-size:3.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:${cb};margin-bottom:2px;">Resumen</div><div style="font-size:5px;line-height:1.42;color:#2C2C28;font-style:italic;">${abs_}</div></div>`:'<div style="flex:1;"></div>';
     const foot=`<div style="padding-top:4px;border-top:.5px solid #E2E0D8;display:flex;justify-content:space-between;position:relative;z-index:1;"><div style="font-size:4px;color:#706F68;">${dt}</div><div style="font-size:3.5px;color:#AEADA6;text-transform:uppercase;letter-spacing:.05em;">nouscience.com</div></div>`;
@@ -817,6 +818,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
       return `<div style="${f}${p}width:185px;height:262px;display:flex;flex-direction:column;overflow:hidden;">
         <div style="${p}background:${cb};height:${cH}px;flex-shrink:0;position:relative;overflow:hidden;padding:11px 13px 10px;display:flex;flex-direction:column;box-sizing:border-box;">
           ${svgCross(170,.1,'white')}
+          ${wmC}
           <div style="position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-start;">
             <div><div style="font-size:4.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:rgba(255,255,255,.82);">NOUSCIENCE</div><div style="font-size:3px;letter-spacing:.5px;color:rgba(255,255,255,.5);margin-top:1px;">Institute of Theology</div></div>
             <div style="font-size:3.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border:.5px solid rgba(255,255,255,.4);color:#fff;">${disc_}</div>
@@ -840,6 +842,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
       return `<div style="${f}${p}width:185px;height:262px;display:flex;overflow:hidden;">
         <div style="${p}background:${cb};width:${sW}px;flex-shrink:0;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:10px 6px;box-sizing:border-box;">
           ${svgArcs(120,'rgba(255,255,255,.9)',.12)}
+          ${wmC}
           <div style="position:relative;z-index:1;font-size:3.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.82);writing-mode:vertical-rl;transform:rotate(180deg);margin:auto 0;line-height:1.1;">NOUSCIENCE INSTITUTE OF THEOLOGY</div>
           <div style="position:relative;z-index:1;font-size:3.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 6px;border:.5px solid rgba(255,255,255,.5);color:#fff;margin-top:6px;">${disc_}</div>
         </div>
