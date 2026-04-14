@@ -313,6 +313,9 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
 /* ── RUNNING HEADER (print only) ── */
 .print-running-hd{display:none;}
 
+/* First page gets zero margins so the cover bleeds edge-to-edge */
+@page:first{margin:0;}
+
 /* ── PRINT / PDF ── */
 @media print {
   @page{margin:2cm 1.6cm;size:A4;}
@@ -328,7 +331,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
   .print-running-hd .prh-right{font-style:italic;}
 
   nav,footer,.breadcrumb,.toc-sidebar,.art-oa-badge,.art-actions,
-  .af-nav,.af-tags-label,.af-tags,.article-footer{display:none!important;}
+  .af-nav,.af-tags-label,.af-tags,.article-footer,.art-cover-card{display:none!important;}
 
   body{
     background:#fff!important;color:#000!important;
@@ -458,7 +461,8 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
   #printCover{
     display:block!important;
     page-break-after:always;break-after:page;
-    height:297mm;overflow:hidden;
+    width:210mm;height:297mm;overflow:hidden;
+    margin:0;padding:0;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;
   }
 }
@@ -995,7 +999,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     // Inject: hide running header on cover, zero margin first page
     const tempStyle = document.createElement('style');
     tempStyle.id = '_coverPrintStyle';
-    tempStyle.textContent = '@media print{.print-running-hd{display:none!important;}@page:first{margin:0;}}';
+    tempStyle.textContent = '@media print{.print-running-hd{display:none!important;}}';
     document.head.appendChild(tempStyle);
 
     // Small delay so the browser re-paints before opening the print dialog
