@@ -791,6 +791,20 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     for(let i=0;i<5;i++){const r=Math.max(4,Math.round(c*.92-i*c*.18));ci+=`<circle cx="${c}" cy="${c}" r="${r}" stroke="${col}" stroke-width="${i===4?1.5:.7}" fill="none"/>`;}
     return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" fill="none" style="position:absolute;opacity:${op};">${ci}</svg>`;
   }
+  function svgNITCrest(sz,col,op){
+    const c=sz*.5,arm=sz*.11,cLen=sz*.34,tSz=sz*.15,tR=sz*.043,fSz=sz*.08,rRope=sz*.43,h=tSz/2,inner=cLen-h;
+    const top=[c,c-cLen],bot=[c,c+cLen],lft=[c-cLen,c],rgt=[c+cLen,c];
+    let s=`<circle cx="${c}" cy="${c}" r="${rRope}" fill="none" stroke="${col}" stroke-width="${sz*.014}" stroke-dasharray="${sz*.05} ${sz*.027}"/>`;
+    s+=`<rect x="${c-arm}" y="${top[1]+h}" width="${arm*2}" height="${inner*2}" fill="${col}"/>`;
+    s+=`<rect x="${lft[0]+h}" y="${c-arm}" width="${inner*2}" height="${arm*2}" fill="${col}"/>`;
+    [[c,c],top,bot,lft,rgt].forEach(([tx,ty])=>{s+=`<rect x="${tx-h}" y="${ty-h}" width="${tSz}" height="${tSz}" rx="${tSz*.12}" fill="${col}"/><circle cx="${tx}" cy="${ty}" r="${tR}" fill="white"/>`;});
+    const q=cLen*.5,fy=fSz*.36;
+    [['I',c-q,c-q],['D',c+q,c-q],['E',c-q,c+q],['T',c+q,c+q]].forEach(([l,x,y])=>{s+=`<text x="${x}" y="${y+fy}" text-anchor="middle" font-size="${fSz}" font-weight="800" font-family="Georgia,serif" fill="${col}">${l}</text>`;});
+    const wy=c+arm*.7,wb=bot[1]-h-sz*.018;
+    s+=`<path d="M${c-arm*.9},${wy} L${c-cLen*.82},${wb} L${c-arm*.9},${wb} Z" fill="${col}"/>`;
+    s+=`<path d="M${c+arm*.9},${wy} L${c+cLen*.82},${wb} L${c+arm*.9},${wb} Z" fill="${col}"/>`;
+    return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" style="display:block;opacity:${op};">${s}</svg>`;
+  }
 
   // ── SCREEN COVER — 185×262px card visible on the article page ─────────────
   function makeScreenCover(art){
@@ -806,8 +820,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     const abs_=esc((art.abstract||'').slice(0,220));
     const code_=esc(art.articleCode||art.article_code||'');
     const dt=esc(fmtDate(art.publishedAt||art.published_at||''));
-    const lM=`<img src="NIT logo.png" alt="NIT" style="height:17px;width:auto;mix-blend-mode:multiply;object-fit:contain;display:block;">`;
-    const wmW=`<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:92%;z-index:0;pointer-events:none;"><img src="NIT logo.png" alt="" style="width:100%;height:auto;display:block;mix-blend-mode:multiply;filter:grayscale(1);opacity:.13;"></div>`;
+    const wmCrest=`<div style="position:absolute;bottom:-30px;right:-30px;z-index:-1;pointer-events:none;">${svgNITCrest(170,cb,.12)}</div>`;
     const av=`<div style="${p}width:17px;height:17px;border-radius:50%;background:${cb};display:flex;align-items:center;justify-content:center;font-size:5.5px;font-weight:800;color:#fff;flex-shrink:0;">${ini_}</div>`;
     const absBox=abs_?`<div style="border-left:2px solid ${cb};padding-left:5px;flex:1;overflow:hidden;position:relative;z-index:1;"><div style="font-size:3.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:${cb};margin-bottom:2px;">Resumen</div><div style="font-size:5px;line-height:1.42;color:#2C2C28;font-style:italic;">${abs_}</div></div>`:'<div style="flex:1;"></div>';
     const foot=`<div style="padding-top:4px;border-top:.5px solid #E2E0D8;display:flex;justify-content:space-between;position:relative;z-index:1;"><div style="font-size:4px;color:#706F68;">${dt}</div><div style="font-size:3.5px;color:#AEADA6;text-transform:uppercase;letter-spacing:.05em;">nouscience.com</div></div>`;
@@ -824,10 +837,9 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
           </div>
           <div style="position:relative;z-index:1;margin-top:auto;"><div style="font-size:3.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px;">Artículo de Investigación</div><div style="font-size:13px;font-weight:800;line-height:1.04;letter-spacing:-.3px;color:#fff;">${ttl}</div></div>
         </div>
-        <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:8px 13px 7px;position:relative;overflow:hidden;box-sizing:border-box;">
+        <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:8px 13px 7px;position:relative;overflow:hidden;box-sizing:border-box;isolation:isolate;">
           ${svgArcs(130,cb,.06)}
-          ${wmW}
-          ${lM}
+          ${wmCrest}
           <div style="height:.5px;background:#E2E0D8;margin:5px 0;"></div>
           <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;position:relative;z-index:1;">${av}<div><div style="font-size:6.5px;font-weight:700;color:#080806;">${aut}</div><div style="font-size:4px;color:#AEADA6;">Nouscience Institute of Theology</div></div></div>
           ${absBox}
@@ -845,15 +857,14 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
           <div style="position:relative;z-index:1;font-size:3.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.82);writing-mode:vertical-rl;transform:rotate(180deg);margin:auto 0;line-height:1.1;">NOUSCIENCE INSTITUTE OF THEOLOGY</div>
           <div style="position:relative;z-index:1;font-size:3.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 6px;border:.5px solid rgba(255,255,255,.5);color:#fff;margin-top:6px;">${disc_}</div>
         </div>
-        <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:10px 10px 7px;position:relative;overflow:hidden;box-sizing:border-box;">
-          ${wmW}
+        <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:10px 10px 7px;position:relative;overflow:hidden;box-sizing:border-box;isolation:isolate;">
+          ${wmCrest}
           <div style="height:2px;background:${cb};margin-bottom:7px;"></div>
           <div style="font-size:3.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:${cb};margin-bottom:5px;">Artículo de Investigación</div>
           <div style="font-size:12.5px;font-weight:800;line-height:1.04;letter-spacing:-.3px;color:#080806;margin-bottom:7px;">${ttl}</div>
           <div style="height:.5px;background:#E2E0D8;margin-bottom:5px;"></div>
           <div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;">${av}<div style="font-size:6px;font-weight:700;color:#080806;">${aut}</div></div>
           ${absBox}
-          ${lM}
           <div style="margin-top:4px;">${foot}</div>
         </div>
       </div>`;
@@ -865,10 +876,9 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
         <div><div style="font-size:4.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:#fff;">NOUSCIENCE</div><div style="font-size:3px;letter-spacing:.4px;color:rgba(255,255,255,.38);">Institute of Theology</div></div>
         <div style="${p}padding:2px 6px;background:${cb};font-size:3.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#fff;">${disc_}</div>
       </div>
-      <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:9px 13px 7px;position:relative;overflow:hidden;box-sizing:border-box;">
+      <div style="flex:1;background:#fff;display:flex;flex-direction:column;padding:9px 13px 7px;position:relative;overflow:hidden;box-sizing:border-box;isolation:isolate;">
         ${svgArcs(180,cb,.05)}
-        ${wmW}
-        ${lM}
+        ${wmCrest}
         <div style="height:.5px;background:#E2E0D8;margin:5px 0;"></div>
         <div style="font-size:3.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:${cb};margin-bottom:4px;position:relative;z-index:1;">Artículo de Investigación${code_?' · '+code_:''}</div>
         <div style="font-size:13px;font-weight:800;line-height:1.04;letter-spacing:-.3px;color:#080806;margin-bottom:5px;position:relative;z-index:1;">${ttl}</div>
