@@ -285,6 +285,40 @@ footer{background:var(--ink);padding:0;}
 
 /* ── TEXT HIGHLIGHTS ── */
 mark.hl{cursor:pointer;border-radius:1px;}
+
+/* ── PAYWALL ── */
+.art-paywall-wrap{position:relative;overflow:hidden;max-height:320px;}
+.art-paywall-wrap::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:200px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,.88) 45%,#fff 100%);
+  pointer-events:none;
+}
+.art-gate{
+  text-align:center;padding:40px 32px 48px;
+  border-top:1px solid var(--rule);margin-top:0;
+}
+.art-gate-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:16px;
+}
+.art-gate-eyebrow::before,.art-gate-eyebrow::after{content:'';display:block;width:24px;height:1px;background:var(--blue);}
+.art-gate-h{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.3;}
+.art-gate-d{font-size:13.5px;color:var(--ink3);line-height:1.6;max-width:400px;margin:0 auto 28px;}
+.art-gate-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.art-gate-primary{
+  background:var(--blue);color:#fff;padding:11px 28px;border-radius:3px;
+  font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  text-decoration:none;transition:opacity .15s;
+}
+.art-gate-primary:hover{opacity:.88;}
+.art-gate-secondary{
+  color:var(--blue);padding:11px 28px;border-radius:3px;
+  border:1.5px solid currentColor;font-size:12.5px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:opacity .15s;
+}
+.art-gate-secondary:hover{opacity:.75;}
+
 mark.hl-yellow{background:#FFF176;color:inherit;}
 mark.hl-blue{background:#C7E0FF;color:inherit;}
 mark.hl-green{background:#C8F0C8;color:inherit;}
@@ -1048,8 +1082,41 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     attempt();
   }
 
+  function applyPaywall(){
+    const attempt=()=>{
+      const contentEl=document.getElementById('artContent');
+      if(!contentEl||!contentEl.children.length){ setTimeout(attempt,120); return; }
+
+      // Wrap content in a height-capped div with fade
+      const wrap=document.createElement('div');
+      wrap.className='art-paywall-wrap';
+      contentEl.parentNode.insertBefore(wrap,contentEl);
+      wrap.appendChild(contentEl);
+
+      // Gate card — inserted after artLayout
+      const layout=document.getElementById('artLayout');
+      const gate=document.createElement('div');
+      gate.className='art-gate';
+      const next=encodeURIComponent(location.href);
+      gate.innerHTML=`
+        <div class="art-gate-eyebrow">Acceso completo</div>
+        <div class="art-gate-h">Regístrate para leer el artículo completo</div>
+        <div class="art-gate-d">El acceso a todos los artículos de investigación de Nouscience Institute of Theology es gratuito. Crea tu cuenta en segundos.</div>
+        <div class="art-gate-btns">
+          <a href="auth.html?mode=signup&next=${next}" class="art-gate-primary">Crear cuenta gratuita</a>
+          <a href="auth.html?next=${next}" class="art-gate-secondary">Ya tengo cuenta</a>
+        </div>`;
+      layout.insertAdjacentElement('afterend',gate);
+
+      // Disable text selection on the blurred portion
+      contentEl.style.userSelect='none';
+      contentEl.style.webkitUserSelect='none';
+    };
+    attempt();
+  }
+
   sb.auth.getSession().then(async({data:{session}})=>{
-    if(!session){ initSaveBtn(false); return; }
+    if(!session){ initSaveBtn(false); applyPaywall(); return; }
     _user=session.user;
     initSaveBtn(true);
 
