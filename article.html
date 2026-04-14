@@ -456,8 +456,9 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
 
   /* ── MAGAZINE COVER (first page) ── */
   #printCover{
+    display:block!important;
     page-break-after:always;break-after:page;
-    height:100vh;overflow:hidden;
+    height:297mm;overflow:hidden;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;
   }
 }
@@ -721,9 +722,13 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
     </div>
   `;
 
-  // Populate cover card (visible on page)
+  // Populate screen cover card (visible on page)
   const artCoverEl = document.getElementById('artCoverCard');
   if (artCoverEl) artCoverEl.innerHTML = makeScreenCover(a);
+
+  // Pre-build print cover (display:none on screen; @media print forces display:block)
+  const printCoverEl = document.getElementById('printCover');
+  if (printCoverEl) printCoverEl.innerHTML = makePrintCover(a);
 
   // Inject raw HTML content safely into the content div
   const contentEl = document.getElementById('artContent');
@@ -979,6 +984,7 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
   }
 
   window.downloadPDF = function() {
+    // Set running title
     const titleEl  = document.querySelector('.art-title');
     const runTitle = document.getElementById('printRunningTitle');
     if (titleEl && runTitle) {
@@ -986,29 +992,22 @@ mark.hl-green{background:#C8F0C8;color:inherit;}
       runTitle.textContent = t.length > 65 ? t.slice(0, 62) + '…' : t;
     }
 
-    // Build and show magazine cover
-    const cover = document.getElementById('printCover');
-    if (cover && a) {
-      cover.innerHTML = makePrintCover(a);
-      cover.style.display = 'block';
-    }
-
-    // Suppress running header on cover page and use zero margin for first page
+    // Inject: hide running header on cover, zero margin first page
     const tempStyle = document.createElement('style');
     tempStyle.id = '_coverPrintStyle';
     tempStyle.textContent = '@media print{.print-running-hd{display:none!important;}@page:first{margin:0;}}';
     document.head.appendChild(tempStyle);
 
-    window.print();
-
-    // Restore after print dialog closes
-    const cleanup = () => {
-      if (cover) cover.style.display = 'none';
-      const ts = document.getElementById('_coverPrintStyle');
-      if (ts) ts.remove();
-      window.removeEventListener('afterprint', cleanup);
-    };
-    window.addEventListener('afterprint', cleanup);
+    // Small delay so the browser re-paints before opening the print dialog
+    setTimeout(() => {
+      window.print();
+      const cleanup = () => {
+        const ts = document.getElementById('_coverPrintStyle');
+        if (ts) ts.remove();
+        window.removeEventListener('afterprint', cleanup);
+      };
+      window.addEventListener('afterprint', cleanup);
+    }, 80);
   };
 
   function esc(str) {
