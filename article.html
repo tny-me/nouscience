@@ -14,27 +14,25 @@
 <body>
 <div class="wrap">
   <header class="site-header">
-    <div>
-      <a class="site-title" href="index.html">JA Sachz</a>
-      <div class="site-tagline">Filosofía, estoicismo, fe y la búsqueda de paz.</div>
-    </div>
+    <a class="site-title" href="index.html">JA Sachz</a>
     <nav class="site-nav">
       <a href="index.html">Inicio</a>
-      <a href="admin.html">Editor</a>
+      <a href="admin.html" class="write">Escribir</a>
     </nav>
   </header>
+</div>
 
-  <main>
-    <article id="post">
-      <div class="post-empty">Cargando…</div>
-    </article>
-  </main>
+<article id="post">
+  <div class="narrow"><div class="post-empty">Cargando…</div></div>
+</article>
 
+<div class="narrow">
   <footer class="site-footer">
     <span>&copy; 2026 JA Sachz</span>
   </footer>
 </div>
 
+<script src="demo-posts.js"></script>
 <script>
 const SB_URL='https://xduylfmrmxqnbtpyyjvb.supabase.co';
 const SB_KEY='sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
@@ -44,34 +42,43 @@ function fmtDate(iso){
   if(!iso)return'';
   try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});}catch{return'';}
 }
+function notFound(){
+  document.getElementById('post').innerHTML=`
+    <div class="narrow">
+      <div class="post-empty">Artículo no encontrado.</div>
+      <div class="post-back-wrap"><a class="post-back" href="index.html">&larr; Volver al inicio</a></div>
+    </div>`;
+}
 
 async function loadPost(){
-  const post=document.getElementById('post');
   const id=new URLSearchParams(location.search).get('id');
-  if(!id){
-    post.innerHTML='<div class="post-empty">Artículo no encontrado.</div><div class="post-back-wrap"><a class="post-back" href="index.html">&larr; Volver al inicio</a></div>';
-    return;
-  }
+  if(!id){notFound();return;}
 
-  let a=null;
-  try{
-    const res=await fetch(SB_URL+'/rest/v1/articles?id=eq.'+encodeURIComponent(id)+'&select=*',
-      {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
-    const data=await res.json();
-    if(!res.ok || !Array.isArray(data) || !data.length) throw new Error('not found');
-    a=data[0];
-  }catch(e){
-    post.innerHTML='<div class="post-empty">Artículo no encontrado.</div><div class="post-back-wrap"><a class="post-back" href="index.html">&larr; Volver al inicio</a></div>';
-    return;
+  let a=DEMO_POSTS.find(p=>p.id===id)||null;
+
+  if(!a){
+    try{
+      const res=await fetch(SB_URL+'/rest/v1/articles?id=eq.'+encodeURIComponent(id)+'&select=*',
+        {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+      const data=await res.json();
+      if(!res.ok || !Array.isArray(data) || !data.length) throw new Error('not found');
+      a=data[0];
+    }catch(e){notFound();return;}
   }
 
   document.title=(a.title||'JA Sachz')+' — JA Sachz';
-  post.innerHTML=`
+  document.getElementById('post').innerHTML=`
     <div class="post-header">
       ${a.discipline?`<span class="post-tag">${esc(a.discipline)}</span>`:''}
       <h1 class="post-title">${esc(a.title)}</h1>
       ${a.subtitle?`<p class="post-subtitle">${esc(a.subtitle)}</p>`:''}
-      <div class="post-meta">${esc(fmtDate(a.published_at))}${a.author?' · '+esc(a.author):''}${a.read_time?' · '+esc(a.read_time):''}</div>
+      <div class="post-byline">
+        <div class="post-avatar">JAS</div>
+        <div>
+          <div class="post-byline-name">${esc(a.author||'JA Sachz')}</div>
+          <div class="post-byline-meta">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
+        </div>
+      </div>
     </div>
     ${a.cover_image?`<div class="post-cover"><img src="${esc(a.cover_image)}" alt=""/></div>`:''}
     <div class="post-body">${a.content||''}</div>

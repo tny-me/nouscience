@@ -15,30 +15,25 @@
 <body>
 <div class="wrap">
   <header class="site-header">
-    <div>
-      <div class="site-title">JA Sachz</div>
-      <div class="site-tagline">Filosofía, estoicismo, fe y la búsqueda de paz.</div>
-    </div>
+    <div class="site-title">JA Sachz</div>
     <nav class="site-nav">
       <a href="index.html">Inicio</a>
-      <a href="admin.html">Editor</a>
+      <a href="admin.html" class="write">Escribir</a>
     </nav>
   </header>
+</div>
 
-  <main>
-    <section id="hero"></section>
+<div class="feed" id="feed">
+  <div class="post-empty">Cargando artículos…</div>
+</div>
 
-    <div class="section-title">Últimos artículos</div>
-    <div class="post-grid" id="postGrid">
-      <div class="post-empty">Cargando artículos…</div>
-    </div>
-  </main>
-
+<div class="narrow">
   <footer class="site-footer">
     <span>&copy; 2026 JA Sachz</span>
   </footer>
 </div>
 
+<script src="demo-posts.js"></script>
 <script>
 const SB_URL='https://xduylfmrmxqnbtpyyjvb.supabase.co';
 const SB_KEY='sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
@@ -48,15 +43,13 @@ function fmtDate(iso){
   if(!iso)return'';
   try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});}catch{return'';}
 }
-function initials(){return 'JAS';}
-function cardImg(a,cls){
-  if(a.cover_image) return `<div class="${cls}"><img src="${esc(a.cover_image)}" alt=""/></div>`;
-  return `<div class="${cls} placeholder"><span>${initials()}</span></div>`;
+function thumb(a){
+  if(a.cover_image) return `<div class="feed-thumb"><img src="${esc(a.cover_image)}" alt=""/></div>`;
+  return `<div class="feed-thumb placeholder"><span>JAS</span></div>`;
 }
 
 async function loadPosts(){
-  const hero=document.getElementById('hero');
-  const grid=document.getElementById('postGrid');
+  const feed=document.getElementById('feed');
   let articles=[];
   try{
     const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=published_at.desc',
@@ -64,42 +57,29 @@ async function loadPosts(){
     articles=await res.json();
     if(!res.ok) throw new Error('Supabase error');
   }catch(e){
-    grid.innerHTML='<div class="post-empty">No se pudieron cargar los artículos.</div>';
-    return;
+    articles=[];
   }
 
   if(!Array.isArray(articles)||!articles.length){
-    grid.innerHTML='<div class="post-empty">Todavía no hay artículos publicados.</div>';
-    return;
+    articles=DEMO_POSTS;
   }
 
-  const [first,...rest]=articles;
-
-  hero.innerHTML=`
-    <div class="hero">
-      ${cardImg(first,'hero-img')}
-      <div>
-        ${first.discipline?`<span class="hero-tag">${esc(first.discipline)}</span>`:''}
-        <h1 class="hero-title"><a href="article.html?id=${esc(first.id)}">${esc(first.title)}</a></h1>
-        ${first.abstract?`<p class="hero-excerpt">${esc(first.abstract)}</p>`:''}
-        <div class="hero-meta">${esc(fmtDate(first.published_at))}${first.read_time?' · '+esc(first.read_time):''}</div>
+  feed.innerHTML=articles.map(a=>`
+    <a class="feed-item" href="article.html?id=${esc(a.id)}">
+      <div class="feed-main">
+        <div class="feed-byline">
+          <div class="feed-avatar">JAS</div>
+          <span>${esc(a.author||'JA Sachz')}</span>
+        </div>
+        <h2 class="feed-title">${esc(a.title)}</h2>
+        ${a.abstract?`<p class="feed-excerpt">${esc(a.abstract)}</p>`:''}
+        <div class="feed-meta">
+          <span>${esc(fmtDate(a.published_at))}</span>
+          ${a.read_time?`<span>·</span><span>${esc(a.read_time)}</span>`:''}
+          ${a.discipline?`<span class="feed-tag">${esc(a.discipline)}</span>`:''}
+        </div>
       </div>
-    </div>
-  `;
-
-  if(!rest.length){
-    grid.innerHTML='';
-    document.querySelector('.section-title').style.display='none';
-    return;
-  }
-
-  grid.innerHTML=rest.map(a=>`
-    <a class="post-card" href="article.html?id=${esc(a.id)}">
-      ${cardImg(a,'post-card-img')}
-      ${a.discipline?`<div class="post-card-tag">${esc(a.discipline)}</div>`:''}
-      <h2 class="post-card-title">${esc(a.title)}</h2>
-      ${a.abstract?`<p class="post-card-excerpt">${esc(a.abstract)}</p>`:''}
-      <div class="post-card-meta">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
+      ${thumb(a)}
     </a>
   `).join('');
 }
