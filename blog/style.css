@@ -1,0 +1,124 @@
+:root{
+  --bg:#fff;
+  --ink:#111;
+  --ink2:#444;
+  --ink3:#999;
+  --accent:#1240AB;
+  --rule:#eee;
+  --maxw:640px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:19px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.wrap{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:48px 24px 96px;
+}
+
+/* HEADER */
+.site-header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:48px;
+  font-family:Helvetica,Arial,sans-serif;
+}
+.site-title{
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:-.01em;
+  color:var(--ink);
+  text-decoration:none;
+}
+.site-nav{display:flex;gap:18px;}
+.site-nav a{
+  font-size:13px;
+  color:var(--ink2);
+  letter-spacing:.02em;
+}
+.site-tagline{
+  font-family:Helvetica,Arial,sans-serif;
+  font-size:13px;
+  color:var(--ink3);
+  margin-top:6px;
+}
+
+/* POST LIST */
+.post-list{list-style:none;}
+.post-item{
+  padding:28px 0;
+  border-bottom:1px solid var(--rule);
+}
+.post-item:first-child{padding-top:0;}
+.post-item:last-child{border-bottom:none;}
+.post-date{
+  font-family:Helvetica,Arial,sans-serif;
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--ink3);
+  margin-bottom:6px;
+}
+.post-title{
+  font-size:24px;
+  line-height:1.35;
+  font-weight:700;
+  margin-bottom:8px;
+}
+.post-title a{color:var(--ink);}
+.post-title a:hover{color:var(--accent);text-decoration:none;}
+.post-excerpt{color:var(--ink2);font-size:17px;}
+
+/* SINGLE POST */
+.post{margin-bottom:40px;}
+.post h1{
+  font-size:32px;
+  line-height:1.3;
+  margin-bottom:10px;
+}
+.post p{margin:0 0 22px;}
+.post blockquote{
+  border-left:3px solid var(--accent);
+  padding-left:18px;
+  margin:0 0 22px;
+  color:var(--ink2);
+  font-style:italic;
+}
+.post-back{
+  display:inline-block;
+  margin-top:8px;
+  font-family:Helvetica,Arial,sans-serif;
+  font-size:13px;
+}
+
+/* FOOTER */
+.site-footer{
+  margin-top:64px;
+  padding-top:24px;
+  border-top:1px solid var(--rule);
+  font-family:Helvetica,Arial,sans-serif;
+  font-size:13px;
+  color:var(--ink3);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.site-footer a{color:var(--ink3);}
+
+@media (max-width:480px){
+  body{font-size:17px;}
+  .post h1{font-size:26px;}
+  .post-title{font-size:21px;}
+}
