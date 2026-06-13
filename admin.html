@@ -234,6 +234,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
             placeholder="Se genera automáticamente al guardar"/>
         </div>
 
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Imagen de portada (URL)</label>
+          <input class="form-input" type="text" id="fCover" placeholder="https://..."/>
+        </div>
+
         <div class="form-divider"></div>
         <div class="form-sec-label">Resumen / Abstract</div>
         <div class="form-group">
@@ -336,7 +341,7 @@ function toDb(a){
   return{id:a.id,title:a.title||null,subtitle:a.subtitle||null,abstract:a.abstract||null,
     author:a.author||null,author_title:a.authorTitle||null,discipline:a.discipline||null,
     tags:a.tags||[],read_time:a.readTime||null,content:a.content||null,
-    article_code:a.articleCode||null,
+    article_code:a.articleCode||null,cover_image:a.coverImage||null,
     featured:!!a.featured,published:!!a.published,published_at:a.publishedAt||null,
     created_at:a.createdAt||new Date().toISOString(),updated_at:new Date().toISOString()};
 }
@@ -344,7 +349,7 @@ function fromDb(r){
   return{id:r.id,title:r.title||'',subtitle:r.subtitle||'',abstract:r.abstract||'',
     author:r.author||'',authorTitle:r.author_title||'',discipline:r.discipline||'',
     tags:r.tags||[],readTime:r.read_time||'',content:r.content||'',
-    articleCode:r.article_code||'',
+    articleCode:r.article_code||'',coverImage:r.cover_image||'',
     featured:!!r.featured,published:!!r.published,publishedAt:r.published_at,
     createdAt:r.created_at,updatedAt:r.updated_at};
 }
@@ -407,7 +412,7 @@ function newArticle(){
   document.getElementById('fTitle').focus();
 }
 function clearForm(){
-  ['fTitle','fSubtitle','fAuthor','fAuthorTitle','fTags','fTime','fCode','fAbstract'].forEach(id=>document.getElementById(id).value='');
+  ['fTitle','fSubtitle','fAuthor','fAuthorTitle','fTags','fTime','fCode','fCover','fAbstract'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fDisc').value='';
   document.getElementById('fFeatured').checked=false;
   if(quill) quill.setContents([],'silent');
@@ -430,6 +435,7 @@ function loadArt(id){
   document.getElementById('fTags').value=(a.tags||[]).join(', ');
   document.getElementById('fTime').value=a.readTime;
   document.getElementById('fCode').value=a.articleCode||'';
+  document.getElementById('fCover').value=a.coverImage||'';
   document.getElementById('fAbstract').value=a.abstract;
   document.getElementById('fFeatured').checked=a.featured;
   if(quill){
@@ -460,6 +466,7 @@ function buildData(published,articleCode){
     discipline:document.getElementById('fDisc').value,
     tags:document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean),
     readTime:document.getElementById('fTime').value.trim(),
+    coverImage:document.getElementById('fCover').value.trim(),
     abstract:document.getElementById('fAbstract').value.trim(),
     content:quill?quill.root.innerHTML:'',
     articleCode:ex?.articleCode||articleCode||null,

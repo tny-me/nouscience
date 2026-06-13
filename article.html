@@ -6,6 +6,9 @@
 <title>JA Sachz</title>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <link rel="apple-touch-icon" href="favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -22,8 +25,8 @@
   </header>
 
   <main>
-    <article class="post" id="post">
-      <p class="post-empty">Cargando…</p>
+    <article id="post">
+      <div class="post-empty">Cargando…</div>
     </article>
   </main>
 
@@ -46,7 +49,7 @@ async function loadPost(){
   const post=document.getElementById('post');
   const id=new URLSearchParams(location.search).get('id');
   if(!id){
-    post.innerHTML='<p class="post-empty">Artículo no encontrado.</p><a class="post-back" href="index.html">&larr; Volver al inicio</a>';
+    post.innerHTML='<div class="post-empty">Artículo no encontrado.</div><div class="post-back-wrap"><a class="post-back" href="index.html">&larr; Volver al inicio</a></div>';
     return;
   }
 
@@ -58,17 +61,21 @@ async function loadPost(){
     if(!res.ok || !Array.isArray(data) || !data.length) throw new Error('not found');
     a=data[0];
   }catch(e){
-    post.innerHTML='<p class="post-empty">Artículo no encontrado.</p><a class="post-back" href="index.html">&larr; Volver al inicio</a>';
+    post.innerHTML='<div class="post-empty">Artículo no encontrado.</div><div class="post-back-wrap"><a class="post-back" href="index.html">&larr; Volver al inicio</a></div>';
     return;
   }
 
   document.title=(a.title||'JA Sachz')+' — JA Sachz';
   post.innerHTML=`
-    <div class="post-date">${esc(fmtDate(a.published_at))}</div>
-    <h1>${esc(a.title)}</h1>
-    ${a.subtitle?`<div class="post-subtitle">${esc(a.subtitle)}</div>`:''}
-    <div class="post-content">${a.content||''}</div>
-    <a class="post-back" href="index.html">&larr; Volver al inicio</a>
+    <div class="post-header">
+      ${a.discipline?`<span class="post-tag">${esc(a.discipline)}</span>`:''}
+      <h1 class="post-title">${esc(a.title)}</h1>
+      ${a.subtitle?`<p class="post-subtitle">${esc(a.subtitle)}</p>`:''}
+      <div class="post-meta">${esc(fmtDate(a.published_at))}${a.author?' · '+esc(a.author):''}${a.read_time?' · '+esc(a.read_time):''}</div>
+    </div>
+    ${a.cover_image?`<div class="post-cover"><img src="${esc(a.cover_image)}" alt=""/></div>`:''}
+    <div class="post-body">${a.content||''}</div>
+    <div class="post-back-wrap"><a class="post-back" href="index.html">&larr; Volver al inicio</a></div>
   `;
 }
 

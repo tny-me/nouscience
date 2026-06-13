@@ -4,16 +4,19 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>JA Sachz</title>
-<meta name="description" content="Notas breves sobre filosofía, estoicismo, fe y la búsqueda de paz."/>
+<meta name="description" content="Notas sobre filosofía, estoicismo, fe y la búsqueda de paz."/>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <link rel="apple-touch-icon" href="favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <div class="wrap">
   <header class="site-header">
     <div>
-      <a class="site-title" href="index.html">JA Sachz</a>
+      <div class="site-title">JA Sachz</div>
       <div class="site-tagline">Filosofía, estoicismo, fe y la búsqueda de paz.</div>
     </div>
     <nav class="site-nav">
@@ -23,9 +26,12 @@
   </header>
 
   <main>
-    <ul class="post-list" id="postList">
-      <li class="post-empty">Cargando artículos…</li>
-    </ul>
+    <section id="hero"></section>
+
+    <div class="section-title">Últimos artículos</div>
+    <div class="post-grid" id="postGrid">
+      <div class="post-empty">Cargando artículos…</div>
+    </div>
   </main>
 
   <footer class="site-footer">
@@ -42,9 +48,15 @@ function fmtDate(iso){
   if(!iso)return'';
   try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});}catch{return'';}
 }
+function initials(){return 'JAS';}
+function cardImg(a,cls){
+  if(a.cover_image) return `<div class="${cls}"><img src="${esc(a.cover_image)}" alt=""/></div>`;
+  return `<div class="${cls} placeholder"><span>${initials()}</span></div>`;
+}
 
 async function loadPosts(){
-  const list=document.getElementById('postList');
+  const hero=document.getElementById('hero');
+  const grid=document.getElementById('postGrid');
   let articles=[];
   try{
     const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=published_at.desc',
@@ -52,21 +64,43 @@ async function loadPosts(){
     articles=await res.json();
     if(!res.ok) throw new Error('Supabase error');
   }catch(e){
-    list.innerHTML='<li class="post-empty">No se pudieron cargar los artículos.</li>';
+    grid.innerHTML='<div class="post-empty">No se pudieron cargar los artículos.</div>';
     return;
   }
 
   if(!Array.isArray(articles)||!articles.length){
-    list.innerHTML='<li class="post-empty">Todavía no hay artículos publicados.</li>';
+    grid.innerHTML='<div class="post-empty">Todavía no hay artículos publicados.</div>';
     return;
   }
 
-  list.innerHTML=articles.map(a=>`
-    <li class="post-item">
-      <div class="post-date">${esc(fmtDate(a.published_at))}</div>
-      <h2 class="post-title"><a href="article.html?id=${esc(a.id)}">${esc(a.title)}</a></h2>
-      ${a.abstract?`<p class="post-excerpt">${esc(a.abstract)}</p>`:''}
-    </li>
+  const [first,...rest]=articles;
+
+  hero.innerHTML=`
+    <div class="hero">
+      ${cardImg(first,'hero-img')}
+      <div>
+        ${first.discipline?`<span class="hero-tag">${esc(first.discipline)}</span>`:''}
+        <h1 class="hero-title"><a href="article.html?id=${esc(first.id)}">${esc(first.title)}</a></h1>
+        ${first.abstract?`<p class="hero-excerpt">${esc(first.abstract)}</p>`:''}
+        <div class="hero-meta">${esc(fmtDate(first.published_at))}${first.read_time?' · '+esc(first.read_time):''}</div>
+      </div>
+    </div>
+  `;
+
+  if(!rest.length){
+    grid.innerHTML='';
+    document.querySelector('.section-title').style.display='none';
+    return;
+  }
+
+  grid.innerHTML=rest.map(a=>`
+    <a class="post-card" href="article.html?id=${esc(a.id)}">
+      ${cardImg(a,'post-card-img')}
+      ${a.discipline?`<div class="post-card-tag">${esc(a.discipline)}</div>`:''}
+      <h2 class="post-card-title">${esc(a.title)}</h2>
+      ${a.abstract?`<p class="post-card-excerpt">${esc(a.abstract)}</p>`:''}
+      <div class="post-card-meta">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
+    </a>
   `).join('');
 }
 
