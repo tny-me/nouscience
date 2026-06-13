@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Editor — Nouscience Institute of Theology</title>
+<title>Editor — JA Sachz</title>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -134,7 +134,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
   <div class="login-box">
     <div class="login-logo">
       <div class="login-lb"></div>
-      <div><span class="login-lm">Nouscience</span><span class="login-ls">Institute of Theology · Editor</span></div>
+      <div><span class="login-lm">JA Sachz</span><span class="login-ls">Editor</span></div>
     </div>
     <h2 class="login-h">Panel de Editor</h2>
     <p class="login-sub">Ingresa la contraseña para acceder al panel.</p>
@@ -147,8 +147,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
 
 <div id="mainApp" style="display:none;">
   <nav>
-    <a class="nav-brand" href="index.html">
-      <img src="NIT logo.png" alt="Nouscience Institute of Theology" style="height:115px;width:auto;display:block;flex-shrink:0;">
+    <a class="nav-brand" href="index.html" style="font-family:'Inter','Arial',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.01em;color:var(--ink);padding:0 24px;">
+      JA Sachz
     </a>
     <div class="nav-title">Panel de Editor</div>
     <div class="nav-right">
@@ -166,7 +166,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
           <button class="sb-tab" onclick="filterList('pub',this)">Publicados</button>
           <button class="sb-tab" onclick="filterList('dra',this)">Borradores</button>
         </div>
-        <button class="sb-backfill" id="btnBackfill" onclick="backfillCodes()" title="Genera códigos NIT para artículos que aún no tienen uno" style="display:none">Asignar IDs faltantes</button>
+        <button class="sb-backfill" id="btnBackfill" onclick="backfillCodes()" title="Genera códigos para artículos que aún no tienen uno" style="display:none">Asignar IDs faltantes</button>
       </div>
       <div class="sb-list" id="artList"></div>
     </div>
@@ -201,7 +201,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
           </div>
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Cargo / Institución</label>
-            <input class="form-input" type="text" id="fAuthorTitle" placeholder="Ej. Teólogo, Nouscience Institute"/>
+            <input class="form-input" type="text" id="fAuthorTitle" placeholder="Ej. Escritor, JA Sachz"/>
           </div>
         </div>
 
@@ -210,18 +210,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
             <label class="form-label">Disciplina</label>
             <select class="form-select" id="fDisc">
               <option value="">Seleccionar...</option>
-              <option>Teología Bíblica</option>
-              <option>Teología Sistemática</option>
-              <option>Cristología</option>
-              <option>Soteriología</option>
-              <option>Teología Moral</option>
-              <option>Apologética</option>
-              <option>Angelología</option>
-              <option>Escatología</option>
-              <option>Teología Histórica</option>
-              <option>Hermenéutica</option>
-              <option>Eclesiología</option>
-              <option>Pneumatología</option>
+              <option>Filosofía</option>
+              <option>Estoicismo</option>
+              <option>Fe</option>
+              <option>Teología</option>
+              <option>Paz</option>
+              <option>Reflexión</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0">
@@ -320,17 +314,15 @@ async function sbDelete(id){
 
 // DISCIPLINE → CODE
 const DISC_CODES={
-  'Teología Bíblica':'TB','Teología Sistemática':'TS','Cristología':'CR',
-  'Soteriología':'ST','Teología Moral':'TM','Apologética':'AP',
-  'Angelología':'AN','Escatología':'ES','Teología Histórica':'TH',
-  'Hermenéutica':'HR','Eclesiología':'EC','Pneumatología':'PN'
+  'Filosofía':'FI','Estoicismo':'ES','Fe':'FE',
+  'Teología':'TE','Paz':'PZ','Reflexión':'RF'
 };
-function discCode(disc){return DISC_CODES[disc]||'TL';}
+function discCode(disc){return DISC_CODES[disc]||'GN';}
 
 function generateArticleCode(disc){
   const dc=discCode(disc);
   const year=new Date().getFullYear();
-  const prefix=`NIT-${dc}-${year}-`;
+  const prefix=`JAS-${dc}-${year}-`;
   const nums=cache
     .filter(a=>a.articleCode&&a.articleCode.startsWith(prefix))
     .map(a=>parseInt(a.articleCode.slice(prefix.length),10))
