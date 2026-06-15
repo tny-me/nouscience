@@ -338,12 +338,14 @@ function generateArticleCode(disc){
 
 // MAPPING
 function toDb(a){
-  return{id:a.id,title:a.title||null,subtitle:a.subtitle||null,abstract:a.abstract||null,
+  const row={id:a.id,title:a.title||null,subtitle:a.subtitle||null,abstract:a.abstract||null,
     author:a.author||null,author_title:a.authorTitle||null,discipline:a.discipline||null,
     tags:a.tags||[],read_time:a.readTime||null,content:a.content||null,
-    article_code:a.articleCode||null,cover_image:a.coverImage||null,
+    article_code:a.articleCode||null,
     featured:!!a.featured,published:!!a.published,published_at:a.publishedAt||null,
     created_at:a.createdAt||new Date().toISOString(),updated_at:new Date().toISOString()};
+  if(a.coverImage)row.cover_image=a.coverImage;  // solo si la columna existe y hay valor
+  return row;
 }
 function fromDb(r){
   return{id:r.id,title:r.title||'',subtitle:r.subtitle||'',abstract:r.abstract||'',

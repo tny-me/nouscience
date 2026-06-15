@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Animi Regnvm</title>
+<title>Animi Regnum</title>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
@@ -141,7 +141,7 @@
 <body>
 
 <nav class="nav">
-  <a class="nav-logo" href="index.html">Animi<span> — </span>Regnvm</a>
+  <a class="nav-logo" href="index.html">Animi<span> — </span>Regnum</a>
   <div class="nav-links">
     <a href="index.html">← Escritos</a>
     <a href="admin.html">Escribir</a>
@@ -157,7 +157,7 @@
 
     <div class="sidebar">
       <div class="sb-cap">
-        <div class="sb-cap-name">Animi Regnvm</div>
+        <div class="sb-cap-name">Animi Regnum</div>
         <div class="sb-cap-vol" id="live-clock">cargando...</div>
       </div>
       <div class="sb-card">
@@ -194,7 +194,7 @@
 </div>
 
 <footer class="footer">
-  <span class="footer-l">Animi Regnvm · est. 2023</span>
+  <span class="footer-l">Animi Regnum · est. 2023</span>
   <div class="footer-r">
     <a href="index.html">Escritos</a><a href="admin.html">Editor</a>
   </div>
@@ -272,7 +272,7 @@ async function loadPost(){
     }catch(e){notFound();return;}
   }
 
-  document.title=(a.title||'Animi Regnvm')+' — Animi Regnvm';
+  document.title=(a.title||'Animi Regnum')+' — Animi Regnum';
 
   const author=esc(a.author||'JA Sachz');
   const dateStr=esc(fmtDate(a.published_at));
@@ -292,7 +292,7 @@ async function loadPost(){
     ${a.cover_image?`<div class="art-cover"><img src="${esc(a.cover_image)}" alt=""/></div>`:''}
     <div class="art-body">${a.content||''}</div>
     <div class="art-foot">
-      <span class="art-brand">Animi Regnvm</span>
+      <span class="art-brand">Animi Regnum</span>
       <a class="art-back" href="index.html"><span class="back-line"></span>Volver a escritos</a>
     </div>
   `;
