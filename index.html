@@ -192,6 +192,27 @@
   .entry-bq p { font-size: 15px; font-style: italic; font-weight: 300; color: #444; line-height: 1.65; }
   .entry-bq cite { display: block; margin-top: 7px; font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: #C0BCB5; font-style: normal; }
 
+  /* contenido completo del artículo en el feed */
+  .entry-content { margin-top: 4px; }
+  .entry-content p { font-size: 15px; font-weight: 400; line-height: 1.88; color: #2E2E2E; margin-bottom: 14px; }
+  .entry-content p:first-of-type::first-letter {
+    font-size: 52px; font-weight: 700; line-height: .8; float: left;
+    margin-right: 6px; margin-top: 4px;
+    color: transparent;
+    background: linear-gradient(135deg, #C4A96A 0%, #8B6F47 60%, #4A3520 100%);
+    -webkit-background-clip: text; background-clip: text;
+  }
+  .entry-content blockquote { border-left: 2px solid #C4A96A; padding: 0 0 0 18px; margin: 18px 0; }
+  .entry-content blockquote p { font-style: italic; font-weight: 300; color: #444; }
+  .entry-content h2 {
+    font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .22em;
+    text-transform: uppercase; color: #ABABAB; margin: 20px 0 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .entry-content h2::after { content: ''; flex: 1; height: 1px; background: #F0EDE8; }
+  .entry-content strong { font-weight: 700; }
+  .entry-content em { font-style: italic; }
+
   .entry-foot {
     display: flex;
     justify-content: space-between;
@@ -397,10 +418,10 @@ function renderFeed(articles){
           <h2 class="entry-title">${esc(a.title)}</h2>
         </a>
         ${lead?`<p class="entry-lead">${esc(lead)}</p>`:''}
-        ${para?`<p class="entry-p entry-p-first">${esc(para)}</p>`:''}
+        <div class="entry-content">${a.content||''}</div>
         <div class="entry-foot">
           <span class="entry-brand">Animi Regnum</span>
-          <a class="entry-cta" href="article.html?id=${esc(a.id)}"><span class="cta-line"></span>Leer entrada</a>
+          <a class="entry-cta" href="article.html?id=${esc(a.id)}"><span class="cta-line"></span>Enlace permanente</a>
         </div>
       </div>
     </div>`;
