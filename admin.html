@@ -120,6 +120,26 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
 .btn-prev:hover{border-color:var(--ink3);color:var(--ink);}
 .btn-del{padding:10px 22px;background:transparent;color:var(--red);font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border:1px solid transparent;cursor:pointer;transition:all .2s;margin-left:auto;}
 .btn-del:hover{border-color:var(--red);background:#FFF5F5;}
+.btn-social{padding:10px 22px;background:transparent;color:#C4A96A;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border:1px solid #C4A96A;cursor:pointer;transition:all .2s;}
+.btn-social:hover{background:#C4A96A;color:#111;}
+/* social modal */
+.social-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;display:flex;align-items:center;justify-content:center;}
+.social-modal{background:#1A1A1A;width:680px;max-width:96vw;max-height:90vh;overflow-y:auto;padding:36px;}
+.social-modal h3{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#C4A96A;margin-bottom:24px;}
+.social-formats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px;}
+.social-fmt{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;border:1px solid #333;cursor:pointer;transition:border-color .2s;}
+.social-fmt:hover{border-color:#C4A96A;}
+.social-fmt-icon{width:48px;height:32px;background:#111;border:1px solid #444;display:flex;align-items:center;justify-content:center;font-size:9px;color:#888;letter-spacing:.05em;}
+.social-fmt-icon.sq{width:32px;height:32px;}
+.social-fmt-icon.st{width:18px;height:32px;}
+.social-fmt-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#888;}
+.social-preview{width:100%;aspect-ratio:1200/630;background:#111;margin-bottom:16px;position:relative;overflow:hidden;}
+.social-preview canvas{width:100%;height:100%;}
+.social-dl-row{display:flex;gap:10px;}
+.social-dl{flex:1;padding:11px;background:#C4A96A;color:#111;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;cursor:pointer;transition:background .2s;}
+.social-dl:hover{background:#D4B97A;}
+.social-close{padding:11px 22px;background:transparent;color:#888;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border:1px solid #333;cursor:pointer;transition:all .2s;}
+.social-close:hover{border-color:#888;color:#fff;}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink2);color:#fff;padding:10px 22px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:all .25s cubic-bezier(.16,1,.3,1);z-index:999;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.ok{background:var(--green);}
@@ -264,6 +284,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
           <button class="btn-pub" id="btnPub" onclick="togglePublish()">Publicar artículo</button>
           <button class="btn-draft" onclick="saveDraft()">Guardar borrador</button>
           <a class="btn-prev" id="btnPrev" href="#" target="_blank">Ver artículo →</a>
+          <button class="btn-social" onclick="openSocialModal()">Imagen social ↗</button>
           <button class="btn-del" onclick="deleteArticle()">Eliminar</button>
         </div>
       </div>
@@ -272,6 +293,32 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Social Image Modal -->
+<div class="social-overlay" id="socialOverlay" style="display:none" onclick="if(event.target===this)closeSocialModal()">
+  <div class="social-modal">
+    <h3>Generar imagen para redes sociales</h3>
+    <div class="social-formats">
+      <div class="social-fmt" onclick="setSocialFmt('landscape')" id="fmt-landscape" style="border-color:#C4A96A">
+        <div class="social-fmt-icon">1200×630</div>
+        <div class="social-fmt-label">Twitter / OG</div>
+      </div>
+      <div class="social-fmt" onclick="setSocialFmt('square')" id="fmt-square">
+        <div class="social-fmt-icon sq">1080×1080</div>
+        <div class="social-fmt-label">Instagram</div>
+      </div>
+      <div class="social-fmt" onclick="setSocialFmt('story')" id="fmt-story">
+        <div class="social-fmt-icon st">1080×1920</div>
+        <div class="social-fmt-label">Stories</div>
+      </div>
+    </div>
+    <canvas id="socialCanvas" style="width:100%;display:block;margin-bottom:16px;"></canvas>
+    <div class="social-dl-row">
+      <button class="social-dl" onclick="downloadSocial()">↓ Descargar imagen</button>
+      <button class="social-close" onclick="closeSocialModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
@@ -609,6 +656,130 @@ function fmtDate(iso){
   if(!iso)return'';
   try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'2-digit'});}
   catch{return'';}
+}
+
+// SOCIAL IMAGE GENERATOR
+let socialFmt='landscape';
+const SOCIAL_SIZES={landscape:[1200,630],square:[1080,1080],story:[1080,1920]};
+
+function openSocialModal(){
+  if(!curId&&!document.getElementById('fTitle').value.trim()){toast('Escribe un título primero');return;}
+  document.getElementById('socialOverlay').style.display='flex';
+  setSocialFmt('landscape');
+}
+function closeSocialModal(){
+  document.getElementById('socialOverlay').style.display='none';
+}
+function setSocialFmt(fmt){
+  socialFmt=fmt;
+  ['landscape','square','story'].forEach(f=>{
+    document.getElementById('fmt-'+f).style.borderColor=f===fmt?'#C4A96A':'#333';
+  });
+  drawSocialCanvas();
+}
+
+function drawSocialCanvas(){
+  const [W,H]=SOCIAL_SIZES[socialFmt];
+  const canvas=document.getElementById('socialCanvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle='#111111';
+  ctx.fillRect(0,0,W,H);
+
+  // Subtle texture lines
+  ctx.strokeStyle='rgba(196,169,106,0.04)';
+  ctx.lineWidth=1;
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  const PAD=W*0.09;
+
+  // Top gold line
+  ctx.fillStyle='#C4A96A';
+  ctx.fillRect(PAD, H*0.1, W*0.06, 2);
+
+  // Brand label
+  ctx.fillStyle='#C4A96A';
+  ctx.font=`500 ${W*0.018}px Arial, sans-serif`;
+  ctx.letterSpacing='0.15em';
+  ctx.fillText('ANIMI REGNUM', PAD, H*0.1 + W*0.045);
+
+  // Subtitle brand
+  ctx.fillStyle='rgba(196,169,106,0.5)';
+  ctx.font=`300 ${W*0.013}px Arial, sans-serif`;
+  ctx.fillText('BY JA SACHZ', PAD, H*0.1 + W*0.045 + W*0.028);
+
+  // Separator
+  ctx.fillStyle='rgba(196,169,106,0.2)';
+  ctx.fillRect(PAD, H*0.1 + W*0.045 + W*0.046, W-PAD*2, 1);
+
+  // Title
+  const title=document.getElementById('fTitle').value.trim()||'Sin título';
+  const disc=document.getElementById('fDisc').value||'';
+
+  ctx.fillStyle='#F5F0E8';
+  const titleY=H*(socialFmt==='story'?0.38:0.42);
+  const titleSize=W*(socialFmt==='landscape'?0.055:0.062);
+  ctx.font=`700 ${titleSize}px Georgia, serif`;
+  wrapText(ctx, title, PAD, titleY, W-PAD*2, titleSize*1.35);
+
+  // Discipline tag
+  if(disc){
+    const tagY=H*(socialFmt==='story'?0.32:0.34);
+    ctx.font=`600 ${W*0.014}px Arial, sans-serif`;
+    ctx.fillStyle='#C4A96A';
+    ctx.fillText(disc.toUpperCase(), PAD, tagY);
+  }
+
+  // Bottom bar
+  ctx.fillStyle='rgba(196,169,106,0.15)';
+  ctx.fillRect(0, H*0.88, W, H*0.12);
+
+  ctx.fillStyle='rgba(196,169,106,0.6)';
+  ctx.fillRect(0, H*0.88, W, 1);
+
+  ctx.fillStyle='#C4A96A';
+  ctx.font=`600 ${W*0.014}px Arial, sans-serif`;
+  ctx.fillText('nouscience.org', PAD, H*0.88+H*0.065);
+
+  ctx.fillStyle='rgba(196,169,106,0.4)';
+  ctx.font=`300 ${W*0.012}px Arial, sans-serif`;
+  ctx.fillText('Animi Regnum · Filosofía y Estoicismo', PAD, H*0.88+H*0.09);
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH){
+  const words=text.split(' ');
+  let line='';
+  let cy=y;
+  const maxLines=4;
+  let lc=0;
+  for(let i=0;i<words.length;i++){
+    const test=line+words[i]+' ';
+    if(ctx.measureText(test).width>maxW&&line){
+      ctx.fillText(line.trim(),x,cy);
+      line=words[i]+' ';
+      cy+=lineH; lc++;
+      if(lc>=maxLines-1){
+        // truncate remaining
+        const rest=words.slice(i+1).join(' ');
+        const full=words[i]+(rest?' …':'');
+        ctx.fillText(full.trim(),x,cy);
+        return;
+      }
+    } else { line=test; }
+  }
+  if(line.trim()) ctx.fillText(line.trim(),x,cy);
+}
+
+function downloadSocial(){
+  drawSocialCanvas();
+  const canvas=document.getElementById('socialCanvas');
+  const title=(document.getElementById('fTitle').value.trim()||'post').replace(/\s+/g,'-').toLowerCase().slice(0,40);
+  const link=document.createElement('a');
+  link.download=`animi-regnum-${title}-${socialFmt}.png`;
+  link.href=canvas.toDataURL('image/png');
+  link.click();
 }
 </script>
 </body>
