@@ -23,12 +23,15 @@
   </header>
 
   <section class="hero">
+    <div class="hero-eyebrow">Notas personales</div>
     <h1>Pensar despacio sobre <span class="accent">filosofía</span>, fe y paz.</h1>
-    <p>Notas breves y honestas sobre estoicismo, teología y la búsqueda de una vida en calma — escritas para volver a leerlas cuando haga falta.</p>
+    <p>Reflexiones breves y honestas sobre estoicismo, teología y la búsqueda de una vida en calma — escritas para volver a leerlas cuando haga falta.</p>
   </section>
 
-  <div class="section-label">Últimos artículos</div>
-  <div class="post-list" id="postList">
+  <div id="featuredWrap"></div>
+
+  <div class="section-label">Más artículos</div>
+  <div class="post-grid" id="postGrid">
     <div class="post-empty">Cargando artículos…</div>
   </div>
 
@@ -50,7 +53,8 @@ function fmtDate(iso){
 }
 
 async function loadPosts(){
-  const list=document.getElementById('postList');
+  const featuredWrap=document.getElementById('featuredWrap');
+  const grid=document.getElementById('postGrid');
   let articles=[];
   try{
     const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=published_at.desc',
@@ -65,16 +69,32 @@ async function loadPosts(){
     articles=DEMO_POSTS;
   }
 
-  list.innerHTML=articles.map(a=>`
-    <a class="post-row" href="article.html?id=${esc(a.id)}">
-      <div class="post-row-left">
-        <div class="post-row-date">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
-        <div class="post-row-title">${esc(a.title)}</div>
-        ${a.abstract?`<p class="post-row-excerpt">${esc(a.abstract)}</p>`:''}
+  const [featured,...rest]=articles;
+
+  if(featured){
+    featuredWrap.innerHTML=`
+      <a class="featured" href="article.html?id=${esc(featured.id)}">
+        <div class="featured-media">${featured.cover_image?`<img src="${esc(featured.cover_image)}" alt=""/>`:''}</div>
+        <div class="featured-body">
+          ${featured.discipline?`<span class="post-row-tag">${esc(featured.discipline)}</span>`:''}
+          <div class="featured-title">${esc(featured.title)}</div>
+          ${featured.abstract?`<p class="featured-excerpt">${esc(featured.abstract)}</p>`:''}
+          <div class="featured-meta">${esc(fmtDate(featured.published_at))}${featured.read_time?' · '+esc(featured.read_time):''}</div>
+        </div>
+      </a>`;
+  }
+
+  grid.innerHTML=rest.map(a=>`
+    <a class="post-card" href="article.html?id=${esc(a.id)}">
+      <div class="post-card-media">${a.cover_image?`<img src="${esc(a.cover_image)}" alt=""/>`:''}</div>
+      <div class="post-card-body">
+        ${a.discipline?`<span class="post-row-tag">${esc(a.discipline)}</span>`:''}
+        <div class="post-card-title">${esc(a.title)}</div>
+        ${a.abstract?`<p class="post-card-excerpt">${esc(a.abstract)}</p>`:''}
+        <div class="post-card-date">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
       </div>
-      ${a.discipline?`<span class="post-row-tag">${esc(a.discipline)}</span>`:''}
     </a>
-  `).join('');
+  `).join('') || (featured?'':'<div class="post-empty">No hay artículos todavía.</div>');
 }
 
 loadPosts();
