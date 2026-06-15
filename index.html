@@ -32,7 +32,7 @@
   .nav-links { display: flex; align-items: center; gap: 28px; }
   .nav-links a { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #888; text-decoration: none; transition: color .2s; }
   .nav-links a:hover { color: #C4A96A; }
-  .nav-btn { background: #C4A96A; color: #111; padding: 7px 20px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; border: none; cursor: pointer; font-family: inherit; transition: background .2s; }
+  .nav-btn { background: #C4A96A; color: #111; padding: 7px 20px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; border: none; cursor: pointer; font-family: inherit; transition: background .2s; text-decoration: none; display: inline-block; }
   .nav-btn:hover { background: #D4B97A; }
 
   .page { max-width: 1280px; margin: 0 auto; padding: 52px 80px 80px 64px; }
@@ -254,12 +254,7 @@
 
 <nav class="nav">
   <div class="nav-logo">Animi<span> — </span>Regnum</div>
-  <div class="nav-links">
-    <a href="#">Escritos</a>
-    <a href="#">Archivo</a>
-    <a href="#">Acerca</a>
-    <button class="nav-btn">Suscribir</button>
-  </div>
+  <a class="nav-btn" href="admin.html">Acceso</a>
 </nav>
 
 <div class="page">

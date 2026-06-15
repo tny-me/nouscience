@@ -142,10 +142,7 @@
 
 <nav class="nav">
   <a class="nav-logo" href="index.html">Animi<span> — </span>Regnum</a>
-  <div class="nav-links">
-    <a href="index.html">← Escritos</a>
-    <a href="admin.html">Escribir</a>
-  </div>
+  <a class="nav-btn" href="admin.html">Acceso</a>
 </nav>
 
 <div class="page">
@@ -259,9 +256,10 @@ async function loadPost(){
   const id=new URLSearchParams(location.search).get('id');
   if(!id){notFound();return;}
 
-  const all=await loadAll();
-  let a=all.find(p=>String(p.id)===String(id))||null;
+  /* 1. buscar en demo posts */
+  let a=DEMO_POSTS.find(p=>String(p.id)===String(id))||null;
 
+  /* 2. si no está, buscar directo en Supabase por ID */
   if(!a){
     try{
       const res=await fetch(SB_URL+'/rest/v1/articles?id=eq.'+encodeURIComponent(id)+'&select=*',
@@ -271,6 +269,9 @@ async function loadPost(){
       a=data[0];
     }catch(e){notFound();return;}
   }
+
+  /* sidebar async (no bloquea el artículo) */
+  loadAll();
 
   document.title=(a.title||'Animi Regnum')+' — Animi Regnum';
 
