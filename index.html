@@ -9,27 +9,43 @@
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <div class="wrap">
   <header class="site-header">
     <div class="site-title">JA Sachz</div>
+    <div class="site-tagline">Notas sobre filosofía, estoicismo, fe y la búsqueda de paz</div>
     <nav class="site-nav">
       <a href="index.html">Inicio</a>
+      <a href="#">Filosofía</a>
+      <a href="#">Estoicismo</a>
+      <a href="#">Fe</a>
+      <a href="#">Paz</a>
       <a href="admin.html" class="write">Escribir</a>
     </nav>
   </header>
-</div>
 
-<div class="feed" id="feed">
-  <div class="post-empty">Cargando artículos…</div>
-</div>
+  <div class="layout">
+    <main>
+      <div class="feed" id="feed">
+        <div class="post-empty">Cargando artículos…</div>
+      </div>
+    </main>
+    <aside class="sidebar">
+      <div class="sidebar-title">Más leídos</div>
+      <div id="sideList"></div>
+      <div class="side-note">
+        <strong>Sobre JA Sachz</strong>
+        Un espacio para pensar despacio: filosofía, estoicismo, fe y la búsqueda de paz interior, en notas breves y honestas.
+      </div>
+    </aside>
+  </div>
 
-<div class="narrow">
   <footer class="site-footer">
     <span>&copy; 2026 JA Sachz</span>
+    <span>Filosofía · Estoicismo · Fe · Teología · Paz</span>
   </footer>
 </div>
 
@@ -41,15 +57,16 @@ const SB_KEY='sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtDate(iso){
   if(!iso)return'';
-  try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});}catch{return'';}
+  try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();}catch{return'';}
 }
-function thumb(a){
-  if(a.cover_image) return `<div class="feed-thumb"><img src="${esc(a.cover_image)}" alt=""/></div>`;
-  return `<div class="feed-thumb placeholder"><span>JAS</span></div>`;
+function img(a,cls){
+  if(a.cover_image) return `<div class="${cls}"><img src="${esc(a.cover_image)}" alt=""/></div>`;
+  return `<div class="${cls} placeholder"><span>JAS</span></div>`;
 }
 
 async function loadPosts(){
   const feed=document.getElementById('feed');
+  const sideList=document.getElementById('sideList');
   let articles=[];
   try{
     const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=published_at.desc',
@@ -65,22 +82,22 @@ async function loadPosts(){
   }
 
   feed.innerHTML=articles.map(a=>`
-    <a class="feed-item" href="article.html?id=${esc(a.id)}">
+    <article class="feed-item">
+      <a href="article.html?id=${esc(a.id)}">${img(a,'feed-img')}</a>
       <div class="feed-main">
-        <div class="feed-byline">
-          <div class="feed-avatar">JAS</div>
-          <span>${esc(a.author||'JA Sachz')}</span>
-        </div>
-        <h2 class="feed-title">${esc(a.title)}</h2>
+        ${a.discipline?`<span class="feed-tag">${esc(a.discipline)}</span>`:''}
+        <h2 class="feed-title"><a href="article.html?id=${esc(a.id)}">${esc(a.title)}</a></h2>
         ${a.abstract?`<p class="feed-excerpt">${esc(a.abstract)}</p>`:''}
-        <div class="feed-meta">
-          <span>${esc(fmtDate(a.published_at))}</span>
-          ${a.read_time?`<span>·</span><span>${esc(a.read_time)}</span>`:''}
-          ${a.discipline?`<span class="feed-tag">${esc(a.discipline)}</span>`:''}
-        </div>
+        <div class="feed-byline">${esc(a.author||'JA Sachz')} · ${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
       </div>
-      ${thumb(a)}
-    </a>
+    </article>
+  `).join('');
+
+  sideList.innerHTML=articles.slice(0,4).map(a=>`
+    <div class="side-item">
+      <a href="article.html?id=${esc(a.id)}">${img(a,'side-img')}</a>
+      <h3 class="side-title"><a href="article.html?id=${esc(a.id)}">${esc(a.title)}</a></h3>
+    </div>
   `).join('');
 }
 

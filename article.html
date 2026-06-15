@@ -8,22 +8,27 @@
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <div class="wrap">
   <header class="site-header">
-    <a class="site-title" href="index.html">JA Sachz</a>
+    <a class="site-title" href="index.html" style="text-decoration:none;">JA Sachz</a>
+    <div class="site-tagline">Notas sobre filosofía, estoicismo, fe y la búsqueda de paz</div>
     <nav class="site-nav">
       <a href="index.html">Inicio</a>
+      <a href="#">Filosofía</a>
+      <a href="#">Estoicismo</a>
+      <a href="#">Fe</a>
+      <a href="#">Paz</a>
       <a href="admin.html" class="write">Escribir</a>
     </nav>
   </header>
 </div>
 
 <article id="post">
-  <div class="narrow"><div class="post-empty">Cargando…</div></div>
+  <div class="post-empty narrow">Cargando…</div>
 </article>
 
 <div class="narrow">
@@ -40,7 +45,7 @@ const SB_KEY='sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtDate(iso){
   if(!iso)return'';
-  try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});}catch{return'';}
+  try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();}catch{return'';}
 }
 function notFound(){
   document.getElementById('post').innerHTML=`
@@ -72,13 +77,7 @@ async function loadPost(){
       ${a.discipline?`<span class="post-tag">${esc(a.discipline)}</span>`:''}
       <h1 class="post-title">${esc(a.title)}</h1>
       ${a.subtitle?`<p class="post-subtitle">${esc(a.subtitle)}</p>`:''}
-      <div class="post-byline">
-        <div class="post-avatar">JAS</div>
-        <div>
-          <div class="post-byline-name">${esc(a.author||'JA Sachz')}</div>
-          <div class="post-byline-meta">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
-        </div>
-      </div>
+      <div class="post-byline">${esc(a.author||'JA Sachz')} · ${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
     </div>
     ${a.cover_image?`<div class="post-cover"><img src="${esc(a.cover_image)}" alt=""/></div>`:''}
     <div class="post-body">${a.content||''}</div>
