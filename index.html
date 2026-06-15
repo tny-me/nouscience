@@ -7,9 +7,6 @@
 <meta name="description" content="Notas sobre filosofía, estoicismo, fe y la búsqueda de paz."/>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <link rel="apple-touch-icon" href="favicon.png"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -27,9 +24,39 @@
     <p>Notas breves y honestas sobre estoicismo, teología y la búsqueda de una vida en calma — escritas para volver a leerlas cuando haga falta.</p>
   </section>
 
-  <div class="section-label">Últimos artículos</div>
-  <div class="post-list" id="postList">
-    <div class="post-empty">Cargando artículos…</div>
+  <div class="layout">
+    <div>
+      <div class="section-label">Últimos artículos</div>
+      <div class="post-list" id="postList">
+        <div class="post-empty">Cargando artículos…</div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="side-box">
+        <div class="side-avatar">JS</div>
+        <div class="side-name">JA Sachz</div>
+        <p class="side-bio">Escribo sobre filosofía, estoicismo, fe y la búsqueda de una vida en calma. Notas pensadas para volver a leerlas cuando haga falta.</p>
+      </div>
+      <div class="side-box">
+        <div class="side-label">Cita</div>
+        <blockquote class="side-quote">
+          No son las cosas las que nos perturban, sino el juicio que hacemos sobre ellas.
+          <cite>Epicteto</cite>
+        </blockquote>
+      </div>
+      <div class="side-box">
+        <div class="side-label">Temas</div>
+        <div class="side-topics">
+          <a href="index.html">Filosofía</a>
+          <a href="index.html">Estoicismo</a>
+          <a href="index.html">Fe</a>
+          <a href="index.html">Teología</a>
+          <a href="index.html">Paz</a>
+          <a href="index.html">Reflexión</a>
+        </div>
+      </div>
+    </aside>
   </div>
 
   <footer class="site-footer">
@@ -68,7 +95,7 @@ async function loadPosts(){
   list.innerHTML=articles.map(a=>`
     <a class="post-row" href="article.html?id=${esc(a.id)}">
       ${a.discipline?`<span class="post-row-tag">${esc(a.discipline)}</span>`:''}
-      <h2 class="post-row-title"><span class="hl">${esc(a.title)}</span></h2>
+      <h2 class="post-row-title">${esc(a.title)}</h2>
       ${a.abstract?`<p class="post-row-excerpt">${esc(a.abstract)}</p>`:''}
       <div class="post-row-meta">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
     </a>
