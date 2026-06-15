@@ -1,111 +1,469 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>JA Sachz</title>
-<meta name="description" content="Notas sobre filosofía, estoicismo, fe y la búsqueda de paz."/>
-<link rel="icon" type="image/png" href="favicon.png"/>
-<link rel="apple-touch-icon" href="favicon.png"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animi Regnvm</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: #fff;
+    color: #111;
+    min-height: 100vh;
+  }
+
+  .nav {
+    background: #111;
+    border-bottom: 2px solid #C4A96A;
+    padding: 0 56px;
+    height: 54px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo { font-size: 14px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #fff; }
+  .nav-logo span { color: #C4A96A; font-weight: 300; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #888; text-decoration: none; transition: color .2s; }
+  .nav-links a:hover { color: #C4A96A; }
+  .nav-btn { background: #C4A96A; color: #111; padding: 7px 20px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; border: none; cursor: pointer; font-family: inherit; transition: background .2s; }
+  .nav-btn:hover { background: #D4B97A; }
+
+  .page { max-width: 1280px; margin: 0 auto; padding: 52px 80px 80px 64px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: start; }
+
+  /* ── FEED ── */
+  .feed { position: relative; }
+
+  /* ── ENTRY ── */
+  .entry {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    margin-bottom: 0;
+    position: relative;
+    transition: opacity .3s;
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .entry.visible { opacity: 1; transform: translateY(0); transition: opacity .5s ease, transform .5s ease; }
+  .entry.hidden { opacity: .05 !important; pointer-events: none; }
+
+  /* LEFT TIMELINE COL */
+  .entry-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  /* number above dot */
+  .entry-n {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    font-style: italic;
+    color: #C4A96A;
+    letter-spacing: .04em;
+    line-height: 1;
+    margin-bottom: 8px;
+    opacity: .7;
+  }
+
+  /* dot */
+  .entry-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #C4A96A;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    transition: background .3s, transform .3s;
+  }
+  .entry:hover .entry-dot {
+    background: #C4A96A;
+    transform: scale(1.3);
+  }
+
+  /* vertical line — only between dot and bottom of entry, NOT between entries */
+  .entry-line {
+    width: 1px;
+    flex: 1;
+    min-height: 32px;
+    background: linear-gradient(to bottom, #C4A96A, #E8E2D6);
+    margin-top: 4px;
+  }
+
+  /* RIGHT CONTENT */
+  .entry-body {
+    padding: 0 0 52px 24px;
+  }
+
+  .entry-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding-top: 2px;
+  }
+  .entry-tag {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: #C4A96A;
+  }
+  .entry-top-line { flex: 1; height: 1px; background: #EDEBE5; }
+  .entry-date {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 9px;
+    color: #C0BCB5;
+    letter-spacing: .07em;
+    white-space: nowrap;
+  }
+
+  .entry-title {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.18;
+    color: #111;
+    margin-bottom: 10px;
+    letter-spacing: -.01em;
+    transition: color .25s;
+  }
+  .entry:hover .entry-title { color: #8B6F47; }
+
+  .entry-lead {
+    font-size: 15px;
+    font-style: italic;
+    font-weight: 300;
+    color: #777;
+    line-height: 1.72;
+    margin-bottom: 18px;
+  }
+
+  .entry-p-first::first-letter {
+    font-size: 52px;
+    font-weight: 700;
+    line-height: .8;
+    float: left;
+    margin-right: 6px;
+    margin-top: 4px;
+    color: transparent;
+    background: linear-gradient(135deg, #C4A96A 0%, #8B6F47 60%, #4A3520 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .entry-p {
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.88;
+    color: #2E2E2E;
+    margin-bottom: 14px;
+  }
+
+  .entry-subhead {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: #ABABAB;
+    margin: 20px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .entry-subhead::after { content: ''; flex: 1; height: 1px; background: #F0EDE8; }
+
+  .entry-bq {
+    border-left: 2px solid #C4A96A;
+    padding: 0 0 0 18px;
+    margin: 18px 0;
+  }
+  .entry-bq p { font-size: 15px; font-style: italic; font-weight: 300; color: #444; line-height: 1.65; }
+  .entry-bq cite { display: block; margin-top: 7px; font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: #C0BCB5; font-style: normal; }
+
+  .entry-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid #F0EDE8;
+  }
+  .entry-brand { font-family: 'Roboto Mono', monospace; font-size: 9px; color: #D0CEC9; letter-spacing: .1em; text-transform: uppercase; }
+  .entry-cta {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #C4A96A;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+  }
+  .cta-line { width: 16px; height: 1px; background: #C4A96A; display: inline-block; position: relative; flex-shrink: 0; transition: width .25s; }
+  .entry-cta:hover .cta-line { width: 28px; }
+  .cta-line::after { content: ''; position: absolute; right: 0; top: -3px; width: 5px; height: 5px; border-right: 1.5px solid #C4A96A; border-top: 1.5px solid #C4A96A; transform: rotate(45deg); }
+
+  /* ── SIDEBAR ── */
+  .sidebar { display: flex; flex-direction: column; gap: 2px; position: sticky; top: 74px; }
+  .sb-cap { background: #111; padding: 16px 20px; border-bottom: 2px solid #C4A96A; }
+  .sb-cap-name { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #fff; }
+  .sb-cap-vol { font-family: 'Roboto Mono', monospace; font-size: 9px; color: #C4A96A; letter-spacing: .07em; margin-top: 4px; }
+  .sb-card { background: #fff; border: 1px solid #E8E4DC; }
+  .sb-sec { padding: 16px 20px; border-bottom: 1px solid #EDEBE5; }
+  .sb-sec:last-child { border-bottom: none; }
+  .sb-lbl { font-family: 'Roboto Mono', monospace; font-size: 8px; letter-spacing: .2em; text-transform: uppercase; color: #C0BCB5; display: block; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #F0ECE4; }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .ftag { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 5px 12px; background: #F8F6F2; color: #666; border: 1px solid #E4DFD6; cursor: pointer; transition: all .2s; font-weight: 500; font-family: inherit; }
+  .ftag.active, .ftag:hover { background: #111; color: #fff; border-color: #111; }
+  .qtext { font-size: 13px; font-style: italic; font-weight: 300; color: #555; line-height: 1.68; margin-bottom: 8px; }
+  .qsrc { font-family: 'Roboto Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: #C0BCB5; }
+  .arc-item { padding: 10px 0; border-bottom: 1px solid #F5F2EA; cursor: pointer; }
+  .arc-item:last-child { border-bottom: none; }
+  .arc-item:hover .arc-t { color: #C4A96A; }
+  .arc-cat { font-family: 'Roboto Mono', monospace; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: #C4A96A; margin-bottom: 3px; }
+  .arc-t { font-size: 13px; font-weight: 500; color: #111; line-height: 1.35; transition: color .2s; }
+  .arc-d { font-family: 'Roboto Mono', monospace; font-size: 9px; color: #C0BCB5; margin-top: 3px; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #E8E4DC; border: 1px solid #E8E4DC; margin-top: 2px; }
+  .stat { background: #fff; padding: 16px 8px; text-align: center; }
+  .stat-n { font-size: 24px; font-weight: 700; color: #111; font-style: italic; line-height: 1; }
+  .stat-l { font-size: 9px; color: #C0BCB5; text-transform: uppercase; letter-spacing: .07em; margin-top: 4px; }
+
+  .footer { background: #111; border-top: 2px solid #C4A96A; padding: 20px 56px; display: flex; justify-content: space-between; align-items: center; margin-top: 40px; }
+  .footer-l { font-family: 'Roboto Mono', monospace; font-size: 10px; color: #555; font-style: italic; }
+  .footer-r { display: flex; gap: 24px; }
+  .footer-r a { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #555; text-decoration: none; transition: color .2s; }
+  .footer-r a:hover { color: #C4A96A; }
+</style>
 </head>
 <body>
-<div class="wrap">
-  <header class="site-header">
-    <div class="site-title">JA Sachz</div>
-    <nav class="site-nav">
-      <a href="index.html">Inicio</a>
-      <a href="admin.html" class="write">Escribir</a>
-    </nav>
-  </header>
 
-  <section class="hero">
-    <h1>Pensar despacio sobre <span class="accent">filosofía</span>, fe y paz.</h1>
-    <p>Notas breves y honestas sobre estoicismo, teología y la búsqueda de una vida en calma — escritas para volver a leerlas cuando haga falta.</p>
-  </section>
+<nav class="nav">
+  <div class="nav-logo">Animi<span> — </span>Regnvm</div>
+  <div class="nav-links">
+    <a href="#">Escritos</a>
+    <a href="#">Archivo</a>
+    <a href="#">Acerca</a>
+    <button class="nav-btn">Suscribir</button>
+  </div>
+</nav>
 
-  <div class="layout">
-    <div>
-      <div class="section-label">Últimos artículos</div>
-      <div class="post-list" id="postList">
-        <div class="post-empty">Cargando artículos…</div>
+<div class="page">
+  <div class="grid">
+
+    <div class="feed" id="feed">
+
+      <!-- Entrada más reciente = número más alto (72) -->
+
+      <div class="entry" data-tag="Práctica">
+        <div class="entry-left">
+          <span class="entry-n">72</span>
+          <div class="entry-dot"></div>
+          <div class="entry-line"></div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-top">
+            <span class="entry-tag">Práctica</span>
+            <span class="entry-top-line"></span>
+            <span class="entry-date">12 Jun 2026 · 6 min</span>
+          </div>
+          <h2 class="entry-title">El diario como acto de resistencia silenciosa</h2>
+          <p class="entry-lead">Escribir cada mañana, antes de que el mundo empiece a definirte, es la práctica más radical que conozco. No terapia. No productividad. Presencia.</p>
+          <p class="entry-p entry-p-first">Marco Aurelio era el hombre más poderoso del mundo conocido. Gobernaba un Imperio desde Britania hasta Mesopotamia. Y sin embargo, cada mañana se sentaba a escribir. No para gobernar mejor. Para no perderse a sí mismo.</p>
+          <div class="entry-subhead">La trampa del ruido externo</div>
+          <p class="entry-p">El ruido del siglo II cumplía la misma función que el nuestro: borrar el contorno del yo. Nosotros tenemos notificaciones, reuniones, métricas, likes. Cambia la forma, no el mecanismo.</p>
+          <div class="entry-bq"><p>"Retírate a ti mismo cuanto puedas y trata con aquellos que puedan hacerte mejor."</p><cite>Marco Aurelio · Meditaciones</cite></div>
+          <p class="entry-p">Antes de abrir cualquier pantalla. Tres páginas a mano, sin editar. El objetivo no es que quede bien escrito — es que quede afuera de tu cabeza.</p>
+          <div class="entry-foot"><span class="entry-brand">Animi Regnvm</span><a class="entry-cta" href="#"><span class="cta-line"></span>Enlace permanente</a></div>
+        </div>
+      </div>
+
+      <div class="entry" data-tag="Filosofía">
+        <div class="entry-left">
+          <span class="entry-n">71</span>
+          <div class="entry-dot"></div>
+          <div class="entry-line"></div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-top">
+            <span class="entry-tag">Filosofía</span>
+            <span class="entry-top-line"></span>
+            <span class="entry-date">03 Jun 2026 · 7 min</span>
+          </div>
+          <h2 class="entry-title">La dicotomía del control, revisitada</h2>
+          <p class="entry-lead">Epicteto lo resumió en una línea hace dos mil años. Seguimos sin aprenderlo. Quizá porque la lección es más incómoda de lo que parece.</p>
+          <p class="entry-p entry-p-first">El Enchiridion abre con una frase que debería estar tatuada en la frente de todo el mundo: algunas cosas dependen de nosotros, otras no. Nuestra opinión, nuestros impulsos — dependen de nosotros. El cuerpo, la reputación, la riqueza — no dependen de nosotros.</p>
+          <div class="entry-bq"><p>"Si crees que solo es tuyo lo que es tuyo, nadie te forzará jamás, nadie te impedirá nada."</p><cite>Epicteto · Enchiridion · Cap. I</cite></div>
+          <p class="entry-p">Lo que gastas en querer controlar lo incontrolable es exactamente lo que te falta para trabajar en lo que sí puedes cambiar. No es resignación. Es redistribución de energía.</p>
+          <div class="entry-foot"><span class="entry-brand">Animi Regnvm</span><a class="entry-cta" href="#"><span class="cta-line"></span>Enlace permanente</a></div>
+        </div>
+      </div>
+
+      <div class="entry" data-tag="Reflexión">
+        <div class="entry-left">
+          <span class="entry-n">70</span>
+          <div class="entry-dot"></div>
+          <div class="entry-line"></div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-top">
+            <span class="entry-tag">Reflexión</span>
+            <span class="entry-top-line"></span>
+            <span class="entry-date">21 May 2026 · 5 min</span>
+          </div>
+          <h2 class="entry-title">Memento mori no es pesimismo: es claridad</h2>
+          <p class="entry-lead">Pensar en la muerte no entristece. Aclara. Es la herramienta de priorización más poderosa que existe, y la hemos convertido en tabú.</p>
+          <p class="entry-p entry-p-first">Los estoicos tenían una práctica llamada meditatio mortis. No morbosa — contemplativa. Cada día, recordar que termina. Que tú terminas. Que este momento no se repite.</p>
+          <div class="entry-bq"><p>"Que ningún día pase sin que hayas avanzado un paso más hacia la muerte. Así verás cuánto vale cada hora."</p><cite>Séneca · Cartas a Lucilio</cite></div>
+          <p class="entry-p">Cuando sabes que el tiempo es finito de verdad, dejas de tolerar lo trivial. Lo que importa empieza a pesar más.</p>
+          <div class="entry-foot"><span class="entry-brand">Animi Regnvm</span><a class="entry-cta" href="#"><span class="cta-line"></span>Enlace permanente</a></div>
+        </div>
+      </div>
+
+      <div class="entry" data-tag="Práctica">
+        <div class="entry-left">
+          <span class="entry-n">69</span>
+          <div class="entry-dot"></div>
+          <div class="entry-line"></div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-top">
+            <span class="entry-tag">Práctica</span>
+            <span class="entry-top-line"></span>
+            <span class="entry-date">09 May 2026 · 5 min</span>
+          </div>
+          <h2 class="entry-title">Sobre el valor infinito de no responder</h2>
+          <p class="entry-lead">La pausa entre el estímulo y la respuesta es donde vive la libertad. Hemos comprimido esa pausa hasta hacerla desaparecer.</p>
+          <p class="entry-p entry-p-first">Responder rápido casi siempre significa responder sin pensar. Cuando tu teléfono vibra y lo miras en treinta segundos, no eres más productivo — eres más reactivo.</p>
+          <div class="entry-bq"><p>"Entre el estímulo y la respuesta hay un espacio. En ese espacio está nuestro poder de elegir."</p><cite>Víktor Frankl</cite></div>
+          <p class="entry-p">No responder es un acto de autorespeto. Las respuestas que pensaste valen más que las que disparaste.</p>
+          <div class="entry-foot"><span class="entry-brand">Animi Regnvm</span><a class="entry-cta" href="#"><span class="cta-line"></span>Enlace permanente</a></div>
+        </div>
+      </div>
+
+      <div class="entry" data-tag="Filosofía">
+        <div class="entry-left">
+          <span class="entry-n">68</span>
+          <div class="entry-dot"></div>
+          <!-- No line after last entry -->
+        </div>
+        <div class="entry-body">
+          <div class="entry-top">
+            <span class="entry-tag">Filosofía</span>
+            <span class="entry-top-line"></span>
+            <span class="entry-date">15 Abr 2026 · 6 min</span>
+          </div>
+          <h2 class="entry-title">Séneca sobre el tiempo que nos roban</h2>
+          <p class="entry-lead">No es que tengamos poco tiempo. Es que malgastamos mucho. Dos mil años después, el diagnóstico es exacto.</p>
+          <p class="entry-p entry-p-first">Séneca escribió De Brevitate Vitae alrededor del año 49 d.C. La respuesta fue implacable: no es la vida la que es corta, es que la desperdicias.</p>
+          <div class="entry-bq"><p>"No es que tengamos poco tiempo, sino que perdemos mucho. La vida es suficientemente larga si es bien invertida."</p><cite>Séneca · De Brevitate Vitae · Cap. I</cite></div>
+          <p class="entry-p">Custodiar el tiempo como el bien más valioso. Significa decir no. La ocupación perpetua es la coartada perfecta para no vivir.</p>
+          <div class="entry-foot"><span class="entry-brand">Animi Regnvm</span><a class="entry-cta" href="#"><span class="cta-line"></span>Enlace permanente</a></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sidebar">
+      <div class="sb-cap">
+        <div class="sb-cap-name">Animi Regnvm</div>
+        <div class="sb-cap-vol" id="live-clock">cargando...</div>
+      </div>
+      <div class="sb-card">
+        <div class="sb-sec">
+          <span class="sb-lbl">Filtrar</span>
+          <div class="tags">
+            <button class="ftag active" onclick="filter(this,'todos')">Todos</button>
+            <button class="ftag" onclick="filter(this,'Práctica')">Práctica</button>
+            <button class="ftag" onclick="filter(this,'Filosofía')">Filosofía</button>
+            <button class="ftag" onclick="filter(this,'Reflexión')">Reflexión</button>
+          </div>
+        </div>
+        <div class="sb-sec">
+          <span class="sb-lbl">Esta semana</span>
+          <p class="qtext">"La filosofía promete sobre todo: sentido común, humanidad y fraternidad."</p>
+          <p class="qsrc">Séneca · Epístola V</p>
+        </div>
+        <div class="sb-sec">
+          <span class="sb-lbl">Archivo</span>
+          <div class="arc-item"><div class="arc-cat">Práctica</div><div class="arc-t">La atención como forma de amor</div><div class="arc-d">Mar 2026</div></div>
+          <div class="arc-item"><div class="arc-cat">Filosofía</div><div class="arc-t">Virtud sin audiencia</div><div class="arc-d">Feb 2026</div></div>
+          <div class="arc-item"><div class="arc-cat">Reflexión</div><div class="arc-t">El ego como obstáculo</div><div class="arc-d">Ene 2026</div></div>
+          <div class="arc-item"><div class="arc-cat">Cuerpo</div><div class="arc-t">Frío, incomodidad, claridad</div><div class="arc-d">Dic 2025</div></div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-n">72</div><div class="stat-l">Ensayos</div></div>
+        <div class="stat"><div class="stat-n">III</div><div class="stat-l">Años</div></div>
+        <div class="stat"><div class="stat-n">∞</div><div class="stat-l">Sin ads</div></div>
+        <div class="stat"><div class="stat-n">1</div><div class="stat-l">Autor</div></div>
       </div>
     </div>
 
-    <aside class="sidebar">
-      <div class="side-box">
-        <div class="side-avatar">JS</div>
-        <div class="side-name">JA Sachz</div>
-        <p class="side-bio">Escribo sobre filosofía, estoicismo, fe y la búsqueda de una vida en calma. Notas pensadas para volver a leerlas cuando haga falta.</p>
-      </div>
-      <div class="side-box">
-        <div class="side-label">Cita</div>
-        <blockquote class="side-quote">
-          No son las cosas las que nos perturban, sino el juicio que hacemos sobre ellas.
-          <cite>Epicteto</cite>
-        </blockquote>
-      </div>
-      <div class="side-box">
-        <div class="side-label">Temas</div>
-        <div class="side-topics">
-          <a href="index.html">Filosofía</a>
-          <a href="index.html">Estoicismo</a>
-          <a href="index.html">Fe</a>
-          <a href="index.html">Teología</a>
-          <a href="index.html">Paz</a>
-          <a href="index.html">Reflexión</a>
-        </div>
-      </div>
-    </aside>
   </div>
-
-  <footer class="site-footer">
-    <span>&copy; 2026 JA Sachz</span>
-    <span>Filosofía · Estoicismo · Fe · Teología · Paz</span>
-  </footer>
 </div>
 
-<script src="demo-posts.js"></script>
+<footer class="footer">
+  <span class="footer-l">Animi Regnvm · est. 2023</span>
+  <div class="footer-r">
+    <a href="#">RSS</a><a href="#">Archivo</a><a href="#">Contacto</a>
+  </div>
+</footer>
+
 <script>
-const SB_URL='https://xduylfmrmxqnbtpyyjvb.supabase.co';
-const SB_KEY='sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
-
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function fmtDate(iso){
-  if(!iso)return'';
-  try{return new Date(iso).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();}catch{return'';}
-}
-
-async function loadPosts(){
-  const list=document.getElementById('postList');
-  let articles=[];
-  try{
-    const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=published_at.desc',
-      {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
-    articles=await res.json();
-    if(!res.ok) throw new Error('Supabase error');
-  }catch(e){
-    articles=[];
+  /* ── LIVE CLOCK ── */
+  function updateClock() {
+    const now = new Date();
+    const dias = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+    const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+    const hh = String(now.getHours()).padStart(2,"0");
+    const mm = String(now.getMinutes()).padStart(2,"0");
+    const ss = String(now.getSeconds()).padStart(2,"0");
+    document.getElementById("live-clock").textContent =
+      dias[now.getDay()] + " " + now.getDate() + " " + meses[now.getMonth()] + " " + now.getFullYear() +
+      " · " + hh + ":" + mm + ":" + ss;
   }
+  updateClock();
+  setInterval(updateClock, 1000);
 
-  if(!Array.isArray(articles)||!articles.length){
-    articles=DEMO_POSTS;
+  /* ── SCROLL REVEAL ── */
+  const entries = document.querySelectorAll('.entry');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  entries.forEach(e => observer.observe(e));
+
+  /* ── FILTER ── */
+  function filter(el, tag) {
+    document.querySelectorAll('.ftag').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.entry').forEach(e => {
+      const show = tag === 'todos' || e.dataset.tag === tag;
+      e.classList.toggle('hidden', !show);
+    });
   }
-
-  list.innerHTML=articles.map(a=>`
-    <a class="post-row" href="article.html?id=${esc(a.id)}">
-      ${a.discipline?`<span class="post-row-tag">${esc(a.discipline)}</span>`:''}
-      <h2 class="post-row-title">${esc(a.title)}</h2>
-      ${a.abstract?`<p class="post-row-excerpt">${esc(a.abstract)}</p>`:''}
-      <div class="post-row-meta">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
-    </a>
-  `).join('');
-}
-
-loadPosts();
 </script>
 </body>
 </html>
