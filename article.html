@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -66,7 +66,7 @@ async function loadPost(){
   document.getElementById('post').innerHTML=`
     <div class="post-header">
       ${a.discipline?`<span class="post-tag">${esc(a.discipline)}</span>`:''}
-      <h1 class="post-title">${esc(a.title)}</h1>
+      <h1 class="post-title"><span class="hl">${esc(a.title)}</span></h1>
       ${a.subtitle?`<p class="post-subtitle">${esc(a.subtitle)}</p>`:''}
       <div class="post-byline">${esc(a.author||'JA Sachz')} · ${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
     </div>
