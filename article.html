@@ -8,30 +8,23 @@
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <div class="wrap">
   <header class="site-header">
-    <a class="site-title" href="index.html" style="text-decoration:none;">JA Sachz</a>
-    <div class="site-tagline">Notas sobre filosofía, estoicismo, fe y la búsqueda de paz</div>
+    <a class="site-title" href="index.html">JA Sachz</a>
     <nav class="site-nav">
       <a href="index.html">Inicio</a>
-      <a href="#">Filosofía</a>
-      <a href="#">Estoicismo</a>
-      <a href="#">Fe</a>
-      <a href="#">Paz</a>
       <a href="admin.html" class="write">Escribir</a>
     </nav>
   </header>
-</div>
 
-<article id="post">
-  <div class="post-empty narrow">Cargando…</div>
-</article>
+  <article id="post">
+    <div class="post-empty">Cargando…</div>
+  </article>
 
-<div class="narrow">
   <footer class="site-footer">
     <span>&copy; 2026 JA Sachz</span>
   </footer>
@@ -45,14 +38,12 @@ const SB_KEY='sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtDate(iso){
   if(!iso)return'';
-  try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();}catch{return'';}
+  try{return new Date(iso).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();}catch{return'';}
 }
 function notFound(){
   document.getElementById('post').innerHTML=`
-    <div class="narrow">
-      <div class="post-empty">Artículo no encontrado.</div>
-      <div class="post-back-wrap"><a class="post-back" href="index.html">&larr; Volver al inicio</a></div>
-    </div>`;
+    <div class="post-empty">Artículo no encontrado.</div>
+    <div class="post-back-wrap"><a class="post-back" href="index.html">&larr; Volver al inicio</a></div>`;
 }
 
 async function loadPost(){

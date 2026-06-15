@@ -9,38 +9,27 @@
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <div class="wrap">
   <header class="site-header">
     <div class="site-title">JA Sachz</div>
-    <div class="site-tagline">Notas sobre filosofía, estoicismo, fe y la búsqueda de paz</div>
     <nav class="site-nav">
       <a href="index.html">Inicio</a>
-      <a href="#">Filosofía</a>
-      <a href="#">Estoicismo</a>
-      <a href="#">Fe</a>
-      <a href="#">Paz</a>
       <a href="admin.html" class="write">Escribir</a>
     </nav>
   </header>
 
-  <div class="layout">
-    <main>
-      <div class="feed" id="feed">
-        <div class="post-empty">Cargando artículos…</div>
-      </div>
-    </main>
-    <aside class="sidebar">
-      <div class="sidebar-title">Más leídos</div>
-      <div id="sideList"></div>
-      <div class="side-note">
-        <strong>Sobre JA Sachz</strong>
-        Un espacio para pensar despacio: filosofía, estoicismo, fe y la búsqueda de paz interior, en notas breves y honestas.
-      </div>
-    </aside>
+  <section class="hero">
+    <h1>Pensar despacio sobre <span class="accent">filosofía</span>, fe y paz.</h1>
+    <p>Notas breves y honestas sobre estoicismo, teología y la búsqueda de una vida en calma — escritas para volver a leerlas cuando haga falta.</p>
+  </section>
+
+  <div class="section-label">Últimos artículos</div>
+  <div class="post-list" id="postList">
+    <div class="post-empty">Cargando artículos…</div>
   </div>
 
   <footer class="site-footer">
@@ -57,16 +46,11 @@ const SB_KEY='sb_publishable_SySQb0TjyYmE8qZ8TD2CXw_z8rQG-65';
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtDate(iso){
   if(!iso)return'';
-  try{return new Date(iso).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();}catch{return'';}
-}
-function img(a,cls){
-  if(a.cover_image) return `<div class="${cls}"><img src="${esc(a.cover_image)}" alt=""/></div>`;
-  return `<div class="${cls} placeholder"><span>JAS</span></div>`;
+  try{return new Date(iso).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();}catch{return'';}
 }
 
 async function loadPosts(){
-  const feed=document.getElementById('feed');
-  const sideList=document.getElementById('sideList');
+  const list=document.getElementById('postList');
   let articles=[];
   try{
     const res=await fetch(SB_URL+'/rest/v1/articles?published=eq.true&order=published_at.desc',
@@ -81,23 +65,15 @@ async function loadPosts(){
     articles=DEMO_POSTS;
   }
 
-  feed.innerHTML=articles.map(a=>`
-    <article class="feed-item">
-      <a href="article.html?id=${esc(a.id)}">${img(a,'feed-img')}</a>
-      <div class="feed-main">
-        ${a.discipline?`<span class="feed-tag">${esc(a.discipline)}</span>`:''}
-        <h2 class="feed-title"><a href="article.html?id=${esc(a.id)}">${esc(a.title)}</a></h2>
-        ${a.abstract?`<p class="feed-excerpt">${esc(a.abstract)}</p>`:''}
-        <div class="feed-byline">${esc(a.author||'JA Sachz')} · ${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
+  list.innerHTML=articles.map(a=>`
+    <a class="post-row" href="article.html?id=${esc(a.id)}">
+      <div class="post-row-left">
+        <div class="post-row-date">${esc(fmtDate(a.published_at))}${a.read_time?' · '+esc(a.read_time):''}</div>
+        <div class="post-row-title">${esc(a.title)}</div>
+        ${a.abstract?`<p class="post-row-excerpt">${esc(a.abstract)}</p>`:''}
       </div>
-    </article>
-  `).join('');
-
-  sideList.innerHTML=articles.slice(0,4).map(a=>`
-    <div class="side-item">
-      <a href="article.html?id=${esc(a.id)}">${img(a,'side-img')}</a>
-      <h3 class="side-title"><a href="article.html?id=${esc(a.id)}">${esc(a.title)}</a></h3>
-    </div>
+      ${a.discipline?`<span class="post-row-tag">${esc(a.discipline)}</span>`:''}
+    </a>
   `).join('');
 }
 
