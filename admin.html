@@ -684,92 +684,105 @@ function drawSocialCanvas(){
   canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d');
 
-  // Background
-  ctx.fillStyle='#111111';
+  const PAD=W*0.1;
+  const isStory=socialFmt==='story';
+
+  // Background: off-white / cream
+  ctx.fillStyle='#F7F4EE';
   ctx.fillRect(0,0,W,H);
 
-  // Subtle texture lines
-  ctx.strokeStyle='rgba(196,169,106,0.04)';
-  ctx.lineWidth=1;
-  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-
-  const PAD=W*0.09;
-
-  // Top gold line
+  // Left gold border bar
   ctx.fillStyle='#C4A96A';
-  ctx.fillRect(PAD, H*0.1, W*0.06, 2);
+  ctx.fillRect(0,0,W*0.012,H);
 
-  // Brand label
-  ctx.fillStyle='#C4A96A';
-  ctx.font=`500 ${W*0.018}px Arial, sans-serif`;
-  ctx.letterSpacing='0.15em';
-  ctx.fillText('ANIMI REGNUM', PAD, H*0.1 + W*0.045);
+  // Top margin rule (full width, after bar)
+  ctx.fillStyle='#E0D9CC';
+  ctx.fillRect(W*0.012,H*0.08,W-W*0.012,1);
 
-  // Subtitle brand
-  ctx.fillStyle='rgba(196,169,106,0.5)';
-  ctx.font=`300 ${W*0.013}px Arial, sans-serif`;
-  ctx.fillText('BY JA SACHZ', PAD, H*0.1 + W*0.045 + W*0.028);
-
-  // Separator
-  ctx.fillStyle='rgba(196,169,106,0.2)';
-  ctx.fillRect(PAD, H*0.1 + W*0.045 + W*0.046, W-PAD*2, 1);
-
-  // Title
   const title=document.getElementById('fTitle').value.trim()||'Sin título';
+  const subtitle=document.getElementById('fSubtitle').value.trim()||'';
   const disc=document.getElementById('fDisc').value||'';
 
-  ctx.fillStyle='#F5F0E8';
-  const titleY=H*(socialFmt==='story'?0.38:0.42);
-  const titleSize=W*(socialFmt==='landscape'?0.055:0.062);
-  ctx.font=`700 ${titleSize}px Georgia, serif`;
-  wrapText(ctx, title, PAD, titleY, W-PAD*2, titleSize*1.35);
-
-  // Discipline tag
+  // — Discipline tag —
+  const discY=H*(isStory?0.18:0.22);
   if(disc){
-    const tagY=H*(socialFmt==='story'?0.32:0.34);
-    ctx.font=`600 ${W*0.014}px Arial, sans-serif`;
+    const tagX=PAD+W*0.015;
+    const tagFs=W*0.013;
+    ctx.font=`700 ${tagFs}px Arial,sans-serif`;
+    const tagW=ctx.measureText(disc.toUpperCase()).width+tagFs*1.4;
+    // tag box
     ctx.fillStyle='#C4A96A';
-    ctx.fillText(disc.toUpperCase(), PAD, tagY);
+    ctx.fillRect(tagX-tagFs*0.7, discY-tagFs*1.1, tagW, tagFs*1.7);
+    ctx.fillStyle='#fff';
+    ctx.font=`700 ${tagFs}px Arial,sans-serif`;
+    ctx.fillText(disc.toUpperCase(), tagX, discY);
   }
 
-  // Bottom bar
-  ctx.fillStyle='rgba(196,169,106,0.15)';
-  ctx.fillRect(0, H*0.88, W, H*0.12);
+  // — Title —
+  const titleFs=W*(isStory?0.072:0.065);
+  const titleY=H*(isStory?0.30:0.36)+(disc?0:-(H*0.06));
+  ctx.fillStyle='#111111';
+  ctx.font=`800 ${titleFs}px Georgia,serif`;
+  const titleLines=wrapTextLines(ctx,title,W-PAD*2-W*0.015,4);
+  titleLines.forEach((line,i)=>ctx.fillText(line,PAD+W*0.015,titleY+i*titleFs*1.28));
 
-  ctx.fillStyle='rgba(196,169,106,0.6)';
-  ctx.fillRect(0, H*0.88, W, 1);
+  // Gold rule under title
+  const ruleY=titleY+titleLines.length*titleFs*1.28+titleFs*0.5;
+  ctx.fillStyle='#C4A96A';
+  ctx.fillRect(PAD+W*0.015, ruleY, W*0.07, 3);
+
+  // — Subtitle —
+  if(subtitle){
+    const subFs=W*(isStory?0.028:0.024);
+    const subY=ruleY+subFs*2.2;
+    ctx.fillStyle='#555550';
+    ctx.font=`300 ${subFs}px Georgia,serif`;
+    const subLines=wrapTextLines(ctx,subtitle,W-PAD*2-W*0.015,3);
+    subLines.forEach((line,i)=>ctx.fillText(line,PAD+W*0.015,subY+i*subFs*1.55));
+  }
+
+  // — Bottom section —
+  // Thin rule above footer
+  ctx.fillStyle='#E0D9CC';
+  ctx.fillRect(W*0.012,H*0.88,W-W*0.012,1);
+
+  // Brand name left
+  const brandFs=W*0.016;
+  ctx.fillStyle='#111111';
+  ctx.font=`700 ${brandFs}px Arial,sans-serif`;
+  ctx.fillText('ANIMI REGNUM', PAD+W*0.015, H*0.88+H*0.065);
 
   ctx.fillStyle='#C4A96A';
-  ctx.font=`600 ${W*0.014}px Arial, sans-serif`;
-  ctx.fillText('nouscience.org', PAD, H*0.88+H*0.065);
+  ctx.font=`400 ${brandFs*0.85}px Arial,sans-serif`;
+  ctx.fillText('by JA Sachz', PAD+W*0.015, H*0.88+H*0.065+brandFs*1.6);
 
-  ctx.fillStyle='rgba(196,169,106,0.4)';
-  ctx.font=`300 ${W*0.012}px Arial, sans-serif`;
-  ctx.fillText('Animi Regnum · Filosofía y Estoicismo', PAD, H*0.88+H*0.09);
+  // Domain right-aligned
+  ctx.fillStyle='#AEADA6';
+  ctx.font=`400 ${brandFs*0.82}px Arial,sans-serif`;
+  ctx.textAlign='right';
+  ctx.fillText('nouscience.org', W-PAD*0.6, H*0.88+H*0.065);
+  ctx.textAlign='left';
 }
 
-function wrapText(ctx, text, x, y, maxW, lineH){
+function wrapTextLines(ctx, text, maxW, maxLines){
   const words=text.split(' ');
+  const lines=[];
   let line='';
-  let cy=y;
-  const maxLines=4;
-  let lc=0;
-  for(let i=0;i<words.length;i++){
-    const test=line+words[i]+' ';
+  for(const word of words){
+    const test=line?line+' '+word:word;
     if(ctx.measureText(test).width>maxW&&line){
-      ctx.fillText(line.trim(),x,cy);
-      line=words[i]+' ';
-      cy+=lineH; lc++;
-      if(lc>=maxLines-1){
-        // truncate remaining
-        const rest=words.slice(i+1).join(' ');
-        const full=words[i]+(rest?' …':'');
-        ctx.fillText(full.trim(),x,cy);
-        return;
+      lines.push(line);
+      line=word;
+      if(lines.length>=maxLines-1){
+        // remaining words go into last line, truncated
+        const rest=words.slice(words.indexOf(word)+1);
+        line=word+(rest.length?' …':'');
+        break;
       }
     } else { line=test; }
   }
-  if(line.trim()) ctx.fillText(line.trim(),x,cy);
+  if(line) lines.push(line);
+  return lines;
 }
 
 function downloadSocial(){
