@@ -405,6 +405,7 @@ async function initApp(){
   quill=new Quill('#quillEditor',{theme:'snow',
     placeholder:'Escribe el contenido completo del artículo aquí...',
     modules:{toolbar:[[{header:[2,3,4,false]}],['bold','italic','underline'],
+      [{background:['#FCE588','#FFD6A5','#C9F2C7','#C9E4FF',false]}],
       ['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']]}});
   quill.on('text-change',()=>{
     const words=quill.getText().trim().split(/\s+/).filter(w=>w.length>0).length;
