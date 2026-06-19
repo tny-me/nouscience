@@ -227,18 +227,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
 
         <div class="form-row-3" style="margin-top:14px;">
           <div class="form-group" style="margin-bottom:0">
-            <label class="form-label">Disciplina</label>
-            <select class="form-select" id="fDisc">
-              <option value="">Seleccionar...</option>
-              <option>Dogmática</option>
-              <option>Filosofía</option>
-              <option>Filosofía de la Religión</option>
-              <option>Escrituras</option>
-              <option>Ética Teológica</option>
-              <option>Patrística</option>
-              <option>Diálogo Intercultural</option>
-              <option>Mística</option>
-            </select>
+            <label class="form-label">Categoría</label>
+            <input class="form-input" type="text" id="fDisc" list="fDiscList" placeholder="Ej. Dogmática, Estoicismo, Bioética..."/>
+            <datalist id="fDiscList"></datalist>
           </div>
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Etiquetas</label>
@@ -366,13 +357,13 @@ async function sbDelete(id){
   if(!r.ok) throw new Error('Error '+r.status+': '+(await r.text()));
 }
 
-// DISCIPLINE → CODE
-const DISC_CODES={
-  'Dogmática':'DG','Filosofía':'FI','Filosofía de la Religión':'FR',
-  'Escrituras':'ES','Ética Teológica':'ET','Patrística':'PA',
-  'Diálogo Intercultural':'DI','Mística':'MI'
-};
-function discCode(disc){return DISC_CODES[disc]||'GN';}
+// DISCIPLINE → CODE (se genera a partir del texto libre, no de una lista fija)
+function discCode(disc){
+  if(!disc) return 'GN';
+  const words=disc.trim().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').split(/\s+/).filter(Boolean);
+  if(words.length>=2) return (words[0][0]||'')+(words[1][0]||'');
+  return (words[0]||'GN').slice(0,2).padEnd(2,'X');
+}
 
 function generateArticleCode(disc){
   const dc=discCode(disc);
@@ -445,6 +436,11 @@ function renderList(){
     return;
   }
   el.innerHTML=arts.map(a=>'<div class="art-item'+(curId===a.id?' active':'')+'" onclick="loadArt(\''+esc(a.id)+'\')"><div class="ai-title">'+esc(a.title||'Sin título')+'</div><div class="ai-meta"><span class="ai-disc">'+esc(a.discipline||'Sin disciplina')+'</span><span class="ai-badge '+(a.published?'pub':'dra')+'">'+(a.published?'Publicado':'Borrador')+'</span></div></div>').join('');
+  updateDiscList();
+}
+function updateDiscList(){
+  const discs=[...new Set(cache.map(a=>a.discipline).filter(Boolean))].sort();
+  document.getElementById('fDiscList').innerHTML=discs.map(d=>'<option value="'+esc(d)+'">').join('');
 }
 function filterList(f,btn){
   curFilt=f;
