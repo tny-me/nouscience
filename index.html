@@ -174,6 +174,21 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
 .fc li:hover{color:var(--ivory)}
 .fbot{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-family:'Inter',sans-serif;font-size:11.5px;color:#3a4455}
 .fbot a{color:var(--gold);text-decoration:none}
+/* selection toolbar */
+.sel-bar{position:fixed;display:none;z-index:1500;background:var(--night);border:1px solid var(--gold);padding:6px;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.3);gap:2px;align-items:center}
+.sel-bar button{background:none;border:none;color:var(--ivory);font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.05em;padding:8px 12px;cursor:pointer;border-radius:3px;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:background .15s,color .15s}
+.sel-bar button:hover{background:rgba(201,168,76,.15);color:var(--gold)}
+.ab mark{background:#F0D98C;color:inherit;padding:0 2px;border-radius:2px}
+/* quotes page */
+.quotes-empty{padding:60px 5vw;text-align:center;color:var(--mist);font-family:'Inter',sans-serif}
+.quotes-empty strong{display:block;font-family:'Playfair Display',serif;font-size:20px;color:var(--night);margin-bottom:8px}
+.qt-item{padding:24px 0;border-bottom:1px solid var(--ivory-dark);display:grid;grid-template-columns:1fr auto;gap:18px;align-items:start}
+.qt-text{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:var(--ink);line-height:1.6}
+.qt-meta{font-family:'Inter',sans-serif;font-size:11px;color:var(--mist);margin-top:8px;display:flex;gap:10px;align-items:center}
+.qt-meta a{color:var(--violet);cursor:pointer;text-decoration:none}
+.qt-meta a:hover{color:var(--gold)}
+.qt-del{background:none;border:1px solid var(--ivory-dark);color:var(--mist);font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s}
+.qt-del:hover{border-color:var(--red,#C41E3A);color:#C41E3A}
 @media(max-width:1000px){.abw{grid-template-columns:1fr;gap:40px}.aside{position:static}}
 @media(max-width:900px){.hero-inner{grid-template-columns:1fr}.hside{border-left:none;border-top:1px solid rgba(201,168,76,.25);padding-left:0;padding-top:32px}.fg{grid-template-columns:1fr}.tc{grid-template-columns:1fr}.vg{grid-template-columns:1fr 1fr}.fi{grid-template-columns:1fr 1fr}.masthead-inner{flex-direction:column;text-align:center}.masthead-nav{justify-content:center}.ai{grid-template-columns:1fr}.ath{display:none}.anav-in{grid-template-columns:1fr}.ans.r{text-align:left}.ans.r .anl{justify-content:flex-start}}
 @media(max-width:600px){.vg{grid-template-columns:1fr}.fi{grid-template-columns:1fr}.atitle{font-size:24px}}
@@ -189,6 +204,7 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
     <nav class="masthead-nav">
       <a onclick="showHome()">Inicio</a>
       <a onclick="showHome()">Archivo</a>
+      <a onclick="showQuotes()">Mis citas</a>
     </nav>
   </div>
 </header>
@@ -280,12 +296,33 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
     <div class="ab" id="rBody"></div>
     <div class="aside">
       <div class="asw"><div class="aswt">Datos del artículo</div><div class="adoi"><strong>Código</strong><span id="rDOI"></span></div></div>
-      <div class="asw"><div class="aswt">Compartir</div><div class="ash"><button class="shb" onclick="copyLink()">🔗 Copiar enlace</button></div></div>
+      <div class="asw"><div class="aswt">Compartir</div><div class="ash"><button class="shb" onclick="copyLink()">🔗 Copiar enlace</button><button class="shb" onclick="showQuotes()">★ Ver mis citas guardadas</button></div></div>
       <div class="asw"><div class="aswt">Artículos relacionados</div><div class="arel" id="rRel"></div></div>
     </div>
   </div>
   <div class="anav"><div class="anav-in"><div class="ans" id="rPrev"></div><div class="ans r" id="rNext"></div></div></div>
 </div><!-- /page-article -->
+
+<!-- QUOTES PAGE -->
+<div id="page-quotes" class="page">
+  <div class="ah" data-sym="❝" style="padding-bottom:48px">
+    <div class="ah-in">
+      <div class="bc"><span class="bl" onclick="showHome()">← Portada</span><span class="sep">/</span><span>Mis citas</span></div>
+      <div class="acl">Tu selección personal</div>
+      <h1 class="atitle">Citas guardadas</h1>
+      <p class="asf">Pasajes que resaltaste mientras leías, guardados en este navegador.</p>
+    </div>
+  </div>
+  <div class="mw" style="padding:48px 5vw 80px;max-width:780px">
+    <div id="quotesList"></div>
+  </div>
+</div><!-- /page-quotes -->
+
+<div class="sel-bar" id="selBar">
+  <button onclick="highlightSelection()">✎ Resaltar y guardar</button>
+  <button onclick="copySelection()">⧉ Copiar cita</button>
+  <button onclick="shareQuoteImage()">↗ Compartir imagen</button>
+</div>
 
 <footer>
   <div class="fi">
@@ -416,9 +453,13 @@ function buildHome(){
   ).join('');
 }
 
+function showPage(id){
+  ['page-home','page-article','page-quotes'].forEach(p=>
+    document.getElementById(p).classList.toggle('active',p===id));
+  hideSelBar();
+}
 function showHome(){
-  document.getElementById('page-home').classList.add('active');
-  document.getElementById('page-article').classList.remove('active');
+  showPage('page-home');
   history.pushState({},'', location.pathname);
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -448,8 +489,7 @@ function showArticle(id){
   document.getElementById('rPrev').innerHTML=prev?`<div class="anl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Artículo anterior</div><div class="ant" onclick="showArticle('${esc(prev.id)}')">${esc(prev.title)}</div><div class="ana">${esc(prev.author||'JA Sachz')}</div>`:'';
   document.getElementById('rNext').innerHTML=next?`<div class="anl">Siguiente artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div><div class="ant" onclick="showArticle('${esc(next.id)}')">${esc(next.title)}</div><div class="ana">${esc(next.author||'JA Sachz')}</div>`:'';
 
-  document.getElementById('page-home').classList.remove('active');
-  document.getElementById('page-article').classList.add('active');
+  showPage('page-article');
   history.pushState({id:a.id},'', location.pathname+'?id='+encodeURIComponent(a.id));
   window.scrollTo({top:0,behavior:'instant'});
 }
@@ -459,10 +499,141 @@ function copyLink(){
 }
 
 function routeFromUrl(){
-  const id=new URLSearchParams(location.search).get('id');
-  if(id) showArticle(id); else showHome();
+  const params=new URLSearchParams(location.search);
+  const id=params.get('id');
+  if(params.get('citas')) showQuotes();
+  else if(id) showArticle(id);
+  else showHome();
 }
 window.addEventListener('popstate', routeFromUrl);
+
+// — CITAS GUARDADAS —
+const QUOTES_KEY='ar_saved_quotes';
+function getQuotes(){
+  try{ return JSON.parse(localStorage.getItem(QUOTES_KEY)||'[]'); }catch{ return []; }
+}
+function saveQuotes(list){ localStorage.setItem(QUOTES_KEY, JSON.stringify(list)); }
+
+function showQuotes(){
+  renderQuotes();
+  showPage('page-quotes');
+  history.pushState({},'', location.pathname+'?citas=1');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderQuotes(){
+  const list=getQuotes();
+  const el=document.getElementById('quotesList');
+  if(!list.length){
+    el.innerHTML='<div class="quotes-empty"><strong>Aún no has guardado citas</strong>Selecciona texto en cualquier artículo y elige «Resaltar y guardar».</div>';
+    return;
+  }
+  el.innerHTML=list.slice().reverse().map(q=>
+    `<div class="qt-item">
+      <div>
+        <div class="qt-text">"${esc(q.text)}"</div>
+        <div class="qt-meta"><a onclick="showArticle('${esc(q.articleId)}')">${esc(q.articleTitle)}</a><span>·</span><span>${fmtDate(q.savedAt)}</span></div>
+      </div>
+      <button class="qt-del" onclick="deleteQuote('${esc(q.id)}')">Quitar</button>
+    </div>`
+  ).join('');
+}
+function deleteQuote(id){
+  saveQuotes(getQuotes().filter(q=>q.id!==id));
+  renderQuotes();
+}
+
+// — SELECCIÓN DE TEXTO EN ARTÍCULO —
+let lastSelectionText='';
+const selBar=document.getElementById('selBar');
+document.addEventListener('mouseup', onTextSelected);
+document.addEventListener('touchend', onTextSelected);
+function onTextSelected(e){
+  if(selBar.contains(e.target)) return;
+  setTimeout(()=>{
+    const sel=window.getSelection();
+    const text=sel.toString().trim();
+    const body=document.getElementById('rBody');
+    if(!text || !body.contains(sel.anchorNode) || !document.getElementById('page-article').classList.contains('active')){
+      hideSelBar(); return;
+    }
+    lastSelectionText=text;
+    const range=sel.getRangeAt(0);
+    const rect=range.getBoundingClientRect();
+    selBar.style.display='flex';
+    const barW=selBar.offsetWidth||220;
+    let left=rect.left+rect.width/2-barW/2;
+    left=Math.max(8,Math.min(left,window.innerWidth-barW-8));
+    selBar.style.left=left+'px';
+    selBar.style.top=Math.max(8,rect.top-46)+'px';
+  },10);
+}
+function hideSelBar(){ selBar.style.display='none'; }
+
+function highlightSelection(){
+  const sel=window.getSelection();
+  if(!sel.rangeCount || !lastSelectionText) return;
+  const range=sel.getRangeAt(0);
+  const mark=document.createElement('mark');
+  try{ range.surroundContents(mark); }
+  catch{ mark.textContent=lastSelectionText; range.deleteContents(); range.insertNode(mark); }
+
+  const a=cache.find(x=>String(x.id)===String(currentArticleId()));
+  const list=getQuotes();
+  list.push({
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    text:lastSelectionText,
+    articleId: a?.id || '',
+    articleTitle: a?.title || '',
+    savedAt:new Date().toISOString()
+  });
+  saveQuotes(list);
+  sel.removeAllRanges();
+  hideSelBar();
+}
+function copySelection(){
+  if(lastSelectionText) navigator.clipboard?.writeText('"'+lastSelectionText+'"');
+  hideSelBar();
+}
+function currentArticleId(){
+  return new URLSearchParams(location.search).get('id');
+}
+
+function shareQuoteImage(){
+  if(!lastSelectionText) return;
+  const a=cache.find(x=>String(x.id)===String(currentArticleId()));
+  const W=1200,H=1200;
+  const canvas=document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#0D1B2A'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#C9A84C'; ctx.fillRect(W*0.1,H*0.16,W*0.06,3);
+  ctx.fillStyle='#C9A84C'; ctx.font='80px Georgia,serif'; ctx.fillText('“',W*0.1,H*0.28);
+  ctx.fillStyle='#F5F0E8';
+  ctx.font='italic 700 44px Georgia,serif';
+  const words=lastSelectionText.split(' ');
+  let line='',y=H*0.4,lines=[];
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>W*0.8 && line){ lines.push(line); line=w; }
+    else line=test;
+  }
+  if(line) lines.push(line);
+  lines.slice(0,8).forEach((l,i)=>ctx.fillText(l,W*0.1,y+i*58));
+  ctx.fillStyle='#C9A84C';
+  ctx.font='600 24px Arial,sans-serif';
+  ctx.fillText((a?.author||'JA Sachz').toUpperCase(), W*0.1, H*0.86);
+  ctx.fillStyle='rgba(245,240,232,.6)';
+  ctx.font='400 20px Arial,sans-serif';
+  ctx.fillText(a?.title||'Nouscience Theology', W*0.1, H*0.86+32);
+  ctx.fillStyle='#C9A84C';
+  ctx.font='700 18px Arial,sans-serif';
+  ctx.fillText('ANIMI REGNUM', W*0.1, H*0.94);
+  const link=document.createElement('a');
+  link.download='cita-animi-regnum.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+  hideSelBar();
+}
 
 loadArticles();
 </script>
