@@ -230,12 +230,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
             <label class="form-label">Disciplina</label>
             <select class="form-select" id="fDisc">
               <option value="">Seleccionar...</option>
+              <option>Dogmática</option>
               <option>Filosofía</option>
-              <option>Estoicismo</option>
-              <option>Fe</option>
-              <option>Teología</option>
-              <option>Paz</option>
-              <option>Reflexión</option>
+              <option>Filosofía de la Religión</option>
+              <option>Escrituras</option>
+              <option>Ética Teológica</option>
+              <option>Patrística</option>
+              <option>Diálogo Intercultural</option>
+              <option>Mística</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0">
@@ -366,8 +368,9 @@ async function sbDelete(id){
 
 // DISCIPLINE → CODE
 const DISC_CODES={
-  'Filosofía':'FI','Estoicismo':'ES','Fe':'FE',
-  'Teología':'TE','Paz':'PZ','Reflexión':'RF'
+  'Dogmática':'DG','Filosofía':'FI','Filosofía de la Religión':'FR',
+  'Escrituras':'ES','Ética Teológica':'ET','Patrística':'PA',
+  'Diálogo Intercultural':'DI','Mística':'MI'
 };
 function discCode(disc){return DISC_CODES[disc]||'GN';}
 
