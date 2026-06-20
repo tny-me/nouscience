@@ -962,20 +962,21 @@ function shareQuoteImage(){
   ctx.font='italic 400 21px Georgia,serif';
   ctx.fillText(truncate(a?.title||'Revista de teología y filosofía', 'italic 400 21px Georgia,serif', maxTextW), PAD, H*0.86+32);
 
-  // pie con invitacion a leer + url
+  // pie: monograma a la izquierda, invitacion a leer + url a la derecha
   ctx.strokeStyle=pal.frame; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(PAD,H*0.92); ctx.lineTo(W-PAD,H*0.92); ctx.stroke();
   ctx.beginPath(); ctx.arc(PAD+14,H*0.945,16,0,Math.PI*2);
   ctx.strokeStyle=pal.accent; ctx.lineWidth=1.5; ctx.stroke();
   ctx.fillStyle=pal.accent; ctx.font='700 16px Georgia,serif'; ctx.textAlign='center';
   ctx.fillText('θ', PAD+14, H*0.945+6);
-  ctx.textAlign='left';
+  ctx.textAlign='right';
   ctx.fillStyle=pal.accent;
   ctx.font='600 17px Arial,sans-serif';
-  ctx.fillText('Lee el artículo completo en', PAD+40, H*0.945-3);
+  ctx.fillText('Lee el artículo completo en', W-PAD, H*0.945-3);
   ctx.fillStyle=pal.sub;
   ctx.font='700 18px Arial,sans-serif';
-  ctx.fillText('nouscience.org', PAD+40, H*0.945+20);
+  ctx.fillText('nouscience.org', W-PAD, H*0.945+20);
+  ctx.textAlign='left';
 
   const link=document.createElement('a');
   link.download='cita-nouscience-theology.png';
