@@ -946,26 +946,36 @@ function shareQuoteImage(){
   ctx.strokeStyle=pal.frame; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(PAD,lastLineY+50); ctx.lineTo(W-PAD,lastLineY+50); ctx.stroke();
 
-  // autor / articulo
+  // revista / articulo
+  function truncate(text,font,maxW){
+    ctx.font=font;
+    if(ctx.measureText(text).width<=maxW) return text;
+    let t=text;
+    while(t.length>1 && ctx.measureText(t+'…').width>maxW){ t=t.slice(0,-1); }
+    return t+'…';
+  }
+  const maxTextW=W-PAD*2;
   ctx.fillStyle=pal.accent;
-  ctx.font='600 24px Arial,sans-serif';
-  ctx.fillText((a?.author||'JA Sachz').toUpperCase(), PAD, H*0.86);
+  ctx.font='700 24px Arial,sans-serif';
+  ctx.fillText('NOUSCIENCE THEOLOGY', PAD, H*0.86);
   ctx.fillStyle=pal.sub;
-  ctx.font='400 20px Arial,sans-serif';
-  ctx.fillText(a?.title||'Nouscience Theology', PAD, H*0.86+32);
+  ctx.font='italic 400 21px Georgia,serif';
+  ctx.fillText(truncate(a?.title||'Revista de teología y filosofía', 'italic 400 21px Georgia,serif', maxTextW), PAD, H*0.86+32);
 
-  // pie de marca con monograma
+  // pie con invitacion a leer + url
+  ctx.strokeStyle=pal.frame; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD,H*0.92); ctx.lineTo(W-PAD,H*0.92); ctx.stroke();
   ctx.beginPath(); ctx.arc(PAD+14,H*0.945,16,0,Math.PI*2);
   ctx.strokeStyle=pal.accent; ctx.lineWidth=1.5; ctx.stroke();
   ctx.fillStyle=pal.accent; ctx.font='700 16px Georgia,serif'; ctx.textAlign='center';
   ctx.fillText('θ', PAD+14, H*0.945+6);
   ctx.textAlign='left';
   ctx.fillStyle=pal.accent;
-  ctx.font='700 18px Arial,sans-serif';
-  ctx.fillText('NOUSCIENCE THEOLOGY', PAD+40, H*0.945-3);
+  ctx.font='600 17px Arial,sans-serif';
+  ctx.fillText('Lee el artículo completo en', PAD+40, H*0.945-3);
   ctx.fillStyle=pal.sub;
-  ctx.font='400 16px Arial,sans-serif';
-  ctx.fillText('nouscience.org', PAD+40, H*0.945+19);
+  ctx.font='700 18px Arial,sans-serif';
+  ctx.fillText('nouscience.org', PAD+40, H*0.945+20);
 
   const link=document.createElement('a');
   link.download='cita-nouscience-theology.png';
