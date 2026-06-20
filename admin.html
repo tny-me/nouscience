@@ -104,6 +104,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
 .quill-wrap .ql-editor blockquote{border-left:3px solid var(--blue);padding:10px 18px;margin:20px 0;background:var(--bluepale);color:var(--ink2);font-style:italic;}
 .quill-wrap .ql-editor a{color:var(--blue);}
 .quill-wrap .ql-editor p{margin-bottom:10px;}
+.quill-extra-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.qxt-btn{padding:8px 16px;background:transparent;color:#6B4E8B;font-family:inherit;font-size:11.5px;font-weight:600;letter-spacing:.04em;border:1px solid #6B4E8B;cursor:pointer;border-radius:3px;transition:all .2s;}
+.qxt-btn:hover{background:#6B4E8B;color:#fff;}
+.qxt-btn.is-active{background:#6B4E8B;color:#fff;}
+.qxt-hint{font-size:11px;color:var(--ink4);}
+.quill-wrap .ql-editor p.ql-pullquote{border-left:3px solid #C9A84C;background:#FBF6E8;padding:14px 20px;margin:18px 0 0;font-size:17px;font-style:italic;color:#1C1C1C;}
+.quill-wrap .ql-editor p.ql-pullquote + p.ql-pullquote{border-top:none;margin-top:0;margin-bottom:18px;padding-top:0;font-size:12.5px;font-style:normal;font-weight:600;letter-spacing:.03em;color:#6B4E8B;opacity:.85;}
+.quill-wrap .ql-editor p.ql-factbox{position:relative;border:1px solid #5BA8C9;background:#EAF5FA;padding:14px 18px 14px 48px;margin:18px 0;border-radius:6px;font-size:14.5px;color:#10394A;}
+.quill-wrap .ql-editor p.ql-factbox::before{content:'💡';position:absolute;left:14px;top:13px;font-size:16px;}
 .feat-check{display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:14px;padding:12px 14px;border:1px solid var(--rule);background:var(--surface);}
 .feat-check input{width:15px;height:15px;accent-color:var(--blue);cursor:pointer;flex-shrink:0;}
 .feat-check-txt{font-size:12px;color:var(--ink3);line-height:1.4;}
@@ -262,6 +271,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
         <div class="form-divider"></div>
         <div class="form-sec-label">Contenido del artículo</div>
         <div class="form-group">
+          <div class="quill-extra-tools">
+            <button type="button" class="qxt-btn" id="qxtQuoteBtn" onclick="applyPullQuote()">❝ Cita destacada</button>
+            <button type="button" class="qxt-btn" id="qxtFactBtn" onclick="applyFactBox()">💡 ¿Sabías que…?</button>
+            <span class="qxt-hint">Selecciona el texto y, si quieres, la línea siguiente con el autor o la fuente, antes de pulsar.</span>
+          </div>
           <div class="quill-wrap"><div id="quillEditor"></div></div>
         </div>
 
@@ -401,6 +415,12 @@ function fromDb(r){
 let curId=null, curFilt='all', quill=null, cache=[];
 
 // INIT
+const Parchment=Quill.import('parchment');
+const PullQuoteAttr=new Parchment.Attributor.Class('pullquote','ql-pullquote',{scope:Parchment.Scope.BLOCK});
+const FactBoxAttr=new Parchment.Attributor.Class('factbox','ql-factbox',{scope:Parchment.Scope.BLOCK});
+Quill.register(PullQuoteAttr,true);
+Quill.register(FactBoxAttr,true);
+
 async function initApp(){
   quill=new Quill('#quillEditor',{theme:'snow',
     placeholder:'Escribe el contenido completo del artículo aquí...',
@@ -412,7 +432,31 @@ async function initApp(){
     const mins=Math.max(1,Math.round(words/200));
     document.getElementById('fTime').value=words<10?'':mins+' min lectura';
   });
+  quill.on('selection-change',range=>{
+    if(!range) return;
+    const fmt=quill.getFormat(range);
+    document.getElementById('qxtQuoteBtn').classList.toggle('is-active',!!fmt.pullquote);
+    document.getElementById('qxtFactBtn').classList.toggle('is-active',!!fmt.factbox);
+  });
   await reloadList();
+}
+function applyPullQuote(){
+  const range=quill.getSelection(true);
+  if(!range) return;
+  const fmt=quill.getFormat(range);
+  const turningOn=!fmt.pullquote;
+  quill.formatLine(range.index,range.length||1,{pullquote:turningOn,factbox:false});
+  document.getElementById('qxtQuoteBtn').classList.toggle('is-active',turningOn);
+  document.getElementById('qxtFactBtn').classList.remove('is-active');
+}
+function applyFactBox(){
+  const range=quill.getSelection(true);
+  if(!range) return;
+  const fmt=quill.getFormat(range);
+  const turningOn=!fmt.factbox;
+  quill.formatLine(range.index,range.length||1,{factbox:turningOn,pullquote:false});
+  document.getElementById('qxtFactBtn').classList.toggle('is-active',turningOn);
+  document.getElementById('qxtQuoteBtn').classList.remove('is-active');
 }
 if(sessionStorage.getItem('nit_ok')==='1') initApp();
 
