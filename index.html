@@ -215,7 +215,7 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
     </div>
     <nav class="masthead-nav">
       <a onclick="showHome()">Inicio</a>
-      <a onclick="showHome()">Archivo</a>
+      <a onclick="showSaved()">Archivo</a>
       <a onclick="showQuotes()">Mis citas</a>
       <a id="navAuthLink" onclick="openAuthModal()">Iniciar sesión</a>
     </nav>
@@ -309,12 +309,27 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
     <div class="ab" id="rBody"></div>
     <div class="aside">
       <div class="asw"><div class="aswt">Datos del artículo</div><div class="adoi"><strong>Código</strong><span id="rDOI"></span></div></div>
-      <div class="asw"><div class="aswt">Compartir</div><div class="ash"><button class="shb" onclick="copyLink()">🔗 Copiar enlace</button><button class="shb" onclick="showQuotes()">★ Ver mis citas guardadas</button></div></div>
+      <div class="asw"><div class="aswt">Compartir</div><div class="ash"><button class="shb" onclick="copyLink()">🔗 Copiar enlace</button><button class="shb" id="saveArtBtn" onclick="toggleSaveArticle()">📑 Guardar para después</button><button class="shb" onclick="showQuotes()">★ Ver mis citas guardadas</button></div></div>
       <div class="asw"><div class="aswt">Artículos relacionados</div><div class="arel" id="rRel"></div></div>
     </div>
   </div>
   <div class="anav"><div class="anav-in"><div class="ans" id="rPrev"></div><div class="ans r" id="rNext"></div></div></div>
 </div><!-- /page-article -->
+
+<!-- SAVED ARTICLES PAGE -->
+<div id="page-saved" class="page">
+  <div class="ah" data-sym="📑" style="padding-bottom:48px">
+    <div class="ah-in">
+      <div class="bc"><span class="bl" onclick="showHome()">← Portada</span><span class="sep">/</span><span>Archivo</span></div>
+      <div class="acl">Tu biblioteca personal</div>
+      <h1 class="atitle">Artículos guardados</h1>
+      <p class="asf">Artículos que marcaste para leer después, asociados a tu cuenta.</p>
+    </div>
+  </div>
+  <div class="mw" style="padding:48px 5vw 80px;max-width:780px">
+    <div id="savedList"></div>
+  </div>
+</div><!-- /page-saved -->
 
 <!-- QUOTES PAGE -->
 <div id="page-quotes" class="page">
@@ -450,7 +465,7 @@ async function signIn(email,password){
   setSession({access_token:data.access_token,refresh_token:data.refresh_token,expires_at:data.expires_at,user:data.user});
   return data;
 }
-function signOut(){ setSession(null); quotesCache=null; updateAuthUI(); showHome(); }
+function signOut(){ setSession(null); quotesCache=null; savedCache=null; updateAuthUI(); showHome(); }
 function updateAuthUI(){
   const link=document.getElementById('navAuthLink');
   const s=getSession();
@@ -507,7 +522,9 @@ async function submitAuthForm(e){
     }
     document.getElementById('authOverlay').style.display='none';
     quotesCache=null;
+    savedCache=null;
     updateAuthUI();
+    updateSaveArtBtn();
   }catch(err){
     errEl.textContent=err.message||'Ocurrió un error';
   }
@@ -586,7 +603,7 @@ function buildHome(){
 }
 
 function showPage(id){
-  ['page-home','page-article','page-quotes'].forEach(p=>
+  ['page-home','page-article','page-quotes','page-saved'].forEach(p=>
     document.getElementById(p).classList.toggle('active',p===id));
   hideSelBar();
 }
@@ -632,6 +649,7 @@ function showArticle(id){
       body:JSON.stringify({article_id:String(a.id),article_title:a.title,read_at:new Date().toISOString()})
     }).catch(()=>{});
   }
+  updateSaveArtBtn();
 }
 
 function copyLink(){
@@ -642,6 +660,7 @@ function routeFromUrl(){
   const params=new URLSearchParams(location.search);
   const id=params.get('id');
   if(params.get('citas')) showQuotes();
+  else if(params.get('archivo')) showSaved();
   else if(id) showArticle(id);
   else showHome();
 }
@@ -657,8 +676,16 @@ async function loadQuotesCache(){
     try{
       const res=await authFetch('/rest/v1/quotes?select=*&order=created_at.desc');
       const data=await res.json();
-      quotesCache=Array.isArray(data)?data.map(r=>({id:r.id,text:r.text,articleId:r.article_id,articleTitle:r.article_title,savedAt:r.created_at})):[];
-    }catch{ quotesCache=[]; }
+      if(res.ok && Array.isArray(data)){
+        quotesCache=data.map(r=>({id:r.id,text:r.text,articleId:r.article_id,articleTitle:r.article_title,savedAt:r.created_at}));
+      }else{
+        console.warn('No se pudieron cargar tus citas guardadas en la cuenta:', data);
+        try{ quotesCache=JSON.parse(localStorage.getItem(QUOTES_KEY)||'[]'); }catch{ quotesCache=[]; }
+      }
+    }catch(err){
+      console.warn('No se pudieron cargar tus citas guardadas en la cuenta:', err);
+      try{ quotesCache=JSON.parse(localStorage.getItem(QUOTES_KEY)||'[]'); }catch{ quotesCache=[]; }
+    }
   }else{
     try{ quotesCache=JSON.parse(localStorage.getItem(QUOTES_KEY)||'[]'); }catch{ quotesCache=[]; }
   }
@@ -697,6 +724,84 @@ async function deleteQuote(id){
     saveLocalQuotes(getQuotes().filter(q=>q.id!==id));
   }
   renderQuotes();
+}
+
+// — ARTÍCULOS GUARDADOS (ARCHIVO) —
+let savedCache=null;
+async function loadSavedCache(){
+  if(!isLoggedIn()){ savedCache=[]; return savedCache; }
+  try{
+    const res=await authFetch('/rest/v1/saved_articles?select=*&order=created_at.desc');
+    const data=await res.json();
+    savedCache=(res.ok && Array.isArray(data))?data.map(r=>({id:r.id,articleId:r.article_id,articleTitle:r.article_title,savedAt:r.created_at})):[];
+    if(!res.ok) console.warn('No se pudieron cargar tus artículos guardados:', data);
+  }catch(err){ console.warn('No se pudieron cargar tus artículos guardados:', err); savedCache=[]; }
+  return savedCache;
+}
+function isArticleSaved(articleId){
+  return (savedCache||[]).some(s=>String(s.articleId)===String(articleId));
+}
+function updateSaveArtBtn(){
+  const btn=document.getElementById('saveArtBtn');
+  if(!btn) return;
+  if(!isLoggedIn()){ btn.textContent='📑 Iniciar sesión para guardar'; return; }
+  btn.textContent=isArticleSaved(currentArticleId())?'📑 Quitar de guardados':'📑 Guardar para después';
+}
+async function toggleSaveArticle(){
+  if(!isLoggedIn()){ openAuthModal(); return; }
+  const a=cache.find(x=>String(x.id)===String(currentArticleId()));
+  if(!a) return;
+  if(savedCache===null) await loadSavedCache();
+  const existing=(savedCache||[]).find(s=>String(s.articleId)===String(a.id));
+  try{
+    if(existing){
+      await authFetch('/rest/v1/saved_articles?id=eq.'+encodeURIComponent(existing.id),{method:'DELETE'});
+      savedCache=savedCache.filter(s=>s.id!==existing.id);
+    }else{
+      const res=await authFetch('/rest/v1/saved_articles',{
+        method:'POST',
+        headers:{'Prefer':'return=representation'},
+        body:JSON.stringify({article_id:String(a.id),article_title:a.title})
+      });
+      const data=await res.json();
+      if(res.ok && data[0]) savedCache=[{id:data[0].id,articleId:data[0].article_id,articleTitle:data[0].article_title,savedAt:data[0].created_at},...savedCache];
+      else console.warn('No se pudo guardar el artículo:', data);
+    }
+  }catch(err){ console.warn('No se pudo guardar el artículo:', err); }
+  updateSaveArtBtn();
+}
+async function showSaved(){
+  await loadSavedCache();
+  renderSaved();
+  showPage('page-saved');
+  history.pushState({},'', location.pathname+'?archivo=1');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderSaved(){
+  const el=document.getElementById('savedList');
+  if(!isLoggedIn()){
+    el.innerHTML='<div class="quotes-empty"><strong>Inicia sesión para guardar artículos</strong>Tu archivo personal se asocia a tu cuenta de Nouscience Theology.</div>';
+    return;
+  }
+  const list=savedCache||[];
+  if(!list.length){
+    el.innerHTML='<div class="quotes-empty"><strong>Aún no has guardado artículos</strong>Abre un artículo y elige «Guardar para después».</div>';
+    return;
+  }
+  el.innerHTML=list.map(s=>
+    `<div class="qt-item">
+      <div>
+        <div class="qt-meta"><a onclick="showArticle('${esc(s.articleId)}')" style="font-family:'Playfair Display',serif;font-size:16px;color:var(--night)">${esc(s.articleTitle)}</a></div>
+        <div class="qt-meta"><span>${fmtDate(s.savedAt)}</span></div>
+      </div>
+      <button class="qt-del" onclick="unsaveArticle('${esc(s.id)}')">Quitar</button>
+    </div>`
+  ).join('');
+}
+async function unsaveArticle(id){
+  try{ await authFetch('/rest/v1/saved_articles?id=eq.'+encodeURIComponent(id),{method:'DELETE'}); }catch{}
+  savedCache=(savedCache||[]).filter(s=>s.id!==id);
+  renderSaved();
 }
 
 // — SELECCIÓN DE TEXTO EN ARTÍCULO —
@@ -742,6 +847,7 @@ async function highlightSelection(){
   if(quotesCache===null) await loadQuotesCache();
 
   if(isLoggedIn()){
+    let saved=false;
     try{
       const res=await authFetch('/rest/v1/quotes',{
         method:'POST',
@@ -751,8 +857,17 @@ async function highlightSelection(){
       const data=await res.json();
       if(res.ok && data[0]){
         quotesCache=[{id:data[0].id,text:data[0].text,articleId:data[0].article_id,articleTitle:data[0].article_title,savedAt:data[0].created_at},...getQuotes()];
+        saved=true;
+      }else{
+        console.warn('No se pudo guardar la cita en tu cuenta:', data);
       }
-    }catch{}
+    }catch(err){ console.warn('No se pudo guardar la cita en tu cuenta:', err); }
+    if(!saved){
+      saveLocalQuotes([...getQuotes(),{
+        id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+        text, articleId, articleTitle, savedAt:new Date().toISOString()
+      }]);
+    }
   }else{
     saveLocalQuotes([...getQuotes(),{
       id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
