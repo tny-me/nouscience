@@ -189,6 +189,18 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
 .qt-meta a:hover{color:var(--gold)}
 .qt-del{background:none;border:1px solid var(--ivory-dark);color:var(--mist);font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s}
 .qt-del:hover{border-color:var(--red,#C41E3A);color:#C41E3A}
+.auth-overlay{display:none;position:fixed;inset:0;background:rgba(13,27,42,.7);z-index:200;align-items:center;justify-content:center;padding:20px}
+.auth-modal{position:relative;background:var(--ivory);max-width:380px;width:100%;padding:36px 32px;border-top:3px solid var(--gold)}
+.auth-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;line-height:1;color:var(--lead);cursor:pointer}
+.auth-modal h3{font-family:'Playfair Display',serif;font-size:24px;color:var(--night);margin-bottom:8px}
+.auth-sub{font-size:13px;color:var(--lead);margin-bottom:22px;line-height:1.5}
+#authForm input{display:block;width:100%;padding:11px 14px;margin-bottom:12px;border:1px solid var(--ivory-dark);background:#fff;font-family:'Inter',sans-serif;font-size:13px}
+#authForm input:focus{outline:none;border-color:var(--gold)}
+.auth-err{font-size:12.5px;color:#C41E3A;margin-bottom:10px;min-height:1px}
+.auth-submit{width:100%;padding:12px;background:var(--night);color:var(--ivory);border:none;font-family:'Inter',sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.auth-submit:hover{background:var(--gold);color:var(--night)}
+.auth-switch{font-size:12.5px;color:var(--lead);margin-top:16px;text-align:center}
+.auth-switch a{color:var(--violet-light);cursor:pointer;text-decoration:underline;margin-left:4px}
 @media(max-width:1000px){.abw{grid-template-columns:1fr;gap:40px}.aside{position:static}}
 @media(max-width:900px){.hero-inner{grid-template-columns:1fr}.hside{border-left:none;border-top:1px solid rgba(201,168,76,.25);padding-left:0;padding-top:32px}.fg{grid-template-columns:1fr}.tc{grid-template-columns:1fr}.vg{grid-template-columns:1fr 1fr}.fi{grid-template-columns:1fr 1fr}.masthead-inner{flex-direction:column;text-align:center}.masthead-nav{justify-content:center}.ai{grid-template-columns:1fr}.ath{display:none}.anav-in{grid-template-columns:1fr}.ans.r{text-align:left}.ans.r .anl{justify-content:flex-start}}
 @media(max-width:600px){.vg{grid-template-columns:1fr}.fi{grid-template-columns:1fr}.atitle{font-size:24px}}
@@ -205,6 +217,7 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
       <a onclick="showHome()">Inicio</a>
       <a onclick="showHome()">Archivo</a>
       <a onclick="showQuotes()">Mis citas</a>
+      <a id="navAuthLink" onclick="openAuthModal()">Iniciar sesión</a>
     </nav>
   </div>
 </header>
@@ -324,6 +337,21 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
   <button onclick="shareQuoteImage()">↗ Compartir imagen</button>
 </div>
 
+<div class="auth-overlay" id="authOverlay" onclick="closeAuthModal(event)">
+  <div class="auth-modal" onclick="event.stopPropagation()">
+    <button class="auth-close" onclick="closeAuthModal()">&times;</button>
+    <h3 id="authTitle">Iniciar sesión</h3>
+    <p class="auth-sub">Guarda tus citas y tu historial de lectura en tu cuenta de Nouscience Theology.</p>
+    <form id="authForm" onsubmit="submitAuthForm(event)">
+      <input type="email" id="authEmail" placeholder="Correo electrónico" required/>
+      <input type="password" id="authPassword" placeholder="Contraseña" required minlength="6"/>
+      <div class="auth-err" id="authErr"></div>
+      <button type="submit" class="auth-submit" id="authSubmitBtn">Entrar</button>
+    </form>
+    <p class="auth-switch"><span id="authSwitchText">¿No tienes cuenta?</span><a onclick="toggleAuthMode()" id="authSwitchLink">Crear una</a></p>
+  </div>
+</div>
+
 <footer>
   <div class="fi">
     <div class="fb">
@@ -379,6 +407,110 @@ async function loadArticles(){
   buildHome();
   buildNav();
   routeFromUrl();
+  updateAuthUI();
+}
+
+// — AUTENTICACIÓN DE LECTORES (correo y contraseña) —
+const AUTH_KEY='ns_auth_session';
+function getSession(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); }catch{ return null; } }
+function setSession(s){ s?localStorage.setItem(AUTH_KEY,JSON.stringify(s)):localStorage.removeItem(AUTH_KEY); }
+function isLoggedIn(){ return !!getSession()?.access_token; }
+
+async function refreshSession(s){
+  try{
+    const res=await fetch(SB_URL+'/auth/v1/token?grant_type=refresh_token',{
+      method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({refresh_token:s.refresh_token})
+    });
+    const data=await res.json();
+    if(!res.ok||!data.access_token){ setSession(null); return null; }
+    const ns={access_token:data.access_token,refresh_token:data.refresh_token,expires_at:data.expires_at,user:data.user};
+    setSession(ns);
+    return ns;
+  }catch{ return null; }
+}
+async function authFetch(path,opts={}){
+  let s=getSession();
+  if(s && s.expires_at && Date.now()/1000>s.expires_at-30){ s=await refreshSession(s); }
+  const headers=Object.assign({'apikey':SB_KEY,'Content-Type':'application/json'},opts.headers||{});
+  headers['Authorization']='Bearer '+(s?.access_token||SB_KEY);
+  return fetch(SB_URL+path, Object.assign({},opts,{headers}));
+}
+async function signUp(email,password){
+  const res=await fetch(SB_URL+'/auth/v1/signup',{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.error_description||data.msg||'No se pudo crear la cuenta');
+  if(data.access_token) setSession({access_token:data.access_token,refresh_token:data.refresh_token,expires_at:data.expires_at,user:data.user});
+  return data;
+}
+async function signIn(email,password){
+  const res=await fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.error_description||data.msg||'Correo o contraseña incorrectos');
+  setSession({access_token:data.access_token,refresh_token:data.refresh_token,expires_at:data.expires_at,user:data.user});
+  return data;
+}
+function signOut(){ setSession(null); quotesCache=null; updateAuthUI(); showHome(); }
+function updateAuthUI(){
+  const link=document.getElementById('navAuthLink');
+  const s=getSession();
+  if(s?.user?.email){
+    link.textContent='Cerrar sesión ('+s.user.email.split('@')[0]+')';
+    link.onclick=signOut;
+  }else{
+    link.textContent='Iniciar sesión';
+    link.onclick=openAuthModal;
+  }
+}
+let authMode='login';
+function openAuthModal(){
+  authMode='login'; renderAuthMode();
+  document.getElementById('authForm').reset();
+  document.getElementById('authOverlay').style.display='flex';
+}
+function closeAuthModal(e){
+  if(e && e.target.id!=='authOverlay') return;
+  document.getElementById('authOverlay').style.display='none';
+}
+function toggleAuthMode(){ authMode=authMode==='login'?'signup':'login'; renderAuthMode(); }
+function renderAuthMode(){
+  const errEl=document.getElementById('authErr');
+  errEl.textContent=''; errEl.style.color='#C41E3A';
+  if(authMode==='login'){
+    document.getElementById('authTitle').textContent='Iniciar sesión';
+    document.getElementById('authSubmitBtn').textContent='Entrar';
+    document.getElementById('authSwitchText').textContent='¿No tienes cuenta?';
+    document.getElementById('authSwitchLink').textContent='Crear una';
+  }else{
+    document.getElementById('authTitle').textContent='Crear cuenta';
+    document.getElementById('authSubmitBtn').textContent='Crear cuenta';
+    document.getElementById('authSwitchText').textContent='¿Ya tienes cuenta?';
+    document.getElementById('authSwitchLink').textContent='Iniciar sesión';
+  }
+}
+async function submitAuthForm(e){
+  e.preventDefault();
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const errEl=document.getElementById('authErr');
+  errEl.textContent=''; errEl.style.color='#C41E3A';
+  try{
+    if(authMode==='login'){
+      await signIn(email,password);
+    }else{
+      const data=await signUp(email,password);
+      if(!data.access_token){
+        errEl.style.color='var(--gold)';
+        errEl.textContent='Cuenta creada. Revisa tu correo para confirmarla antes de iniciar sesión.';
+        return;
+      }
+    }
+    document.getElementById('authOverlay').style.display='none';
+    quotesCache=null;
+    updateAuthUI();
+  }catch(err){
+    errEl.textContent=err.message||'Ocurrió un error';
+  }
 }
 
 function buildNav(){
@@ -492,6 +624,14 @@ function showArticle(id){
   showPage('page-article');
   history.pushState({id:a.id},'', location.pathname+'?id='+encodeURIComponent(a.id));
   window.scrollTo({top:0,behavior:'instant'});
+
+  if(isLoggedIn()){
+    authFetch('/rest/v1/reading_history?on_conflict=user_id,article_id',{
+      method:'POST',
+      headers:{'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({article_id:String(a.id),article_title:a.title,read_at:new Date().toISOString()})
+    }).catch(()=>{});
+  }
 }
 
 function copyLink(){
@@ -509,12 +649,24 @@ window.addEventListener('popstate', routeFromUrl);
 
 // — CITAS GUARDADAS —
 const QUOTES_KEY='ar_saved_quotes';
-function getQuotes(){
-  try{ return JSON.parse(localStorage.getItem(QUOTES_KEY)||'[]'); }catch{ return []; }
+let quotesCache=null;
+function getQuotes(){ return quotesCache||[]; }
+function saveLocalQuotes(list){ quotesCache=list; localStorage.setItem(QUOTES_KEY, JSON.stringify(list)); }
+async function loadQuotesCache(){
+  if(isLoggedIn()){
+    try{
+      const res=await authFetch('/rest/v1/quotes?select=*&order=created_at.desc');
+      const data=await res.json();
+      quotesCache=Array.isArray(data)?data.map(r=>({id:r.id,text:r.text,articleId:r.article_id,articleTitle:r.article_title,savedAt:r.created_at})):[];
+    }catch{ quotesCache=[]; }
+  }else{
+    try{ quotesCache=JSON.parse(localStorage.getItem(QUOTES_KEY)||'[]'); }catch{ quotesCache=[]; }
+  }
+  return quotesCache;
 }
-function saveQuotes(list){ localStorage.setItem(QUOTES_KEY, JSON.stringify(list)); }
 
-function showQuotes(){
+async function showQuotes(){
+  await loadQuotesCache();
   renderQuotes();
   showPage('page-quotes');
   history.pushState({},'', location.pathname+'?citas=1');
@@ -537,8 +689,13 @@ function renderQuotes(){
     </div>`
   ).join('');
 }
-function deleteQuote(id){
-  saveQuotes(getQuotes().filter(q=>q.id!==id));
+async function deleteQuote(id){
+  if(isLoggedIn()){
+    try{ await authFetch('/rest/v1/quotes?id=eq.'+encodeURIComponent(id),{method:'DELETE'}); }catch{}
+    quotesCache=getQuotes().filter(q=>q.id!==id);
+  }else{
+    saveLocalQuotes(getQuotes().filter(q=>q.id!==id));
+  }
   renderQuotes();
 }
 
@@ -569,7 +726,7 @@ function onTextSelected(e){
 }
 function hideSelBar(){ selBar.style.display='none'; }
 
-function highlightSelection(){
+async function highlightSelection(){
   const sel=window.getSelection();
   if(!sel.rangeCount || !lastSelectionText) return;
   const range=sel.getRangeAt(0);
@@ -578,17 +735,30 @@ function highlightSelection(){
   catch{ mark.textContent=lastSelectionText; range.deleteContents(); range.insertNode(mark); }
 
   const a=cache.find(x=>String(x.id)===String(currentArticleId()));
-  const list=getQuotes();
-  list.push({
-    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-    text:lastSelectionText,
-    articleId: a?.id || '',
-    articleTitle: a?.title || '',
-    savedAt:new Date().toISOString()
-  });
-  saveQuotes(list);
+  const text=lastSelectionText, articleId=a?.id||'', articleTitle=a?.title||'';
   sel.removeAllRanges();
   hideSelBar();
+
+  if(quotesCache===null) await loadQuotesCache();
+
+  if(isLoggedIn()){
+    try{
+      const res=await authFetch('/rest/v1/quotes',{
+        method:'POST',
+        headers:{'Prefer':'return=representation'},
+        body:JSON.stringify({article_id:articleId,article_title:articleTitle,text})
+      });
+      const data=await res.json();
+      if(res.ok && data[0]){
+        quotesCache=[{id:data[0].id,text:data[0].text,articleId:data[0].article_id,articleTitle:data[0].article_title,savedAt:data[0].created_at},...getQuotes()];
+      }
+    }catch{}
+  }else{
+    saveLocalQuotes([...getQuotes(),{
+      id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+      text, articleId, articleTitle, savedAt:new Date().toISOString()
+    }]);
+  }
 }
 function copySelection(){
   if(lastSelectionText) navigator.clipboard?.writeText('"'+lastSelectionText+'"');
