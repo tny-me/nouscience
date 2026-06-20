@@ -678,6 +678,13 @@ function setSocialFmt(fmt){
   drawSocialCanvas();
 }
 
+function hashStr(s){
+  let h=0;
+  for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; }
+  return Math.abs(h);
+}
+const ACCENT_PALETTES=['#C4A96A','#8C6BAD','#4FA876','#5BA8C9','#D46A8C','#E0A458'];
+
 function drawSocialCanvas(){
   const [W,H]=SOCIAL_SIZES[socialFmt];
   const canvas=document.getElementById('socialCanvas');
@@ -686,22 +693,22 @@ function drawSocialCanvas(){
 
   const PAD=W*0.1;
   const isStory=socialFmt==='story';
+  const title=document.getElementById('fTitle').value.trim()||'Sin título';
+  const subtitle=document.getElementById('fSubtitle').value.trim()||'';
+  const disc=document.getElementById('fDisc').value||'';
+  const accent=ACCENT_PALETTES[hashStr(title)%ACCENT_PALETTES.length];
 
   // Background: off-white / cream
   ctx.fillStyle='#F7F4EE';
   ctx.fillRect(0,0,W,H);
 
-  // Left gold border bar
-  ctx.fillStyle='#C4A96A';
+  // Left accent border bar
+  ctx.fillStyle=accent;
   ctx.fillRect(0,0,W*0.012,H);
 
   // Top margin rule (full width, after bar)
   ctx.fillStyle='#E0D9CC';
   ctx.fillRect(W*0.012,H*0.08,W-W*0.012,1);
-
-  const title=document.getElementById('fTitle').value.trim()||'Sin título';
-  const subtitle=document.getElementById('fSubtitle').value.trim()||'';
-  const disc=document.getElementById('fDisc').value||'';
 
   // — Discipline tag —
   const discY=H*(isStory?0.18:0.22);
@@ -711,7 +718,7 @@ function drawSocialCanvas(){
     ctx.font=`700 ${tagFs}px Arial,sans-serif`;
     const tagW=ctx.measureText(disc.toUpperCase()).width+tagFs*1.4;
     // tag box
-    ctx.fillStyle='#C4A96A';
+    ctx.fillStyle=accent;
     ctx.fillRect(tagX-tagFs*0.7, discY-tagFs*1.1, tagW, tagFs*1.7);
     ctx.fillStyle='#fff';
     ctx.font=`700 ${tagFs}px Arial,sans-serif`;
@@ -729,13 +736,13 @@ function drawSocialCanvas(){
   // "By JA Sachz" byline under title
   const bylineFs=W*0.016;
   const bylineY=titleY+titleLines.length*titleFs*1.28+bylineFs*1.4;
-  ctx.fillStyle='#C4A96A';
+  ctx.fillStyle=accent;
   ctx.font=`400 ${bylineFs}px Arial,sans-serif`;
   ctx.fillText('By JA Sachz', PAD+W*0.015, bylineY);
 
-  // Gold rule under byline
+  // Accent rule under byline
   const ruleY=bylineY+bylineFs*1.1;
-  ctx.fillStyle='#C4A96A';
+  ctx.fillStyle=accent;
   ctx.fillRect(PAD+W*0.015, ruleY, W*0.07, 3);
 
   // — Subtitle —
@@ -757,7 +764,7 @@ function drawSocialCanvas(){
   const brandFs=W*0.016;
   ctx.fillStyle='#111111';
   ctx.font=`700 ${brandFs}px Arial,sans-serif`;
-  ctx.fillText('ANIMI REGNUM', PAD+W*0.015, H*0.88+H*0.065);
+  ctx.fillText('NOUSCIENCE THEOLOGY', PAD+W*0.015, H*0.88+H*0.065);
 
   // Domain right-aligned
   ctx.fillStyle='#AEADA6';

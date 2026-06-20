@@ -259,7 +259,7 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
         </div>
         <div class="sw" style="background:linear-gradient(135deg,#0D1B2A,#1a0d2a)">
           <div class="swt">Acerca de la revista</div>
-          <p style="font-size:13.5px;color:rgba(245,240,232,.75);line-height:1.65">Nouscience Theology es un espacio de reflexión teológica, filosófica y bíblica, escrito por JA Sachz bajo el sello de Animi Regnum.</p>
+          <p style="font-size:13.5px;color:rgba(245,240,232,.75);line-height:1.65">Nouscience Theology es un espacio de reflexión teológica, filosófica y bíblica, escrito por JA Sachz.</p>
         </div>
       </div>
     </div>
@@ -328,12 +328,12 @@ footer{background:#080f18;padding:56px 5vw 32px;border-top:1px solid #1f3247}
   <div class="fi">
     <div class="fb">
       <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--ivory);font-weight:900">Nous<em style="color:var(--gold);font-style:italic">cience</em> Theology</div>
-      <p>Revista de teología, filosofía y reflexión bíblica. Un proyecto de Animi Regnum, por JA Sachz.</p>
+      <p>Revista de teología, filosofía y reflexión bíblica, por JA Sachz.</p>
     </div>
     <div class="fc" id="footSecciones"><h4>Secciones</h4><ul></ul></div>
     <div class="fc"><h4>Revista</h4><ul><li onclick="showHome()">Portada</li></ul></div>
   </div>
-  <div class="fbot"><span id="footYear">© 2026 Nouscience Theology.</span><span>Animi Regnum · by JA Sachz</span></div>
+  <div class="fbot"><span id="footYear">© 2026 Nouscience Theology.</span><span>nouscience.org</span></div>
 </footer>
 
 <script>
@@ -598,17 +598,31 @@ function currentArticleId(){
   return new URLSearchParams(location.search).get('id');
 }
 
+function hashStr(s){
+  let h=0;
+  for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; }
+  return Math.abs(h);
+}
+const QUOTE_PALETTES=[
+  {bg:'#0D1B2A',accent:'#C9A84C',text:'#F5F0E8',sub:'rgba(245,240,232,.6)'},
+  {bg:'#1B0D2A',accent:'#8C6BAD',text:'#F2EAF7',sub:'rgba(242,234,247,.6)'},
+  {bg:'#0D2A1B',accent:'#4FA876',text:'#EAF7EF',sub:'rgba(234,247,239,.6)'},
+  {bg:'#2A1B0D',accent:'#E0A458',text:'#F7EFE4',sub:'rgba(247,239,228,.6)'},
+  {bg:'#1A0D14',accent:'#D46A8C',text:'#F7E9EE',sub:'rgba(247,233,238,.6)'},
+  {bg:'#0D1A2A',accent:'#5BA8C9',text:'#E9F4F7',sub:'rgba(233,244,247,.6)'}
+];
 function shareQuoteImage(){
   if(!lastSelectionText) return;
   const a=cache.find(x=>String(x.id)===String(currentArticleId()));
+  const pal=QUOTE_PALETTES[hashStr(lastSelectionText)%QUOTE_PALETTES.length];
   const W=1200,H=1200;
   const canvas=document.createElement('canvas');
   canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#0D1B2A'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#C9A84C'; ctx.fillRect(W*0.1,H*0.16,W*0.06,3);
-  ctx.fillStyle='#C9A84C'; ctx.font='80px Georgia,serif'; ctx.fillText('“',W*0.1,H*0.28);
-  ctx.fillStyle='#F5F0E8';
+  ctx.fillStyle=pal.bg; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=pal.accent; ctx.fillRect(W*0.1,H*0.16,W*0.06,3);
+  ctx.fillStyle=pal.accent; ctx.font='80px Georgia,serif'; ctx.fillText('“',W*0.1,H*0.28);
+  ctx.fillStyle=pal.text;
   ctx.font='italic 700 44px Georgia,serif';
   const words=lastSelectionText.split(' ');
   let line='',y=H*0.4,lines=[];
@@ -619,15 +633,18 @@ function shareQuoteImage(){
   }
   if(line) lines.push(line);
   lines.slice(0,8).forEach((l,i)=>ctx.fillText(l,W*0.1,y+i*58));
-  ctx.fillStyle='#C9A84C';
+  ctx.fillStyle=pal.accent;
   ctx.font='600 24px Arial,sans-serif';
   ctx.fillText((a?.author||'JA Sachz').toUpperCase(), W*0.1, H*0.86);
-  ctx.fillStyle='rgba(245,240,232,.6)';
+  ctx.fillStyle=pal.sub;
   ctx.font='400 20px Arial,sans-serif';
   ctx.fillText(a?.title||'Nouscience Theology', W*0.1, H*0.86+32);
-  ctx.fillStyle='#C9A84C';
+  ctx.fillStyle=pal.accent;
   ctx.font='700 18px Arial,sans-serif';
-  ctx.fillText('ANIMI REGNUM', W*0.1, H*0.94);
+  ctx.fillText('NOUSCIENCE THEOLOGY', W*0.1, H*0.94);
+  ctx.fillStyle=pal.sub;
+  ctx.font='400 16px Arial,sans-serif';
+  ctx.fillText('nouscience.org', W*0.1, H*0.94+24);
   const link=document.createElement('a');
   link.download='cita-animi-regnum.png';
   link.href=canvas.toDataURL('image/png');
