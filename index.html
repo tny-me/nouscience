@@ -889,49 +889,86 @@ function hashStr(s){
   return Math.abs(h);
 }
 const QUOTE_PALETTES=[
-  {bg:'#0D1B2A',accent:'#C9A84C',text:'#F5F0E8',sub:'rgba(245,240,232,.6)'},
-  {bg:'#1B0D2A',accent:'#8C6BAD',text:'#F2EAF7',sub:'rgba(242,234,247,.6)'},
-  {bg:'#0D2A1B',accent:'#4FA876',text:'#EAF7EF',sub:'rgba(234,247,239,.6)'},
-  {bg:'#2A1B0D',accent:'#E0A458',text:'#F7EFE4',sub:'rgba(247,239,228,.6)'},
-  {bg:'#1A0D14',accent:'#D46A8C',text:'#F7E9EE',sub:'rgba(247,233,238,.6)'},
-  {bg:'#0D1A2A',accent:'#5BA8C9',text:'#E9F4F7',sub:'rgba(233,244,247,.6)'}
+  {bg:'#0D1B2A',bg2:'#142840',accent:'#C9A84C',text:'#F5F0E8',sub:'rgba(245,240,232,.62)',frame:'rgba(201,168,76,.35)'},
+  {bg:'#EDEFF2',bg2:'#E2E5EA',accent:'#0D1B2A',text:'#10202F',sub:'rgba(16,32,47,.6)',frame:'rgba(13,27,42,.18)'}
 ];
 function shareQuoteImage(){
   if(!lastSelectionText) return;
   const a=cache.find(x=>String(x.id)===String(currentArticleId()));
-  const pal=QUOTE_PALETTES[hashStr(lastSelectionText)%QUOTE_PALETTES.length];
-  const W=1200,H=1200;
+  const h=hashStr(lastSelectionText);
+  const pal=QUOTE_PALETTES[h%QUOTE_PALETTES.length];
+  const W=1200,H=1200,PAD=W*0.1;
   const canvas=document.createElement('canvas');
   canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d');
-  ctx.fillStyle=pal.bg; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle=pal.accent; ctx.fillRect(W*0.1,H*0.16,W*0.06,3);
-  ctx.fillStyle=pal.accent; ctx.font='80px Georgia,serif'; ctx.fillText('“',W*0.1,H*0.28);
+
+  const grad=ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,pal.bg); grad.addColorStop(1,pal.bg2);
+  ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+
+  // marco decorativo
+  ctx.strokeStyle=pal.frame; ctx.lineWidth=2;
+  ctx.strokeRect(PAD*0.45,PAD*0.45,W-PAD*0.9,H-PAD*0.9);
+
+  // simbolo theta de fondo
+  ctx.save();
+  ctx.globalAlpha=0.07;
+  ctx.fillStyle=pal.accent;
+  ctx.font='900 560px Georgia,serif';
+  ctx.fillText('θ', W*0.58, H*0.78);
+  ctx.restore();
+
+  // linea superior + etiqueta
+  ctx.fillStyle=pal.accent; ctx.fillRect(PAD,H*0.155,46,3);
+  ctx.fillStyle=pal.accent;
+  ctx.font='700 14px Arial,sans-serif';
+  ctx.textBaseline='alphabetic';
+  ctx.fillText((a?.discipline||'TEOLOGÍA').toUpperCase(), PAD+58, H*0.16);
+
+  // comillas grandes
+  ctx.fillStyle=pal.accent; ctx.font='800 110px Georgia,serif'; ctx.fillText('“',PAD-6,H*0.32);
+
+  // texto de la cita
   ctx.fillStyle=pal.text;
-  ctx.font='italic 700 44px Georgia,serif';
+  ctx.font='italic 600 46px "Playfair Display",Georgia,serif';
   const words=lastSelectionText.split(' ');
-  let line='',y=H*0.4,lines=[];
+  let line='',y=H*0.42,lines=[];
   for(const w of words){
     const test=line?line+' '+w:w;
-    if(ctx.measureText(test).width>W*0.8 && line){ lines.push(line); line=w; }
+    if(ctx.measureText(test).width>W*0.78 && line){ lines.push(line); line=w; }
     else line=test;
   }
   if(line) lines.push(line);
-  lines.slice(0,8).forEach((l,i)=>ctx.fillText(l,W*0.1,y+i*58));
+  lines.slice(0,8).forEach((l,i)=>ctx.fillText(l,PAD,y+i*60));
+  const lastLineY=y+(Math.min(lines.length,8)-1)*60;
+
+  // separador
+  ctx.strokeStyle=pal.frame; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD,lastLineY+50); ctx.lineTo(W-PAD,lastLineY+50); ctx.stroke();
+
+  // autor / articulo
   ctx.fillStyle=pal.accent;
   ctx.font='600 24px Arial,sans-serif';
-  ctx.fillText((a?.author||'JA Sachz').toUpperCase(), W*0.1, H*0.86);
+  ctx.fillText((a?.author||'JA Sachz').toUpperCase(), PAD, H*0.86);
   ctx.fillStyle=pal.sub;
   ctx.font='400 20px Arial,sans-serif';
-  ctx.fillText(a?.title||'Nouscience Theology', W*0.1, H*0.86+32);
+  ctx.fillText(a?.title||'Nouscience Theology', PAD, H*0.86+32);
+
+  // pie de marca con monograma
+  ctx.beginPath(); ctx.arc(PAD+14,H*0.945,16,0,Math.PI*2);
+  ctx.strokeStyle=pal.accent; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle=pal.accent; ctx.font='700 16px Georgia,serif'; ctx.textAlign='center';
+  ctx.fillText('θ', PAD+14, H*0.945+6);
+  ctx.textAlign='left';
   ctx.fillStyle=pal.accent;
   ctx.font='700 18px Arial,sans-serif';
-  ctx.fillText('NOUSCIENCE THEOLOGY', W*0.1, H*0.94);
+  ctx.fillText('NOUSCIENCE THEOLOGY', PAD+40, H*0.945-3);
   ctx.fillStyle=pal.sub;
   ctx.font='400 16px Arial,sans-serif';
-  ctx.fillText('nouscience.org', W*0.1, H*0.94+24);
+  ctx.fillText('nouscience.org', PAD+40, H*0.945+19);
+
   const link=document.createElement('a');
-  link.download='cita-animi-regnum.png';
+  link.download='cita-nouscience-theology.png';
   link.href=canvas.toDataURL('image/png');
   link.click();
   hideSelBar();
