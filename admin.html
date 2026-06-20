@@ -419,8 +419,8 @@ let curId=null, curFilt='all', quill=null, cache=[];
 
 // INIT
 const Parchment=Quill.import('parchment');
-const PullQuoteAttr=new Parchment.Attributor.Class('pullquote','ql-pullquote',{scope:Parchment.Scope.BLOCK});
-const FactBoxAttr=new Parchment.Attributor.Class('factbox','ql-factbox',{scope:Parchment.Scope.BLOCK});
+const PullQuoteAttr=new Parchment.Attributor.Class('pullquote','ql-pullquote',{scope:Parchment.Scope.BLOCK,whitelist:['true']});
+const FactBoxAttr=new Parchment.Attributor.Class('factbox','ql-factbox',{scope:Parchment.Scope.BLOCK,whitelist:['true']});
 Quill.register(PullQuoteAttr,true);
 Quill.register(FactBoxAttr,true);
 
@@ -437,9 +437,13 @@ async function initApp(){
   });
   quill.on('selection-change',range=>{
     if(!range) return;
-    const fmt=quill.getFormat(range);
-    document.getElementById('qxtQuoteBtn').classList.toggle('is-active',!!fmt.pullquote);
-    document.getElementById('qxtFactBtn').classList.toggle('is-active',!!fmt.factbox);
+    setTimeout(()=>{
+      try{
+        const fmt=quill.getFormat(range);
+        document.getElementById('qxtQuoteBtn').classList.toggle('is-active',!!fmt.pullquote);
+        document.getElementById('qxtFactBtn').classList.toggle('is-active',!!fmt.factbox);
+      }catch(e){}
+    },0);
   });
   await reloadList();
 }
