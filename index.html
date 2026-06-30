@@ -174,6 +174,26 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
 .ts{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
 .tp{padding:9px 18px;border:1px solid rgba(255,255,255,.22);font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.66);cursor:pointer;background:transparent;transition:border-color .2s,color .2s,background .2s}
 .tp:hover,.tp.active{border-color:var(--accent);color:#fff;background:rgba(166,38,44,.16)}
+
+/* — CHIP FILTER BAR: modern pill chips for filtering the homepage
+   listing by category, placed above the featured-articles section.
+   Hairline border by default; on hover/active, filled with a
+   category-tinted wash and a category-colored border. — */
+.chipbar{padding:28px 0 8px}
+.chipbar-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.chipbar-label::before{content:'';display:block;width:18px;height:1.5px;background:var(--accent)}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 16px 8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--white);cursor:pointer;transition:border-color .2s,background-color .2s,color .2s,transform .15s;-webkit-tap-highlight-color:transparent}
+.chip:hover{border-color:var(--chip-c,var(--accent));transform:translateY(-1px)}
+.chip-dot{width:7px;height:7px;border-radius:50%;background:var(--chip-c,var(--accent));flex-shrink:0;transition:transform .2s}
+.chip-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);transition:color .2s}
+.chip.active{border-color:var(--chip-c,var(--accent));background:color-mix(in srgb, var(--chip-c,var(--accent)) 9%, var(--white))}
+.chip.active .chip-label{color:var(--chip-c,var(--accent))}
+.chip.active .chip-dot{transform:scale(1.25)}
+.chip:active{transform:translateY(0) scale(.98)}
+.chip.chip-all{padding-left:16px}
+.chip.chip-all.active{background:var(--ink);border-color:var(--ink)}
+.chip.chip-all.active .chip-label{color:var(--paper)}
 .empty-state{padding:96px 5vw;text-align:center;color:var(--ink-faint);font-family:'Inter',sans-serif}
 .empty-state strong{display:block;font-family:'Fraunces',serif;font-size:24px;color:var(--ink);margin-bottom:12px;font-weight:500}
 
@@ -231,6 +251,29 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
 .ant{font-family:'Fraunces',serif;font-size:19px;font-weight:500;color:var(--ink);line-height:1.3;cursor:pointer;transition:color .2s}
 .ant:hover{color:var(--accent)}
 .ana{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:8px}
+
+/* — ABOUT PAGE — long-form editorial page, same typeset rules as the
+   article page, narrow reading measure, mono "§ 0N" section markers. */
+.about-hero{background:var(--paper);padding:64px 5vw 40px;border-bottom:1.5px solid var(--ink)}
+.about-hero-in{max-width:740px;margin:0 auto}
+.about-kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.about-kicker::before{content:'';display:block;width:24px;height:1.5px;background:var(--accent)}
+.about-title{font-family:'Fraunces',serif;font-size:clamp(34px,5vw,56px);font-weight:600;color:var(--ink);line-height:1.05;letter-spacing:-.02em;margin-bottom:20px}
+.about-lede{font-family:'Fraunces',serif;font-size:19px;font-weight:300;font-style:italic;color:var(--ink-soft);line-height:1.6;max-width:640px}
+.about-body{max-width:1080px;margin:0 auto;padding:0 5vw}
+.about-sec{max-width:680px;margin:0 auto;padding:64px 0;border-bottom:.5px solid var(--line)}
+.about-sec:last-of-type{border-bottom:none}
+.about-secmark{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.about-secmark::before{content:'';display:block;width:18px;height:1.5px;background:var(--accent)}
+.about-sec h2{font-family:'Fraunces',serif;font-size:clamp(24px,3vw,32px);font-weight:600;color:var(--ink);letter-spacing:-.01em;margin-bottom:22px;line-height:1.18}
+.about-sec p{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:var(--ink);line-height:1.8;margin-bottom:22px}
+.about-sec p:last-child{margin-bottom:0}
+.about-sec p strong{font-weight:600}
+.ab-disc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+.ab-disc{padding:18px 20px;border:1px solid var(--line);border-left:2.5px solid var(--chip-c,var(--accent));background:var(--paper-dim)}
+.ab-disc-h{font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;letter-spacing:.02em;color:var(--ink);display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.ab-disc-subs{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-faint);letter-spacing:.02em;line-height:1.6}
+@media(max-width:640px){.ab-disc-grid{grid-template-columns:1fr}}
 
 /* — FOOTER: dark, structural, mono colophon line — */
 footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border-top:none}
@@ -321,6 +364,10 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
   </div>
 </section>
 <div class="mw">
+  <div class="chipbar" id="chipBar" style="display:none">
+    <div class="chipbar-label">Filtrar por tema</div>
+    <div class="chips" id="chipsList"></div>
+  </div>
   <section class="fs">
     <div class="sh"><h2>Artículos Destacados</h2><span class="sh-idx mono">§ 01</span></div>
     <div class="fg" id="featuredGrid"></div>
@@ -418,6 +465,59 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
   </div>
 </div><!-- /page-quotes -->
 
+<!-- ABOUT PAGE -->
+<div id="page-about" class="page">
+  <div class="about-hero">
+    <div class="about-hero-in">
+      <div class="bc"><span class="bl" onclick="showHome()">← Portada</span><span class="sep">/</span><span>Acerca de</span></div>
+      <div class="about-kicker">Acerca de la revista</div>
+      <h1 class="about-title">Nous<em style="font-style:italic;color:var(--accent)">cience</em> Journal</h1>
+      <p class="about-lede">Una publicación académica multidisciplinaria dedicada a explicar, con rigor y claridad, las ideas que mejor explican el mundo.</p>
+    </div>
+  </div>
+
+  <div class="about-body">
+
+    <div class="about-sec">
+      <div class="about-secmark">§ 01 — Quiénes somos</div>
+      <h2>Una revista, no una colección de opiniones</h2>
+      <p>Nouscience Journal es una publicación académica multidisciplinaria que existe para un propósito sencillo de enunciar y difícil de sostener: producir contenido riguroso, bien explicado y genuinamente útil en filosofía, ciencia, tecnología, economía, historia, psicología y teología. No aspiramos a la novedad por sí misma ni a la opinión rápida; aspiramos a artículos que, dentro de cinco o diez años, sigan siendo una referencia razonable sobre el tema que tratan.</p>
+      <p>Operamos con los estándares editoriales de las instituciones de investigación serias: verificación de fuentes, precisión terminológica, y la disposición a tratar temas complejos sin simplificarlos hasta la trivialidad ni complicarlos hasta la oscuridad innecesaria. Escribimos para un lector exigente que prefiere entender un argumento completo a memorizar un titular.</p>
+    </div>
+
+    <div class="about-sec">
+      <div class="about-secmark">§ 02 — Filosofía editorial</div>
+      <h2>Rigor antes que sensacionalismo</h2>
+      <p>Vivimos en un ecosistema informativo que recompensa la urgencia y el escándalo. Nouscience Journal elige deliberadamente lo contrario: preferimos el artículo que tarda en escribirse al que se publica primero; preferimos la matización a la frase contundente que no resiste el segundo análisis. Cuando un tema es incierto, lo decimos. Cuando un debate sigue abierto en la comunidad académica, lo presentamos como tal.</p>
+      <p>Por esa misma razón, los artículos de Nouscience Journal no llevan firma individual. No es un gesto de anonimato sino de método: el artículo responde a la publicación en su conjunto —a su proceso editorial, sus fuentes y sus estándares— y no a la autoridad personal de quien lo redactó. Es una convención que tomamos, sin disimulo, de publicaciones como <em style="font-style:italic">The Economist</em>: lo que se firma es el criterio institucional, no el ego de un autor. El argumento debe sostenerse por su propio peso, no por quién lo dice.</p>
+      <p>Esto no significa neutralidad artificial ni ausencia de criterio. Significa que el criterio se aplica con la misma disciplina en cada pieza, independientemente de quién la haya escrito, y que ese criterio puede examinarse y cuestionarse igual que cualquier otro argumento.</p>
+    </div>
+
+    <div class="about-sec">
+      <div class="about-secmark">§ 03 — Qué cubrimos</div>
+      <h2>Siete disciplinas, una misma exigencia</h2>
+      <p>Nouscience Journal cubre un rango deliberadamente amplio de disciplinas, no porque carezca de enfoque, sino porque creemos que los problemas más interesantes rara vez respetan las fronteras entre departamentos universitarios. Un artículo sobre inteligencia artificial puede requerir tanto epistemología como economía; uno sobre historia económica puede requerir psicología y teología política.</p>
+      <div class="ab-disc-grid" id="aboutCoverage"></div>
+    </div>
+
+    <div class="about-sec">
+      <div class="about-secmark">§ 04 — Cómo trabajamos</div>
+      <h2>Proceso editorial</h2>
+      <p>Cada artículo parte de una pregunta concreta y se construye a partir de fuentes primarias, literatura académica revisada por pares y, cuando corresponde, datos verificables. Evitamos la cita de autoridad sin sustento y el argumento que no podría defenderse frente a un especialista en la materia.</p>
+      <p>El proceso editorial revisa tres cosas en cada pieza: que la tesis esté claramente planteada, que la evidencia presentada la sostenga de manera proporcional —ni más, ni menos de lo que los datos permiten— y que la prosa sea legible sin sacrificar precisión. Un artículo que es correcto pero ilegible ha fallado tanto como uno que es legible pero incorrecto.</p>
+      <p>Revisamos y corregimos artículos publicados cuando aparece evidencia que lo justifica. Preferimos la corrección pública a la pretensión de infalibilidad.</p>
+    </div>
+
+    <div class="about-sec">
+      <div class="about-secmark">§ 05 — Para quién escribimos</div>
+      <h2>El lector que imaginamos</h2>
+      <p>Escribimos para lectores curiosos fuera —y dentro— de la academia: personas que quieren entender por qué algo es cierto, no solo que lo es. No presuponemos formación especializada en cada disciplina, pero tampoco rebajamos la complejidad del mundo para hacerla cómoda. La claridad es un compromiso editorial; la simplificación excesiva, una falta de respeto al lector.</p>
+      <p><strong>Nouscience Journal</strong> — Vol. I, MMXXVI. Publicación continua. ISSN 2950—XXXX.</p>
+    </div>
+
+  </div>
+</div><!-- /page-about -->
+
 <div class="sel-bar" id="selBar">
   <button onclick="highlightSelection()">✎ Resaltar y guardar</button>
   <button onclick="copySelection()">⧉ Copiar cita</button>
@@ -446,7 +546,7 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
       <p>Revista académica multidisciplinaria de filosofía, ciencia, tecnología, economía, historia, psicología y teología.</p>
     </div>
     <div class="fc" id="footSecciones"><h4>Secciones</h4><ul></ul></div>
-    <div class="fc"><h4>Revista</h4><ul><li onclick="showHome()">Portada</li></ul></div>
+    <div class="fc"><h4>Revista</h4><ul><li onclick="showHome()">Portada</li><li onclick="showAbout()">Acerca de la revista</li></ul></div>
   </div>
   <div class="fbot"><span id="footYear">© 2026 Nouscience Journal.</span><span>nouscience.org</span></div>
 </footer>
@@ -636,26 +736,47 @@ function buildNav(){
   fs.innerHTML=cats.map(c=>`<li onclick="filterByCat('${esc(c)}')">${esc(c)}</li>`).join('');
   document.getElementById('footYear').textContent='© '+new Date().getFullYear()+' Nouscience Journal.';
 }
+// Current homepage filter state (category only — chips filter by category;
+// the existing nav dropdown ?cat=&sub= deep link still narrows to a
+// subcategory via the same underlying activeCat mechanism).
+let activeCat=null, activeSub=null;
+
 function filterByCat(c){
-  showHome();
-  history.pushState({},'', location.pathname+'?cat='+encodeURIComponent(c));
-  setTimeout(()=>{
-    const els=document.querySelectorAll('.tp');
-    els.forEach(el=>el.classList.toggle('active',el.textContent.trim()===c));
-  },50);
+  showPage('page-home');
+  activeCat=c||null; activeSub=null;
+  const url=c?location.pathname+'?cat='+encodeURIComponent(c):location.pathname;
+  history.pushState({},'', url);
+  buildHome();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function filterBySub(c,s){
-  showHome();
+  showPage('page-home');
+  activeCat=c||null; activeSub=s||null;
   history.pushState({},'', location.pathname+'?cat='+encodeURIComponent(c)+'&sub='+encodeURIComponent(s));
-  setTimeout(()=>{
-    const els=document.querySelectorAll('.tp');
-    els.forEach(el=>el.classList.toggle('active',el.textContent.trim()===s));
-  },50);
+  buildHome();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 // Alias retained for any external/legacy callers using the old name.
 function filterByDisc(d){ filterByCat(d); }
 
+function renderChips(){
+  const bar=document.getElementById('chipBar');
+  const list=document.getElementById('chipsList');
+  if(!cache.length){ bar.style.display='none'; list.innerHTML=''; return; }
+  const counts={};
+  cache.forEach(a=>{ if(a.category) counts[a.category]=(counts[a.category]||0)+1; });
+  const cats=Object.keys(counts);
+  if(!cats.length){ bar.style.display='none'; list.innerHTML=''; return; }
+  bar.style.display='block';
+  const allChip=`<span class="chip chip-all${!activeCat?' active':''}" onclick="filterByCat(null)"><span class="chip-label">Todos</span></span>`;
+  const catChips=cats.map(c=>
+    `<span class="chip${activeCat===c?' active':''}" style="--chip-c:${catColor(c)}" onclick="filterByCat('${esc(c)}')"><span class="chip-dot"></span><span class="chip-label">${esc(c)}</span></span>`
+  ).join('');
+  list.innerHTML=allChip+catChips;
+}
+
 function buildHome(){
+  renderChips();
   const hero=document.getElementById('heroSection');
   const empty=document.getElementById('emptyState');
   if(!cache.length){
@@ -667,16 +788,30 @@ function buildHome(){
     document.getElementById('topicTags').innerHTML='';
     return;
   }
+
+  // Apply the active category/subcategory filter (set via chips or the
+  // nav dropdown) to the working list used for every homepage section.
+  let filtered=cache;
+  if(activeCat) filtered=filtered.filter(a=>a.category===activeCat);
+  if(activeSub) filtered=filtered.filter(a=>a.subcategory===activeSub);
+
+  if(!filtered.length){
+    hero.style.display='none'; empty.style.display='block';
+    document.getElementById('featuredGrid').innerHTML='';
+    document.getElementById('recentList').innerHTML='';
+    document.getElementById('sideAlso').innerHTML='';
+    return;
+  }
   empty.style.display='none'; hero.style.display='block';
 
-  const lead=cache.find(a=>a.featured)||cache[0];
+  const lead=filtered.find(a=>a.featured)||filtered[0];
   document.getElementById('hTitle').innerHTML=esc(lead.title);
   document.getElementById('hExcerpt').textContent=lead.subtitle||lead.abstract||'';
   document.getElementById('hReadBtn').onclick=()=>showArticle(lead.id);
   document.getElementById('hMedia').style.background=`linear-gradient(135deg,${catColor(lead.category)}22,var(--paper-dim))`;
   document.getElementById('hMediaGlyph').textContent=symFor(lead.category);
 
-  const rest=cache.filter(a=>a.id!==lead.id);
+  const rest=filtered.filter(a=>a.id!==lead.id);
   document.getElementById('sideAlso').innerHTML=rest.slice(0,4).map((a,i)=>
     `<div class="sa" onclick="showArticle('${esc(a.id)}')"><div class="sa-idx mono">${String(i+1).padStart(2,'0')}</div><div><div class="sa-tag"><span class="cat-dot" style="background:${catColor(a.category)}"></span>${esc(a.category||'')}</div><h4>${esc(a.title)}</h4><p>${esc(a.readTime||'')}</p></div></div>`
   ).join('');
@@ -721,18 +856,20 @@ function buildHome(){
   document.getElementById('topicsList').innerHTML=cats.map(c=>
     `<li onclick="filterByCat('${esc(c)}')"><span class="cat-dot" style="background:${catColor(c)}"></span> ${esc(c)} <span class="tc-ct">${counts[c]}</span></li>`
   ).join('');
-  document.getElementById('topicTags').innerHTML=cats.map((c,i)=>
-    `<span class="tp${i===0?' active':''}" onclick="filterByCat('${esc(c)}')">${esc(c)}</span>`
+  document.getElementById('topicTags').innerHTML=cats.map(c=>
+    `<span class="tp${activeCat===c?' active':''}" onclick="filterByCat('${esc(c)}')">${esc(c)}</span>`
   ).join('');
 }
 
 function showPage(id){
-  ['page-home','page-article','page-quotes','page-saved'].forEach(p=>
+  ['page-home','page-article','page-quotes','page-saved','page-about'].forEach(p=>
     document.getElementById(p).classList.toggle('active',p===id));
   hideSelBar();
 }
 function showHome(){
+  activeCat=null; activeSub=null;
   showPage('page-home');
+  buildHome();
   history.pushState({},'', location.pathname);
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -783,10 +920,11 @@ function routeFromUrl(){
   const cat=params.get('cat'), sub=params.get('sub');
   if(params.get('citas')) showQuotes();
   else if(params.get('archivo')) showSaved();
+  else if(params.get('acerca')) showAbout();
   else if(id) showArticle(id);
-  else if(cat && sub){ showHome(); setTimeout(()=>{const els=document.querySelectorAll('.tp');els.forEach(el=>el.classList.toggle('active',el.textContent.trim()===sub));},50); }
-  else if(cat){ showHome(); setTimeout(()=>{const els=document.querySelectorAll('.tp');els.forEach(el=>el.classList.toggle('active',el.textContent.trim()===cat));},50); }
-  else showHome();
+  else if(cat && sub){ activeCat=cat; activeSub=sub; showPage('page-home'); buildHome(); window.scrollTo({top:0,behavior:'smooth'}); }
+  else if(cat){ activeCat=cat; activeSub=null; showPage('page-home'); buildHome(); window.scrollTo({top:0,behavior:'smooth'}); }
+  else{ activeCat=null; activeSub=null; showPage('page-home'); buildHome(); }
 }
 window.addEventListener('popstate', routeFromUrl);
 
@@ -926,6 +1064,29 @@ async function unsaveArticle(id){
   try{ await authFetch('/rest/v1/saved_articles?id=eq.'+encodeURIComponent(id),{method:'DELETE'}); }catch{}
   savedCache=(savedCache||[]).filter(s=>s.id!==id);
   renderSaved();
+}
+
+// — ACERCA DE LA REVISTA —
+const ABOUT_DEFAULT_DISCIPLINES=['Filosofía','Ciencia','Tecnología','Economía','Historia','Psicología','Teología'];
+function renderAboutCoverage(){
+  const map=catSubMap();
+  const cats=Object.keys(map);
+  const list=cats.length?cats:ABOUT_DEFAULT_DISCIPLINES;
+  const el=document.getElementById('aboutCoverage');
+  if(!el) return;
+  el.innerHTML=list.map(c=>{
+    const subs=map[c]?[...map[c]]:[];
+    return `<div class="ab-disc" style="--chip-c:${catColor(c)}">
+      <div class="ab-disc-h"><span class="cat-dot" style="background:${catColor(c)}"></span>${esc(c)}</div>
+      ${subs.length?`<div class="ab-disc-subs">${subs.map(s=>esc(s)).join(' · ')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+function showAbout(){
+  renderAboutCoverage();
+  showPage('page-about');
+  history.pushState({},'', location.pathname+'?acerca=1');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // — SELECCIÓN DE TEXTO EN ARTÍCULO —
