@@ -32,7 +32,7 @@
   --u:8px;
 }
 html{scroll-behavior:smooth}
-body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 .mono{font-family:'JetBrains Mono',monospace}
 
 /* — UTILITY BAR — */
@@ -52,7 +52,7 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
 .mh-meta b{color:var(--ink-soft);font-weight:500}
 .brand{cursor:pointer;text-align:center}
 .brand-name{font-family:'Fraunces',serif;font-size:clamp(34px,4.6vw,58px);font-weight:600;font-optical-sizing:auto;color:var(--ink);letter-spacing:-.02em;line-height:1}
-.brand-name em{color:var(--accent);font-style:italic;font-weight:500}
+.brand-name em{color:var(--ink);font-style:normal;font-weight:600}
 .brand-tagline{font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--ink-faint);margin-top:14px}
 
 .snav{background:var(--paper);border-bottom:1px solid var(--ink);position:relative}
@@ -76,6 +76,7 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
    monospace numerals. — */
 .hero{background:var(--paper);padding:64px 5vw 0;border-bottom:none}
 .hero-inner{max-width:1360px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1px 1fr;gap:56px;align-items:start;padding-bottom:56px}
+.hero-inner>*{min-width:0}
 .hero-rule{background:var(--line);width:1px;align-self:stretch}
 .hlabel{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:12px}
 .hlabel::before{content:'';display:block;width:28px;height:1.5px;background:var(--accent)}
@@ -93,8 +94,9 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
 .sa{padding:20px 0;border-bottom:.5px solid var(--line-soft);cursor:pointer;transition:opacity .2s;display:grid;grid-template-columns:32px 1fr;gap:16px}
 .sa:hover{opacity:.62}
 .sa:last-child{border-bottom:none}
+.sa>*{min-width:0}
 .sa-idx{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-faint);padding-top:2px}
-.sa-tag{font-family:'Inter',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.sa-tag{font-family:'Inter',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .sa h4{font-family:'Fraunces',serif;font-size:16.5px;font-weight:500;color:var(--ink);line-height:1.32;margin-bottom:6px}
 .sa p{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em}
 
@@ -109,6 +111,7 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
    through" device). — */
 .fs{padding:0 0 72px}
 .fg{display:grid;grid-template-columns:1.4fr 1px 1fr;gap:48px}
+.fg>*{min-width:0}
 .fg-rule{background:var(--line);width:1px}
 .fg-secondary{display:flex;flex-direction:column;gap:0}
 .card{display:flex;flex-direction:column;cursor:pointer}
@@ -116,6 +119,7 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
 .card.card-lead .ci{flex:1.1;margin-bottom:0}
 .card.card-lead .card-body{flex:1;display:flex;flex-direction:column;justify-content:center}
 .card-row{display:grid;grid-template-columns:28px 96px 1fr;gap:20px;padding:24px 0;border-bottom:.5px solid var(--line-soft);cursor:pointer;align-items:start}
+.card-row>*{min-width:0}
 .card-row:first-child{padding-top:0}
 .card-row:last-child{border-bottom:none}
 .cr-idx{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);padding-top:4px}
@@ -438,7 +442,7 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
 <footer>
   <div class="fi">
     <div class="fb">
-      <div style="font-family:'Fraunces',serif;font-size:27px;color:var(--ivory);font-weight:700">Nous<em style="color:var(--gold);font-style:italic;font-weight:500">cience</em> Journal</div>
+      <div style="font-family:'Fraunces',serif;font-size:27px;color:var(--ivory);font-weight:700">Nous<em style="color:var(--ivory);font-style:normal;font-weight:500">cience</em> Journal</div>
       <p>Revista académica multidisciplinaria de filosofía, ciencia, tecnología, economía, historia, psicología y teología.</p>
     </div>
     <div class="fc" id="footSecciones"><h4>Secciones</h4><ul></ul></div>
