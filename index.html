@@ -373,11 +373,6 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
     <div class="fg" id="featuredGrid"></div>
   </section>
 </div>
-<div class="qb">
-  <div class="qb-rule"></div>
-  <blockquote>"El corazón nos inquieta, Señor, hasta que encuentre reposo en ti."</blockquote>
-  <cite>— San Agustín de Hipona, Confesiones, I.1</cite>
-</div>
 <div class="mw">
   <section class="cs">
     <div class="tc">
@@ -882,7 +877,6 @@ function showArticle(id){
   document.getElementById('rTitle').textContent=a.title;
   document.getElementById('rSF').textContent=a.subtitle||a.abstract||'';
   document.getElementById('rStats').innerHTML=fmtDate(a.publishedAt)+(a.readTime?'<br>'+esc(a.readTime):'');
-  document.getElementById('rDOI').textContent=a.articleCode||'—';
   document.getElementById('rBody').innerHTML=a.content||'';
 
   const others=cache.filter(x=>x.id!==a.id).slice(0,3);
