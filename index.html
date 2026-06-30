@@ -213,8 +213,8 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
 .amb{display:flex;align-items:center;gap:24px;padding:24px 0 32px;border-top:.5px solid var(--line);flex-wrap:wrap}
 .ast{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;line-height:2}
 .strip{height:1.5px;background:var(--ink)}
-.abw{max-width:1080px;margin:0 auto;padding:56px 5vw 96px;display:grid;grid-template-columns:1fr 300px;gap:72px;align-items:start}
-.ab{max-width:700px}
+.abw{max-width:1320px;margin:0 auto;padding:56px 5vw 96px;display:grid;grid-template-columns:minmax(0,760px) 280px;justify-content:start;gap:64px;align-items:start}
+.ab{max-width:760px}
 .ab p{margin-bottom:26px;font-size:18.5px;line-height:1.85;color:var(--ink);font-family:'Fraunces',serif;font-weight:300}
 .ab>p:first-of-type::first-letter{font-family:'Fraunces',serif;font-weight:600;font-size:76px;line-height:.78;float:left;padding:6px 10px 0 0;color:var(--accent)}
 .ab h2,.ab h3{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--ink);margin:52px 0 20px;letter-spacing:-.01em}
@@ -427,7 +427,6 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
   <div class="abw">
     <div class="ab" id="rBody"></div>
     <div class="aside">
-      <div class="asw"><div class="aswt">Datos del artículo</div><div class="adoi"><strong>Código</strong><span id="rDOI"></span></div></div>
       <div class="asw"><div class="aswt">Compartir</div><div class="ash"><button class="shb" onclick="copyLink()">🔗 Copiar enlace</button><button class="shb" id="saveArtBtn" onclick="toggleSaveArticle()">📑 Guardar para después</button><button class="shb" onclick="showQuotes()">★ Ver mis citas guardadas</button></div></div>
       <div class="asw"><div class="aswt">Artículos relacionados</div><div class="arel" id="rRel"></div></div>
     </div>
