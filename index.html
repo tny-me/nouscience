@@ -419,6 +419,7 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
     </div>
   </div>
   <div class="strip"></div>
+  <div id="rCoverWrap" style="display:none;max-width:1320px;margin:0 auto;padding:0 5vw 48px"><img id="rCoverImg" style="width:100%;max-height:520px;object-fit:cover;display:block;border:.5px solid var(--line)" alt=""/></div>
   <div class="abw">
     <div class="ab" id="rBody"></div>
     <div class="aside">
@@ -802,8 +803,16 @@ function buildHome(){
   document.getElementById('hTitle').innerHTML=esc(lead.title);
   document.getElementById('hExcerpt').textContent=lead.subtitle||lead.abstract||'';
   document.getElementById('hReadBtn').onclick=()=>showArticle(lead.id);
-  document.getElementById('hMedia').style.background=`linear-gradient(135deg,${catColor(lead.category)}22,var(--paper-dim))`;
-  document.getElementById('hMediaGlyph').textContent=symFor(lead.category);
+  const hMedia=document.getElementById('hMedia');
+  const hGlyph=document.getElementById('hMediaGlyph');
+  if(lead.coverImage){
+    hMedia.style.background=`url(${lead.coverImage}) center/cover no-repeat`;
+    hGlyph.style.display='none';
+  } else {
+    hMedia.style.background=`linear-gradient(135deg,${catColor(lead.category)}22,var(--paper-dim))`;
+    hGlyph.style.display='';
+    hGlyph.textContent=symFor(lead.category);
+  }
 
   const rest=filtered.filter(a=>a.id!==lead.id);
   document.getElementById('sideAlso').innerHTML=rest.slice(0,4).map((a,i)=>
@@ -878,6 +887,10 @@ function showArticle(id){
   document.getElementById('rSF').textContent=a.subtitle||a.abstract||'';
   document.getElementById('rStats').innerHTML=fmtDate(a.publishedAt)+(a.readTime?'<br>'+esc(a.readTime):'');
   document.getElementById('rBody').innerHTML=a.content||'';
+  const coverWrap=document.getElementById('rCoverWrap');
+  const coverImg=document.getElementById('rCoverImg');
+  if(a.coverImage){coverImg.src=a.coverImage;coverWrap.style.display='block';}
+  else{coverWrap.style.display='none';coverImg.src='';}
 
   const others=cache.filter(x=>x.id!==a.id).slice(0,3);
   document.getElementById('rRel').innerHTML=others.map(o=>
