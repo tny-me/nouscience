@@ -264,8 +264,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
         </div>
 
         <div class="form-group" style="margin-top:10px;">
-          <label class="form-label">Imagen de portada (URL)</label>
-          <input class="form-input" type="text" id="fCover" placeholder="https://..."/>
+          <label class="form-label">Imagen de portada</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input class="form-input" type="text" id="fCover" placeholder="https://..." style="flex:1"/>
+            <button type="button" class="btn-draft" id="btnCoverUpload" onclick="document.getElementById('fCoverFile').click()" style="white-space:nowrap;">📤 Subir imagen</button>
+            <input type="file" id="fCoverFile" accept="image/*" style="display:none" onchange="uploadCoverImage(this.files[0])"/>
+          </div>
+          <div id="coverUploadStatus" style="font-size:12px;color:var(--ink3);margin-top:6px;"></div>
+          <img id="coverPreview" style="display:none;max-width:240px;max-height:140px;object-fit:cover;margin-top:10px;border:1px solid var(--bd);border-radius:4px;"/>
         </div>
 
         <div class="form-divider"></div>
@@ -376,6 +382,38 @@ async function sbUpdate(id,row){
 async function sbDelete(id){
   const r=await fetch(SB_URL+'/rest/v1/articles?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:HDR});
   if(!r.ok) throw new Error('Error '+r.status+': '+(await r.text()));
+}
+
+// COVER IMAGE UPLOAD (Supabase Storage, bucket "covers")
+async function uploadCoverImage(file){
+  if(!file) return;
+  const statusEl=document.getElementById('coverUploadStatus');
+  const btn=document.getElementById('btnCoverUpload');
+  if(!file.type.startsWith('image/')){ statusEl.textContent='El archivo debe ser una imagen.'; statusEl.style.color='#c0392b'; return; }
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+  const path=(curId||genId())+'-'+Date.now()+'.'+ext;
+  btn.disabled=true; statusEl.style.color='var(--ink3)'; statusEl.textContent='Subiendo...';
+  try{
+    const r=await fetch(SB_URL+'/storage/v1/object/covers/'+path,{
+      method:'POST',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type},
+      body:file
+    });
+    if(!r.ok) throw new Error('Error '+r.status+': '+(await r.text()));
+    const publicUrl=SB_URL+'/storage/v1/object/public/covers/'+path;
+    document.getElementById('fCover').value=publicUrl;
+    showCoverPreview(publicUrl);
+    statusEl.style.color='#1a7a3c'; statusEl.textContent='Imagen subida correctamente.';
+  }catch(e){
+    statusEl.style.color='#c0392b'; statusEl.textContent='No se pudo subir la imagen: '+e.message;
+  }finally{
+    btn.disabled=false;
+    document.getElementById('fCoverFile').value='';
+  }
+}
+function showCoverPreview(url){
+  const img=document.getElementById('coverPreview');
+  if(url){ img.src=url; img.style.display='block'; } else { img.style.display='none'; img.removeAttribute('src'); }
 }
 
 // CATEGORÍA → CÓDIGO (se genera a partir del texto libre, no de una lista fija)
@@ -521,6 +559,8 @@ function clearForm(){
   ['fTitle','fSubtitle','fAuthor','fAuthorTitle','fTags','fTime','fCode','fCover','fAbstract'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fCategory').value='';
   document.getElementById('fFeatured').checked=false;
+  document.getElementById('coverUploadStatus').textContent='';
+  showCoverPreview('');
   if(quill) quill.setContents([],'silent');
   setStatus(false,null);
   document.getElementById('btnPub').textContent='Publicar artículo';
@@ -542,6 +582,8 @@ function loadArt(id){
   document.getElementById('fTime').value=a.readTime;
   document.getElementById('fCode').value=a.articleCode||'';
   document.getElementById('fCover').value=a.coverImage||'';
+  document.getElementById('coverUploadStatus').textContent='';
+  showCoverPreview(a.coverImage||'');
   document.getElementById('fAbstract').value=a.abstract;
   document.getElementById('fFeatured').checked=a.featured;
   if(quill){
