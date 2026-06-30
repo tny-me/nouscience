@@ -244,20 +244,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
             <datalist id="fCategoryList"></datalist>
           </div>
           <div class="form-group" style="margin-bottom:0">
-            <label class="form-label">Subcategoría</label>
-            <input class="form-input" type="text" id="fSubcategory" list="fSubcategoryList" placeholder="Ej. Ética, Epistemología, IA..."/>
-            <datalist id="fSubcategoryList"></datalist>
+            <label class="form-label">Etiquetas <span style="font-weight:400;opacity:.6">(separadas por coma)</span></label>
+            <input class="form-input" type="text" id="fTags" placeholder="Ej. Dios, Trinidad, Fe"/>
           </div>
         </div>
         <div class="form-row-3" style="margin-top:14px;">
           <div class="form-group" style="margin-bottom:0">
-            <label class="form-label">Etiquetas</label>
-            <input class="form-input" type="text" id="fTags" placeholder="Ej. Dios, Trinidad, Fe"/>
-          </div>
-          <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Lectura</label>
             <input class="form-input" type="text" id="fTime" placeholder="Auto" readonly style="background:var(--bg);color:var(--ink3);cursor:default;" title="Se calcula automáticamente según el contenido"/>
           </div>
+          <div class="form-group" style="margin-bottom:0"></div>
           <div class="form-group" style="margin-bottom:0"></div>
         </div>
         <div class="form-group" style="margin-top:10px;">
@@ -406,10 +402,7 @@ function generateArticleCode(cat){
 function toDb(a){
   const row={id:a.id,title:a.title||null,subtitle:a.subtitle||null,abstract:a.abstract||null,
     author:a.author||null,author_title:a.authorTitle||null,
-    // NOTE: requires the `category`/`subcategory` columns added by
-    // /tmp/sql/category_subcategory.sql — until that migration is run in
-    // Supabase, saving will fail because these columns don't exist yet.
-    category:a.category||null,subcategory:a.subcategory||null,discipline:a.category||null,
+    category:a.category||null,discipline:a.category||null,
     tags:a.tags||[],read_time:a.readTime||null,content:a.content||null,
     article_code:a.articleCode||null,
     featured:!!a.featured,published:!!a.published,published_at:a.publishedAt||null,
@@ -420,7 +413,7 @@ function toDb(a){
 function fromDb(r){
   return{id:r.id,title:r.title||'',subtitle:r.subtitle||'',abstract:r.abstract||'',
     author:r.author||'',authorTitle:r.author_title||'',
-    category:r.category||r.discipline||'',subcategory:r.subcategory||'',
+    category:r.category||r.discipline||'',
     tags:r.tags||[],readTime:r.read_time||'',content:r.content||'',
     articleCode:r.article_code||'',coverImage:r.cover_image||'',
     featured:!!r.featured,published:!!r.published,publishedAt:r.published_at,
@@ -458,7 +451,6 @@ async function initApp(){
       }catch(e){}
     },0);
   });
-  document.getElementById('fCategory').addEventListener('input',updateSubcatList);
   await reloadList();
 }
 function applyPullQuote(){
@@ -501,23 +493,12 @@ function renderList(){
     el.innerHTML='<div class="sb-empty"><strong>Sin artículos'+(curFilt!=='all'?' aquí':'')+'</strong>'+(curFilt==='all'?'Crea tu primer artículo arriba.':'Cambia el filtro.')+'</div>';
     return;
   }
-  el.innerHTML=arts.map(a=>'<div class="art-item'+(curId===a.id?' active':'')+'" onclick="loadArt(\''+esc(a.id)+'\')"><div class="ai-title">'+esc(a.title||'Sin título')+'</div><div class="ai-meta"><span class="ai-disc">'+esc([a.category,a.subcategory].filter(Boolean).join(' › ')||'Sin categoría')+'</span><span class="ai-badge '+(a.published?'pub':'dra')+'">'+(a.published?'Publicado':'Borrador')+'</span></div></div>').join('');
+  el.innerHTML=arts.map(a=>'<div class="art-item'+(curId===a.id?' active':'')+'" onclick="loadArt(\''+esc(a.id)+'\')"><div class="ai-title">'+esc(a.title||'Sin título')+'</div><div class="ai-meta"><span class="ai-disc">'+esc(a.category||'Sin categoría')+'</span><span class="ai-badge '+(a.published?'pub':'dra')+'">'+(a.published?'Publicado':'Borrador')+'</span></div></div>').join('');
   updateDiscList();
 }
 function updateDiscList(){
   const cats=[...new Set(cache.map(a=>a.category).filter(Boolean))].sort();
   document.getElementById('fCategoryList').innerHTML=cats.map(c=>'<option value="'+esc(c)+'">').join('');
-  updateSubcatList();
-}
-function updateSubcatList(){
-  const curCat=(document.getElementById('fCategory').value||'').trim().toLowerCase();
-  let subs;
-  if(curCat){
-    subs=[...new Set(cache.filter(a=>(a.category||'').trim().toLowerCase()===curCat).map(a=>a.subcategory).filter(Boolean))].sort();
-  }else{
-    subs=[...new Set(cache.map(a=>a.subcategory).filter(Boolean))].sort();
-  }
-  document.getElementById('fSubcategoryList').innerHTML=subs.map(s=>'<option value="'+esc(s)+'">').join('');
 }
 function filterList(f,btn){
   curFilt=f;
@@ -539,7 +520,6 @@ function newArticle(){
 function clearForm(){
   ['fTitle','fSubtitle','fAuthor','fAuthorTitle','fTags','fTime','fCode','fCover','fAbstract'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fCategory').value='';
-  document.getElementById('fSubcategory').value='';
   document.getElementById('fFeatured').checked=false;
   if(quill) quill.setContents([],'silent');
   setStatus(false,null);
@@ -558,7 +538,6 @@ function loadArt(id){
   document.getElementById('fAuthor').value=a.author;
   document.getElementById('fAuthorTitle').value=a.authorTitle;
   document.getElementById('fCategory').value=a.category;
-  document.getElementById('fSubcategory').value=a.subcategory;
   document.getElementById('fTags').value=(a.tags||[]).join(', ');
   document.getElementById('fTime').value=a.readTime;
   document.getElementById('fCode').value=a.articleCode||'';
@@ -574,7 +553,6 @@ function loadArt(id){
   document.getElementById('btnPub').classList.toggle('is-pub',a.published);
   document.getElementById('btnPrev').href='article.html?id='+id;
   renderList();
-  updateSubcatList();
   document.getElementById('editorArea').scrollTop=0;
 }
 function setStatus(pub,date){
@@ -592,7 +570,6 @@ function buildData(published,articleCode){
     author:document.getElementById('fAuthor').value.trim(),
     authorTitle:document.getElementById('fAuthorTitle').value.trim(),
     category:document.getElementById('fCategory').value.trim(),
-    subcategory:document.getElementById('fSubcategory').value.trim(),
     tags:document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean),
     readTime:document.getElementById('fTime').value.trim(),
     coverImage:document.getElementById('fCover').value.trim(),
