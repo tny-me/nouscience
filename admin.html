@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Editor — JA Sachz</title>
+<title>Editor — Nouscience Journal</title>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -166,7 +166,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
   <div class="login-box">
     <div class="login-logo">
       <div class="login-lb"></div>
-      <div><span class="login-lm">JA Sachz</span><span class="login-ls">Editor</span></div>
+      <div><span class="login-lm">Nouscience Journal</span><span class="login-ls">Editor</span></div>
     </div>
     <h2 class="login-h">Panel de Editor</h2>
     <p class="login-sub">Ingresa la contraseña para acceder al panel.</p>
@@ -180,7 +180,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
 <div id="mainApp" style="display:none;">
   <nav>
     <a class="nav-brand" href="index.html" style="font-family:'Inter','Arial',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.01em;color:var(--ink);padding:0 24px;">
-      JA Sachz
+      Nouscience Journal
     </a>
     <div class="nav-title">Panel de Editor</div>
     <div class="nav-right">
@@ -233,16 +233,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
           </div>
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Cargo / Institución</label>
-            <input class="form-input" type="text" id="fAuthorTitle" placeholder="Ej. Escritor, JA Sachz"/>
+            <input class="form-input" type="text" id="fAuthorTitle" placeholder="Ej. Profesor, Universidad de Salamanca"/>
           </div>
         </div>
 
-        <div class="form-row-3" style="margin-top:14px;">
+        <div class="form-row" style="margin-top:14px;">
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Categoría</label>
-            <input class="form-input" type="text" id="fDisc" list="fDiscList" placeholder="Ej. Dogmática, Estoicismo, Bioética..."/>
-            <datalist id="fDiscList"></datalist>
+            <input class="form-input" type="text" id="fCategory" list="fCategoryList" placeholder="Ej. Filosofía, Ciencia, Tecnología..."/>
+            <datalist id="fCategoryList"></datalist>
           </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Subcategoría</label>
+            <input class="form-input" type="text" id="fSubcategory" list="fSubcategoryList" placeholder="Ej. Ética, Epistemología, IA..."/>
+            <datalist id="fSubcategoryList"></datalist>
+          </div>
+        </div>
+        <div class="form-row-3" style="margin-top:14px;">
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Etiquetas</label>
             <input class="form-input" type="text" id="fTags" placeholder="Ej. Dios, Trinidad, Fe"/>
@@ -251,6 +258,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);bo
             <label class="form-label">Lectura</label>
             <input class="form-input" type="text" id="fTime" placeholder="Auto" readonly style="background:var(--bg);color:var(--ink3);cursor:default;" title="Se calcula automáticamente según el contenido"/>
           </div>
+          <div class="form-group" style="margin-bottom:0"></div>
         </div>
         <div class="form-group" style="margin-top:10px;">
           <label class="form-label">Código de artículo</label>
@@ -374,18 +382,18 @@ async function sbDelete(id){
   if(!r.ok) throw new Error('Error '+r.status+': '+(await r.text()));
 }
 
-// DISCIPLINE → CODE (se genera a partir del texto libre, no de una lista fija)
-function discCode(disc){
-  if(!disc) return 'GN';
-  const words=disc.trim().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').split(/\s+/).filter(Boolean);
+// CATEGORÍA → CÓDIGO (se genera a partir del texto libre, no de una lista fija)
+function discCode(cat){
+  if(!cat) return 'GN';
+  const words=cat.trim().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').split(/\s+/).filter(Boolean);
   if(words.length>=2) return (words[0][0]||'')+(words[1][0]||'');
   return (words[0]||'GN').slice(0,2).padEnd(2,'X');
 }
 
-function generateArticleCode(disc){
-  const dc=discCode(disc);
+function generateArticleCode(cat){
+  const dc=discCode(cat);
   const year=new Date().getFullYear();
-  const prefix=`JAS-${dc}-${year}-`;
+  const prefix=`NJ-${dc}-${year}-`;
   const nums=cache
     .filter(a=>a.articleCode&&a.articleCode.startsWith(prefix))
     .map(a=>parseInt(a.articleCode.slice(prefix.length),10))
@@ -397,7 +405,11 @@ function generateArticleCode(disc){
 // MAPPING
 function toDb(a){
   const row={id:a.id,title:a.title||null,subtitle:a.subtitle||null,abstract:a.abstract||null,
-    author:a.author||null,author_title:a.authorTitle||null,discipline:a.discipline||null,
+    author:a.author||null,author_title:a.authorTitle||null,
+    // NOTE: requires the `category`/`subcategory` columns added by
+    // /tmp/sql/category_subcategory.sql — until that migration is run in
+    // Supabase, saving will fail because these columns don't exist yet.
+    category:a.category||null,subcategory:a.subcategory||null,discipline:a.category||null,
     tags:a.tags||[],read_time:a.readTime||null,content:a.content||null,
     article_code:a.articleCode||null,
     featured:!!a.featured,published:!!a.published,published_at:a.publishedAt||null,
@@ -407,7 +419,8 @@ function toDb(a){
 }
 function fromDb(r){
   return{id:r.id,title:r.title||'',subtitle:r.subtitle||'',abstract:r.abstract||'',
-    author:r.author||'',authorTitle:r.author_title||'',discipline:r.discipline||'',
+    author:r.author||'',authorTitle:r.author_title||'',
+    category:r.category||r.discipline||'',subcategory:r.subcategory||'',
     tags:r.tags||[],readTime:r.read_time||'',content:r.content||'',
     articleCode:r.article_code||'',coverImage:r.cover_image||'',
     featured:!!r.featured,published:!!r.published,publishedAt:r.published_at,
@@ -445,6 +458,7 @@ async function initApp(){
       }catch(e){}
     },0);
   });
+  document.getElementById('fCategory').addEventListener('input',updateSubcatList);
   await reloadList();
 }
 function applyPullQuote(){
@@ -487,12 +501,23 @@ function renderList(){
     el.innerHTML='<div class="sb-empty"><strong>Sin artículos'+(curFilt!=='all'?' aquí':'')+'</strong>'+(curFilt==='all'?'Crea tu primer artículo arriba.':'Cambia el filtro.')+'</div>';
     return;
   }
-  el.innerHTML=arts.map(a=>'<div class="art-item'+(curId===a.id?' active':'')+'" onclick="loadArt(\''+esc(a.id)+'\')"><div class="ai-title">'+esc(a.title||'Sin título')+'</div><div class="ai-meta"><span class="ai-disc">'+esc(a.discipline||'Sin disciplina')+'</span><span class="ai-badge '+(a.published?'pub':'dra')+'">'+(a.published?'Publicado':'Borrador')+'</span></div></div>').join('');
+  el.innerHTML=arts.map(a=>'<div class="art-item'+(curId===a.id?' active':'')+'" onclick="loadArt(\''+esc(a.id)+'\')"><div class="ai-title">'+esc(a.title||'Sin título')+'</div><div class="ai-meta"><span class="ai-disc">'+esc([a.category,a.subcategory].filter(Boolean).join(' › ')||'Sin categoría')+'</span><span class="ai-badge '+(a.published?'pub':'dra')+'">'+(a.published?'Publicado':'Borrador')+'</span></div></div>').join('');
   updateDiscList();
 }
 function updateDiscList(){
-  const discs=[...new Set(cache.map(a=>a.discipline).filter(Boolean))].sort();
-  document.getElementById('fDiscList').innerHTML=discs.map(d=>'<option value="'+esc(d)+'">').join('');
+  const cats=[...new Set(cache.map(a=>a.category).filter(Boolean))].sort();
+  document.getElementById('fCategoryList').innerHTML=cats.map(c=>'<option value="'+esc(c)+'">').join('');
+  updateSubcatList();
+}
+function updateSubcatList(){
+  const curCat=(document.getElementById('fCategory').value||'').trim().toLowerCase();
+  let subs;
+  if(curCat){
+    subs=[...new Set(cache.filter(a=>(a.category||'').trim().toLowerCase()===curCat).map(a=>a.subcategory).filter(Boolean))].sort();
+  }else{
+    subs=[...new Set(cache.map(a=>a.subcategory).filter(Boolean))].sort();
+  }
+  document.getElementById('fSubcategoryList').innerHTML=subs.map(s=>'<option value="'+esc(s)+'">').join('');
 }
 function filterList(f,btn){
   curFilt=f;
@@ -513,7 +538,8 @@ function newArticle(){
 }
 function clearForm(){
   ['fTitle','fSubtitle','fAuthor','fAuthorTitle','fTags','fTime','fCode','fCover','fAbstract'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fDisc').value='';
+  document.getElementById('fCategory').value='';
+  document.getElementById('fSubcategory').value='';
   document.getElementById('fFeatured').checked=false;
   if(quill) quill.setContents([],'silent');
   setStatus(false,null);
@@ -531,7 +557,8 @@ function loadArt(id){
   document.getElementById('fSubtitle').value=a.subtitle;
   document.getElementById('fAuthor').value=a.author;
   document.getElementById('fAuthorTitle').value=a.authorTitle;
-  document.getElementById('fDisc').value=a.discipline;
+  document.getElementById('fCategory').value=a.category;
+  document.getElementById('fSubcategory').value=a.subcategory;
   document.getElementById('fTags').value=(a.tags||[]).join(', ');
   document.getElementById('fTime').value=a.readTime;
   document.getElementById('fCode').value=a.articleCode||'';
@@ -547,6 +574,7 @@ function loadArt(id){
   document.getElementById('btnPub').classList.toggle('is-pub',a.published);
   document.getElementById('btnPrev').href='article.html?id='+id;
   renderList();
+  updateSubcatList();
   document.getElementById('editorArea').scrollTop=0;
 }
 function setStatus(pub,date){
@@ -563,7 +591,8 @@ function buildData(published,articleCode){
     subtitle:document.getElementById('fSubtitle').value.trim(),
     author:document.getElementById('fAuthor').value.trim(),
     authorTitle:document.getElementById('fAuthorTitle').value.trim(),
-    discipline:document.getElementById('fDisc').value,
+    category:document.getElementById('fCategory').value.trim(),
+    subcategory:document.getElementById('fSubcategory').value.trim(),
     tags:document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean),
     readTime:document.getElementById('fTime').value.trim(),
     coverImage:document.getElementById('fCover').value.trim(),
@@ -582,7 +611,7 @@ async function saveDraft(){
   if(!validate())return;
   const ex=cache.find(a=>a.id===curId);
   let code=ex?.articleCode||null;
-  if(!code) code=generateArticleCode(document.getElementById('fDisc').value);
+  if(!code) code=generateArticleCode(document.getElementById('fCategory').value);
   const art=buildData(ex?.published||false,code);
   const isNew=!curId;
   if(!curId) curId=art.id;
@@ -609,7 +638,7 @@ async function togglePublish(){
   }
   const ex=cache.find(a=>a.id===curId);
   let code=ex?.articleCode||null;
-  if(!code) code=generateArticleCode(document.getElementById('fDisc').value);
+  if(!code) code=generateArticleCode(document.getElementById('fCategory').value);
   const art=buildData(!(ex?.published||false),code);
   const isNew=!curId;
   if(!curId) curId=art.id;
@@ -656,7 +685,7 @@ async function backfillCodes(){
   let count=0;
   try{
     for(const a of missing){
-      const code=generateArticleCode(a.discipline||'');
+      const code=generateArticleCode(a.category||'');
       a.articleCode=code; // update cache in-place so next iteration sees it
       await fetch(SB_URL+'/rest/v1/articles?id=eq.'+encodeURIComponent(a.id),
         {method:'PATCH',headers:HDR,body:JSON.stringify({article_code:code})});
@@ -746,7 +775,7 @@ function drawSocialCanvas(){
   const isStory=socialFmt==='story';
   const title=document.getElementById('fTitle').value.trim()||'Sin título';
   const subtitle=document.getElementById('fSubtitle').value.trim()||'';
-  const disc=document.getElementById('fDisc').value||'';
+  const disc=document.getElementById('fCategory').value||'';
   const accent=ACCENT_PALETTES[hashStr(title)%ACCENT_PALETTES.length];
 
   // Background: off-white / cream
@@ -784,15 +813,8 @@ function drawSocialCanvas(){
   const titleLines=wrapTextLines(ctx,title,W-PAD*2-W*0.015,4);
   titleLines.forEach((line,i)=>ctx.fillText(line,PAD+W*0.015,titleY+i*titleFs*1.28));
 
-  // "By JA Sachz" byline under title
-  const bylineFs=W*0.016;
-  const bylineY=titleY+titleLines.length*titleFs*1.28+bylineFs*1.4;
-  ctx.fillStyle=accent;
-  ctx.font=`400 ${bylineFs}px Arial,sans-serif`;
-  ctx.fillText('By JA Sachz', PAD+W*0.015, bylineY);
-
-  // Accent rule under byline
-  const ruleY=bylineY+bylineFs*1.1;
+  // Accent rule under title (no byline — institutional/anonymous voice)
+  const ruleY=titleY+titleLines.length*titleFs*1.28+W*0.022;
   ctx.fillStyle=accent;
   ctx.fillRect(PAD+W*0.015, ruleY, W*0.07, 3);
 
@@ -815,7 +837,7 @@ function drawSocialCanvas(){
   const brandFs=W*0.016;
   ctx.fillStyle='#111111';
   ctx.font=`700 ${brandFs}px Arial,sans-serif`;
-  ctx.fillText('NOUSCIENCE THEOLOGY', PAD+W*0.015, H*0.88+H*0.065);
+  ctx.fillText('NOUSCIENCE JOURNAL', PAD+W*0.015, H*0.88+H*0.065);
 
   // Domain right-aligned
   ctx.fillStyle='#AEADA6';
@@ -851,7 +873,7 @@ function downloadSocial(){
   const canvas=document.getElementById('socialCanvas');
   const title=(document.getElementById('fTitle').value.trim()||'post').replace(/\s+/g,'-').toLowerCase().slice(0,40);
   const link=document.createElement('a');
-  link.download=`animi-regnum-${title}-${socialFmt}.png`;
+  link.download=`nouscience-journal-${title}-${socialFmt}.png`;
   link.href=canvas.toDataURL('image/png');
   link.click();
 }
