@@ -349,6 +349,30 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
 .auth-submit:hover{background:var(--accent)}
 .auth-switch{font-size:12.5px;color:var(--ink-soft);margin-top:18px;text-align:center}
 .auth-switch a{color:var(--accent);cursor:pointer;text-decoration:underline;margin-left:4px}
+/* — PER-CATEGORY FRANJAS — */
+.cat-section{padding:48px 0 56px;border-top:1px solid var(--line);max-width:1360px;margin:0 auto;padding-left:5vw;padding-right:5vw}
+.cat-sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:16px;border-bottom:.5px solid var(--line)}
+.cat-sh-left{display:flex;flex-direction:row;gap:10px;align-items:center}
+.cat-sh-name{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft)}
+.cat-sh-idx{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint)}
+.cat-grid{display:grid;grid-template-columns:2fr 1fr;gap:48px;align-items:start}
+.cat-grid>*{min-width:0}
+.cat-lead{cursor:pointer}
+.cat-lead-img img{width:100%;height:auto;display:block;border:.5px solid var(--line);margin-bottom:24px}
+.cat-lead-glyph{aspect-ratio:16/9;background:var(--paper-dim);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:72px;color:var(--ink-faint);margin-bottom:24px;border:.5px solid var(--line)}
+.cat-lead-title{font-family:'Fraunces',serif;font-size:clamp(22px,2.4vw,32px);font-weight:600;color:var(--ink);line-height:1.1;letter-spacing:-.02em;margin-bottom:12px;transition:color .2s}
+.cat-lead:hover .cat-lead-title{color:var(--accent)}
+.cat-lead-meta{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint)}
+.cat-stack{}
+.cat-stack-item{padding:18px 0;border-bottom:.5px solid var(--line-soft);cursor:pointer;transition:opacity .2s}
+.cat-stack-item:last-child{border-bottom:none}
+.cat-stack-item:hover{opacity:.65}
+.cat-stack-tag{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cat-stack-title{font-family:'Fraunces',serif;font-size:16px;font-weight:500;color:var(--ink);line-height:1.25;margin-bottom:6px}
+.cat-stack-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint)}
+.cat-solo{cursor:pointer;display:flex;flex-direction:column;gap:12px;max-width:640px}
+.cat-solo:hover .cat-lead-title{color:var(--accent)}
+@media(max-width:900px){.cat-grid{grid-template-columns:1fr}}
 @media(max-width:1000px){.abw{grid-template-columns:1fr;gap:40px}.aside{position:static}.masthead-inner{grid-template-columns:1fr}.mh-meta{display:none}}
 @media(max-width:900px){.hero-body{grid-template-columns:1fr}.hero-divider{display:none}.fg{grid-template-columns:1fr}.fg-rule{display:none}.card-lead{flex-direction:column}.tc{grid-template-columns:1fr}.fi{grid-template-columns:1fr 1fr}.utilbar-in{flex-direction:column;gap:8px;text-align:center}.ai{grid-template-columns:1fr}.ath{display:none}.anav-in{grid-template-columns:1fr}.ans.r{text-align:left}.ans.r .anl{justify-content:flex-start}}
 @media(max-width:600px){.fi{grid-template-columns:1fr}.atitle{font-size:26px}.card-row{grid-template-columns:24px 72px 1fr}.ab>p:first-of-type::first-letter{font-size:56px}}
@@ -407,18 +431,15 @@ footer{background:var(--ink);color:var(--paper-dim);padding:64px 5vw 32px;border
     <div class="chipbar-label">Filtrar por tema</div>
     <div class="chips" id="chipsList"></div>
   </div>
-  <section class="fs">
-    <div class="sh"><h2>Artículos Destacados</h2><span class="sh-idx mono">§ 01</span></div>
-    <div class="fg" id="featuredGrid"></div>
-  </section>
 </div>
+<!-- Hidden legacy divs kept so no JS reference throws -->
+<div id="featuredGrid" style="display:none"></div>
+<div id="recentList" style="display:none"></div>
+<!-- Per-category franjas injected here by buildHome() -->
+<div id="catSections"></div>
 <div class="mw">
   <section class="cs">
     <div class="tc">
-      <div>
-        <div class="sh"><h2>Artículos Recientes</h2><span class="sh-idx mono">§ 02</span></div>
-        <div class="al" id="recentList"></div>
-      </div>
       <div>
         <div class="sw">
           <div class="swt">Temas de la Revista</div>
@@ -821,103 +842,120 @@ function buildHome(){
   renderChips();
   const hero=document.getElementById('heroSection');
   const empty=document.getElementById('emptyState');
+  const catSections=document.getElementById('catSections');
+
   if(!cache.length){
     hero.style.display='none'; empty.style.display='block';
-    document.getElementById('featuredGrid').innerHTML='';
-    document.getElementById('recentList').innerHTML='';
+    catSections.innerHTML='';
     document.getElementById('sideAlso').innerHTML='';
     document.getElementById('topicsList').innerHTML='';
     document.getElementById('topicTags').innerHTML='';
     return;
   }
+  empty.style.display='none';
 
-  // Apply the active category/subcategory filter (set via chips or the
-  // nav dropdown) to the working list used for every homepage section.
-  let filtered=cache;
-  if(activeCat) filtered=filtered.filter(a=>a.category===activeCat);
-  if(activeSub) filtered=filtered.filter(a=>(a.tags||[]).includes(activeSub));
+  // Build per-category map from all published articles (unfiltered)
+  // preserving the order categories first appear (by most-recent article).
+  const allCats=[];
+  const catMap={};
+  cache.forEach(a=>{
+    if(!a.category) return;
+    if(!catMap[a.category]){ catMap[a.category]=[]; allCats.push(a.category); }
+    catMap[a.category].push(a);
+  });
 
-  if(!filtered.length){
-    hero.style.display='none'; empty.style.display='block';
-    document.getElementById('featuredGrid').innerHTML='';
-    document.getElementById('recentList').innerHTML='';
-    document.getElementById('sideAlso').innerHTML='';
-    return;
-  }
-  empty.style.display='none'; hero.style.display='block';
+  // Determine the global featured/lead article (for the #heroSection)
+  const globalLead=cache.find(a=>a.featured)||cache[0];
 
-  const lead=filtered.find(a=>a.featured)||filtered[0];
-  document.getElementById('hTitle').innerHTML=esc(lead.title);
-  document.getElementById('hTitle').onclick=()=>showArticle(lead.id);
-  document.getElementById('hExcerpt').textContent=lead.subtitle||lead.abstract||'';
-  document.getElementById('hReadBtn').onclick=()=>showArticle(lead.id);
-  const hMedia=document.getElementById('hMedia');
-  const hGlyph=document.getElementById('hMediaGlyph');
-  const hImg=document.getElementById('hMediaImg');
-  if(lead.coverImage){
-    hImg.src=lead.coverImage; hImg.style.display='block';
-    hGlyph.style.display='none';
-    hMedia.style.background='none';
-  } else {
-    hImg.style.display='none'; hImg.src='';
-    hGlyph.style.display=''; hGlyph.textContent=symFor(lead.category);
-    hMedia.style.background=`linear-gradient(135deg,${catColor(lead.category)}22,var(--paper-dim))`;
-  }
+  // Build the #heroSection — always show it (or hide if activeCat and
+  // lead category doesn't match)
+  const showHero=!activeCat||(globalLead.category===activeCat);
+  hero.style.display=showHero?'block':'none';
 
-  const rest=filtered.filter(a=>a.id!==lead.id);
-  document.getElementById('sideAlso').innerHTML=rest.slice(0,4).map((a,i)=>
-    `<div class="sa" onclick="showArticle('${esc(a.id)}')"><div class="sa-idx mono">${String(i+1).padStart(2,'0')}</div><div><div class="sa-tag"><span class="cat-dot" style="background:${catColor(a.category)}"></span>${esc(a.category||'')}</div><h4>${esc(a.title)}</h4><p>${esc(a.readTime||'')}</p></div></div>`
-  ).join('');
-
-  // Magazine mosaic grid — asymmetric 12-col layout:
-  // card 0 → 8 cols (large), card 1 → 4 cols,
-  // cards 2-4 → 4 cols each (three equal), cards 5+ → 6 cols pairs.
-  // Image-led cards show a real <img>; text-forward cards show a pull-number + left accent border.
-  const gridArticles=rest.slice(0,9);
-  function colSpan(i){
-    if(i===0) return 'mc-8';
-    if(i===1) return 'mc-4';
-    if(i>=2&&i<=4) return 'mc-4';
-    return 'mc-6';
-  }
-  document.getElementById('featuredGrid').innerHTML=gridArticles.map((a,i)=>{
-    const cc=catColor(a.category);
-    const span=colSpan(i);
-    const num=String(i+1).padStart(2,'0');
-    const excerpt=a.abstract||a.subtitle||'';
-    if(a.coverImage){
-      // Image-led card
-      return `<div class="mc ${span} mc-img" onclick="showArticle('${esc(a.id)}')" style="--mc-accent:${cc}">
-        <img src="${esc(a.coverImage)}" alt="${esc(a.title)}" loading="lazy"/>
-        <div class="ctag"><span class="cat-dot" style="background:${cc}"></span>${esc(a.category||'')}</div>
-        <div class="mc-title">${esc(a.title)}</div>
-        ${excerpt?`<div class="mc-excerpt">${esc(excerpt)}</div>`:''}
-        <div class="cfoot"><span>${esc(a.readTime||'')}</span>${a.publishedAt?`<span>${fmtDate(a.publishedAt)}</span>`:''}</div>
-      </div>`;
+  if(showHero){
+    document.getElementById('hTitle').innerHTML=esc(globalLead.title);
+    document.getElementById('hTitle').onclick=()=>showArticle(globalLead.id);
+    document.getElementById('hExcerpt').textContent=globalLead.subtitle||globalLead.abstract||'';
+    document.getElementById('hReadBtn').onclick=()=>showArticle(globalLead.id);
+    const hMedia=document.getElementById('hMedia');
+    const hGlyph=document.getElementById('hMediaGlyph');
+    const hImg=document.getElementById('hMediaImg');
+    if(globalLead.coverImage){
+      hImg.src=globalLead.coverImage; hImg.style.display='block';
+      hGlyph.style.display='none';
+      hMedia.style.background='none';
     } else {
-      // Text-forward card — left accent border, pull-number, no image box
-      return `<div class="mc ${span} mc-text" onclick="showArticle('${esc(a.id)}')" style="--mc-accent:${cc}">
-        <span class="mc-pullnum">${num}</span>
-        <div class="ctag"><span class="cat-dot" style="background:${cc}"></span>${esc(a.category||'')}</div>
-        <div class="mc-title">${esc(a.title)}</div>
-        ${excerpt&&i<3?`<div class="mc-excerpt">${esc(excerpt)}</div>`:''}
-        <div class="cfoot"><span>${esc(a.readTime||'')}</span>${a.publishedAt?`<span>${fmtDate(a.publishedAt)}</span>`:''}</div>
+      hImg.style.display='none'; hImg.src='';
+      hGlyph.style.display=''; hGlyph.textContent=symFor(globalLead.category);
+      hMedia.style.background=`linear-gradient(135deg,${catColor(globalLead.category)}22,var(--paper-dim))`;
+    }
+    // Side "also in this issue" — other articles from all categories
+    const rest=cache.filter(a=>a.id!==globalLead.id);
+    document.getElementById('sideAlso').innerHTML=rest.slice(0,4).map((a,i)=>
+      `<div class="sa" onclick="showArticle('${esc(a.id)}')"><div class="sa-idx mono">${String(i+1).padStart(2,'0')}</div><div><div class="sa-tag"><span class="cat-dot" style="background:${catColor(a.category)}"></span>${esc(a.category||'')}</div><h4>${esc(a.title)}</h4><p>${esc(a.readTime||'')}</p></div></div>`
+    ).join('');
+  }
+
+  // Build per-category sections
+  // Determine visible cats based on activeCat filter
+  const visibleCats=activeCat?(allCats.filter(c=>c===activeCat)):allCats;
+
+  let sectionIndex=1;
+  catSections.innerHTML=visibleCats.map(c=>{
+    const arts=catMap[c];
+    if(!arts||!arts.length) return '';
+    // Apply activeSub filter within this category
+    const catArts=activeSub?arts.filter(a=>(a.tags||[]).includes(activeSub)):arts;
+    if(!catArts.length) return '';
+
+    const cc=catColor(c);
+    const idxStr='§&nbsp;'+String(sectionIndex).padStart(2,'0');
+    sectionIndex++;
+
+    const lead=catArts.find(a=>a.featured)||catArts[0];
+    const others=catArts.filter(a=>a.id!==lead.id);
+
+    const leadImgHtml=lead.coverImage
+      ?`<div class="cat-lead-img"><img src="${esc(lead.coverImage)}" alt="${esc(lead.title)}" width="100%" loading="lazy"/></div>`
+      :`<div class="cat-lead-glyph">${symFor(c)}</div>`;
+
+    const leadHtml=`<div class="cat-lead" onclick="showArticle('${esc(lead.id)}')">
+      ${leadImgHtml}
+      <div class="cat-lead-title">${esc(lead.title)}</div>
+      <div class="cat-lead-meta">${esc(lead.readTime||'')}${lead.publishedAt?' · '+fmtDate(lead.publishedAt):''}</div>
+    </div>`;
+
+    if(catArts.length===1){
+      // Single article — full-width solo card
+      return `<div class="cat-section" data-cat="${esc(c)}">
+        <div class="cat-sh">
+          <div class="cat-sh-left"><span class="cat-dot" style="background:${cc}"></span><span class="cat-sh-name">${esc(c)}</span></div>
+          <span class="cat-sh-idx">${idxStr}</span>
+        </div>
+        <div class="cat-solo" onclick="showArticle('${esc(lead.id)}')">
+          ${leadImgHtml}
+          <div class="cat-lead-title">${esc(lead.title)}</div>
+          <div class="cat-lead-meta">${esc(lead.readTime||'')}${lead.publishedAt?' · '+fmtDate(lead.publishedAt):''}</div>
+        </div>
       </div>`;
     }
+
+    const stackHtml=`<div class="cat-stack">${others.map(a=>`<div class="cat-stack-item" onclick="showArticle('${esc(a.id)}')">
+      <div class="cat-stack-tag"><span class="cat-dot" style="background:${cc}"></span>${esc(c)}</div>
+      <div class="cat-stack-title">${esc(a.title)}</div>
+      <div class="cat-stack-meta">${esc(a.readTime||'')}${a.publishedAt?' · '+fmtDate(a.publishedAt):''}</div>
+    </div>`).join('')}</div>`;
+
+    return `<div class="cat-section" data-cat="${esc(c)}">
+      <div class="cat-sh">
+        <div class="cat-sh-left"><span class="cat-dot" style="background:${cc}"></span><span class="cat-sh-name">${esc(c)}</span></div>
+        <span class="cat-sh-idx">${idxStr}</span>
+      </div>
+      <div class="cat-grid">${leadHtml}${stackHtml}</div>
+    </div>`;
   }).join('');
 
-  // Recent list — editorial numbered table-of-contents rows
-  document.getElementById('recentList').innerHTML='<div class="re-list">'+rest.slice(9,18).map((a,i)=>{
-    const cc=catColor(a.category);
-    const num=String(i+10).padStart(2,'0');
-    return `<div class="re-item" onclick="showArticle('${esc(a.id)}')">
-      <span class="re-num">${num}</span>
-      <span class="re-cat"><span class="cat-dot" style="background:${cc}"></span>${esc(a.category||'')}</span>
-      <div class="re-title">${esc(a.title)}</div>
-      <span class="re-meta">${esc(a.readTime||'')}</span>
-    </div>`;
-  }).join('')+'</div>';
-
+  // Topics sidebar + tag cloud (use all articles)
   const counts={};
   cache.forEach(a=>{ if(a.category) counts[a.category]=(counts[a.category]||0)+1; });
   const cats=Object.keys(counts);
