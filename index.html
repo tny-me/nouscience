@@ -85,7 +85,8 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
 .hero-divider{background:var(--line);width:1px;align-self:stretch}
 .hlabel{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:12px}
 .hlabel::before{content:'';display:block;width:28px;height:1.5px;background:var(--accent)}
-.htitle{font-family:'Fraunces',serif;font-size:clamp(28px,3.8vw,52px);font-weight:600;color:var(--ink);line-height:1.06;letter-spacing:-.025em;margin-bottom:20px}
+.htitle{font-family:'Fraunces',serif;font-size:clamp(28px,3.8vw,52px);font-weight:600;color:var(--ink);line-height:1.06;letter-spacing:-.025em;margin-bottom:20px;cursor:pointer;transition:color .2s}
+.htitle:hover{color:var(--accent)}
 .htitle em{color:var(--accent);font-style:italic;font-weight:500}
 .hexcerpt{font-size:17px;color:var(--ink);line-height:1.7;margin-bottom:28px;font-family:'Fraunces',serif;font-weight:300;opacity:.75}
 .rbtn{display:inline-flex;align-items:center;gap:8px;padding:0;background:none;border:none;border-bottom:1.5px solid var(--ink);color:var(--ink);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:color .25s,border-color .25s;padding-bottom:4px}
@@ -847,6 +848,7 @@ function buildHome(){
 
   const lead=filtered.find(a=>a.featured)||filtered[0];
   document.getElementById('hTitle').innerHTML=esc(lead.title);
+  document.getElementById('hTitle').onclick=()=>showArticle(lead.id);
   document.getElementById('hExcerpt').textContent=lead.subtitle||lead.abstract||'';
   document.getElementById('hReadBtn').onclick=()=>showArticle(lead.id);
   const hMedia=document.getElementById('hMedia');
