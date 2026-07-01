@@ -106,38 +106,71 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,
 .sh-idx{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:.05em}
 .sh::after{content:none}
 
-/* — EDITORIAL GRID: lead story + numbered index list, asymmetric,
-   separated by a hairline column rule (the recurring "grid showing
-   through" device). — */
+/* — MAGAZINE MOSAIC GRID: asymmetric 12-col CSS grid,
+   image-led cards vs. text-forward editorial cards,
+   hairline borders, no shadows, Fraunces + mono rhythm. — */
 .fs{padding:0 0 72px}
-.fg{display:grid;grid-template-columns:1.4fr 1px 1fr;gap:48px}
-.fg>*{min-width:0}
-.fg-rule{background:var(--line);width:1px}
-.fg-secondary{display:flex;flex-direction:column;gap:0}
-.card{display:flex;flex-direction:column;cursor:pointer}
-.card.card-lead{flex-direction:row;gap:36px}
-.card.card-lead .ci{flex:1.1;margin-bottom:0}
-.card.card-lead .card-body{flex:1;display:flex;flex-direction:column;justify-content:center}
-.card-row{display:grid;grid-template-columns:28px 96px 1fr;gap:20px;padding:24px 0;border-bottom:.5px solid var(--line-soft);cursor:pointer;align-items:start}
-.card-row>*{min-width:0}
-.card-row:first-child{padding-top:0}
-.card-row:last-child{border-bottom:none}
-.cr-idx{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);padding-top:4px}
-.card-row .ci{width:96px;aspect-ratio:1/1;margin-bottom:0}
-.card-row .card-body{min-width:0}
-.card-row:hover h3{color:var(--accent)}
-.ci{width:100%;background:var(--paper-dim);position:relative;overflow:hidden;margin-bottom:18px}
-.ci::after{content:'';position:absolute;inset:0;border:.5px solid var(--line)}
+/* legacy classes kept for any residual references */
+.fg-rule{display:none}
+.fg-secondary{display:none}
+.card-lead{display:none}
+.cr-idx{display:none}
 .ci-b{aspect-ratio:16/9}
-.ci:not(.ci-b){aspect-ratio:4/3}
 .cv{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:52px;font-weight:600;opacity:.18;color:var(--ink);font-style:italic}
-.ctag{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.card h3{font-family:'Fraunces',serif;font-weight:500;color:var(--ink);line-height:1.2;margin-bottom:10px;transition:color .2s;letter-spacing:-.015em}
-.card:hover h3{color:var(--accent)}
-.card-lead h3{font-size:34px;line-height:1.1}
-.card-row h3{font-size:16.5px}
-.card p{font-size:14.5px;color:var(--ink-soft);line-height:1.6;flex:1;font-family:'Fraunces',serif;font-weight:300}
-.cfoot{margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.03em;display:flex;gap:14px}
+.ctag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.cfoot{margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;display:flex;gap:14px}
+
+/* Mosaic grid container */
+.fg{display:grid;grid-template-columns:repeat(12,1fr);gap:0;border-top:.5px solid var(--line)}
+
+/* Generic mosaic card */
+.mc{cursor:pointer;padding:28px 28px 24px;border-right:.5px solid var(--line);border-bottom:.5px solid var(--line);transition:background .18s;display:flex;flex-direction:column;min-width:0}
+.mc:last-child{border-right:none}
+.mc:hover{background:var(--paper-dim)}
+.mc:hover .mc-title{color:var(--accent)}
+
+/* Column spans */
+.mc-8{grid-column:span 8}
+.mc-4{grid-column:span 4}
+.mc-6{grid-column:span 6}
+.mc-12{grid-column:span 12}
+
+/* Image-led card */
+.mc-img img{width:100%;height:auto;display:block;margin-bottom:20px;border-bottom:.5px solid var(--line)}
+.mc-title{font-family:'Fraunces',serif;font-weight:500;color:var(--ink);line-height:1.18;transition:color .2s;letter-spacing:-.018em;margin-bottom:10px}
+.mc-8 .mc-title{font-size:clamp(24px,2.8vw,36px)}
+.mc-4 .mc-title,.mc-6 .mc-title{font-size:clamp(18px,1.9vw,24px)}
+.mc-excerpt{font-family:'Fraunces',serif;font-weight:300;font-size:14.5px;color:var(--ink-soft);line-height:1.62;flex:1;margin-bottom:12px}
+
+/* Text-forward card — no image */
+.mc-text{border-left:2px solid var(--mc-accent,var(--accent))}
+.mc-text .mc-pullnum{font-family:'Fraunces',serif;font-size:clamp(36px,4vw,56px);font-weight:600;font-style:italic;color:var(--ink);opacity:.08;line-height:1;margin-bottom:8px;letter-spacing:-.04em;display:block}
+.mc-text .mc-title{font-size:clamp(17px,1.7vw,22px)}
+.mc-8.mc-text .mc-title{font-size:clamp(22px,2.4vw,32px)}
+
+/* Recent list — editorial numbered index */
+.re-list{display:flex;flex-direction:column;border-top:.5px solid var(--line)}
+.re-item{display:grid;grid-template-columns:40px auto 1fr auto;gap:0 20px;align-items:baseline;padding:18px 0;border-bottom:.5px solid var(--line-soft);cursor:pointer;transition:opacity .18s}
+.re-item:hover{opacity:.7}
+.re-item:hover .re-title{color:var(--accent)}
+.re-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:.06em;white-space:nowrap;align-self:center}
+.re-sep{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--line);letter-spacing:0;align-self:center}
+.re-cat{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;align-self:center;display:flex;align-items:center;gap:6px}
+.re-title{font-family:'Fraunces',serif;font-weight:500;font-size:17px;color:var(--ink);line-height:1.28;transition:color .2s;letter-spacing:-.01em}
+.re-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);white-space:nowrap;align-self:center;text-transform:uppercase;letter-spacing:.04em}
+
+@media(max-width:900px){
+  .fg{grid-template-columns:1fr 1fr}
+  .mc-8,.mc-4,.mc-6,.mc-12{grid-column:span 2}
+}
+@media(max-width:600px){
+  .fg{grid-template-columns:1fr}
+  .mc-8,.mc-4,.mc-6,.mc-12{grid-column:span 1}
+  .mc:last-child{border-right:none}
+  .re-item{grid-template-columns:32px 1fr;gap:0 12px}
+  .re-sep,.re-cat,.re-meta{display:none}
+  .re-title{grid-column:2}
+}
 
 /* — PULL QUOTE BAND: oversized display serif framed by hairline
    top/bottom rules and a short accent tick, no panel fill. — */
@@ -830,39 +863,54 @@ function buildHome(){
     `<div class="sa" onclick="showArticle('${esc(a.id)}')"><div class="sa-idx mono">${String(i+1).padStart(2,'0')}</div><div><div class="sa-tag"><span class="cat-dot" style="background:${catColor(a.category)}"></span>${esc(a.category||'')}</div><h4>${esc(a.title)}</h4><p>${esc(a.readTime||'')}</p></div></div>`
   ).join('');
 
-  // Editorial grid: one large lead story (left) + a thin-rule divided list
-  // of smaller secondary stories (right) — not a uniform card grid.
-  const gridLead=rest[0];
-  const gridSecondary=rest.slice(1,5);
-  document.getElementById('featuredGrid').innerHTML=(gridLead?
-    `<div class="card card-lead" onclick="showArticle('${esc(gridLead.id)}')">
-      <div class="ci ci-b" style="background:linear-gradient(135deg,${catColor(gridLead.category)}1a,var(--paper-dim))"><div class="cv">${symFor(gridLead.category)}</div></div>
-      <div class="card-body">
-        <div class="ctag"><span class="cat-dot" style="background:${catColor(gridLead.category)}"></span>${esc(gridLead.category||'')}</div>
-        <h3>${esc(gridLead.title)}</h3>
-        <p>${esc(gridLead.abstract||gridLead.subtitle||'')}</p>
-        <div class="cfoot"><span>${esc(gridLead.readTime||'')}</span></div>
-      </div>
-    </div>`:'')+
-    '<div class="fg-rule"></div>'+
-    '<div class="fg-secondary">'+gridSecondary.map((a,i)=>
-      `<div class="card card-row" onclick="showArticle('${esc(a.id)}')">
-        <div class="cr-idx mono">${String(i+2).padStart(2,'0')}</div>
-        <div class="ci" style="background:linear-gradient(135deg,${catColor(a.category)}1a,var(--paper-dim))"><div class="cv" style="font-size:22px">${symFor(a.category)}</div></div>
-        <div class="card-body">
-          <div class="ctag"><span class="cat-dot" style="background:${catColor(a.category)}"></span>${esc(a.category||'')}</div>
-          <h3>${esc(a.title)}</h3>
-          <div class="cfoot"><span>${esc(a.readTime||'')}</span></div>
-        </div>
-      </div>`
-    ).join('')+'</div>';
+  // Magazine mosaic grid — asymmetric 12-col layout:
+  // card 0 → 8 cols (large), card 1 → 4 cols,
+  // cards 2-4 → 4 cols each (three equal), cards 5+ → 6 cols pairs.
+  // Image-led cards show a real <img>; text-forward cards show a pull-number + left accent border.
+  const gridArticles=rest.slice(0,9);
+  function colSpan(i){
+    if(i===0) return 'mc-8';
+    if(i===1) return 'mc-4';
+    if(i>=2&&i<=4) return 'mc-4';
+    return 'mc-6';
+  }
+  document.getElementById('featuredGrid').innerHTML=gridArticles.map((a,i)=>{
+    const cc=catColor(a.category);
+    const span=colSpan(i);
+    const num=String(i+1).padStart(2,'0');
+    const excerpt=a.abstract||a.subtitle||'';
+    if(a.coverImage){
+      // Image-led card
+      return `<div class="mc ${span} mc-img" onclick="showArticle('${esc(a.id)}')" style="--mc-accent:${cc}">
+        <img src="${esc(a.coverImage)}" alt="${esc(a.title)}" loading="lazy"/>
+        <div class="ctag"><span class="cat-dot" style="background:${cc}"></span>${esc(a.category||'')}</div>
+        <div class="mc-title">${esc(a.title)}</div>
+        ${excerpt?`<div class="mc-excerpt">${esc(excerpt)}</div>`:''}
+        <div class="cfoot"><span>${esc(a.readTime||'')}</span>${a.publishedAt?`<span>${fmtDate(a.publishedAt)}</span>`:''}</div>
+      </div>`;
+    } else {
+      // Text-forward card — left accent border, pull-number, no image box
+      return `<div class="mc ${span} mc-text" onclick="showArticle('${esc(a.id)}')" style="--mc-accent:${cc}">
+        <span class="mc-pullnum">${num}</span>
+        <div class="ctag"><span class="cat-dot" style="background:${cc}"></span>${esc(a.category||'')}</div>
+        <div class="mc-title">${esc(a.title)}</div>
+        ${excerpt&&i<3?`<div class="mc-excerpt">${esc(excerpt)}</div>`:''}
+        <div class="cfoot"><span>${esc(a.readTime||'')}</span>${a.publishedAt?`<span>${fmtDate(a.publishedAt)}</span>`:''}</div>
+      </div>`;
+    }
+  }).join('');
 
-  document.getElementById('recentList').innerHTML=rest.slice(5,9).map((a,i)=>
-    `<div class="ai" onclick="showArticle('${esc(a.id)}')">
-      <div><div class="an mono">${String(i+1).padStart(2,'0')}</div><div class="atag"><span class="cat-dot" style="background:${catColor(a.category)}"></span>${esc(a.category||'')}</div><div class="at">${esc(a.title)}</div><div class="ae">${esc(a.abstract||a.subtitle||'')}</div><div class="am">${fmtDate(a.publishedAt)} · ${esc(a.readTime||'')}</div></div>
-      <div class="ath" style="background:linear-gradient(135deg,${catColor(a.category)}1a,var(--paper-dim));aspect-ratio:3/4"><div class="athi">${symFor(a.category)}</div></div>
-    </div>`
-  ).join('');
+  // Recent list — editorial numbered table-of-contents rows
+  document.getElementById('recentList').innerHTML='<div class="re-list">'+rest.slice(9,18).map((a,i)=>{
+    const cc=catColor(a.category);
+    const num=String(i+10).padStart(2,'0');
+    return `<div class="re-item" onclick="showArticle('${esc(a.id)}')">
+      <span class="re-num">${num}</span>
+      <span class="re-cat"><span class="cat-dot" style="background:${cc}"></span>${esc(a.category||'')}</span>
+      <div class="re-title">${esc(a.title)}</div>
+      <span class="re-meta">${esc(a.readTime||'')}</span>
+    </div>`;
+  }).join('')+'</div>';
 
   const counts={};
   cache.forEach(a=>{ if(a.category) counts[a.category]=(counts[a.category]||0)+1; });
